@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "author": "bismarck <zuoqingyu@nuaa.edu.cn>",
+  "scripts": {
+    "dev": "umi dev",
+    "build": "umi build",
+    "postinstall": "umi setup",
+    "setup": "umi setup",
+    "start": "npm run dev"
+  },
+  "dependencies": {
+    "@umijs/plugins": "^4.0.83",
+    "umi": "^4.0.83"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.33",
+    "@types/react-dom": "^18.0.11",
+    "typescript": "^5.0.3"
+  }
+}
