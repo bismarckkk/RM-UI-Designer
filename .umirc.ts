@@ -6,4 +6,6 @@ export default defineConfig({
     { path: "/docs", component: "docs" },
   ],
   npmClient: 'yarn',
+  plugins: ['@umijs/plugins/dist/antd'],
+  antd: {},
 });

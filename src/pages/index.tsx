@@ -7,7 +7,7 @@ export default function HomePage() {
       <p>
         <img src={yayJpg} width="388" />
       </p>
-      <p>
+      <p className="ds-font">
         To get started, edit <code>pages/index.tsx</code> and save to reload.
       </p>
     </div>
