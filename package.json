@@ -11,6 +11,7 @@
   "dependencies": {
     "@umijs/plugins": "^4.0.83",
     "antd": "^5.9.3",
+    "fabric": "^5.3.0",
     "react-konva": "^18.2.10",
     "umi": "^4.0.83"
   },

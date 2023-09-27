@@ -10,3 +10,36 @@
 .ds-font {
     font-family: ds-digitalnormal;
 }
+
+.container {
+    height: calc(100vh - 140px);
+    width: 100%;
+}
+
+.full {
+    height: 100%;
+    width: 100%;
+}
+
+.card-body {
+    height: calc((100vh - 256px) / 2);
+    overflow: auto;
+}
+
+.card-body::-webkit-scrollbar {
+    width: 0;
+}
+
+.card-body:hover::-webkit-scrollbar {
+    width: 4px;
+}
+
+.card-body::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.card-body::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.1);
+}

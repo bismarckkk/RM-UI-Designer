@@ -116,12 +116,12 @@ class Index extends Component {
                     </Header>
                     <Content className='site-layout' style={{ marginTop: 20 }}>
                         <div className='site-layout-background'
-                             style={{ padding: 24, paddingTop: 56, paddingBottom: 0, minHeight: 'calc(100vh - 84px)' }}>
-                            <Outlet />
+                             style={{ padding: 12, paddingTop: 56, paddingBottom: 0, minHeight: 'calc(100vh - 84px)' }}>
+                            <Outlet style={{height: '100%', width: '100%'}} />
                         </div>
                     </Content>
                     <Footer style={{ textAlign: 'center' }}>RM UI Designer ©2023 Created by
-                        <a href={'https://github.com/bismarckkk'}>Bismarckkk</a>
+                        <a href={'https://github.com/bismarckkk'}> Bismarckkk</a>
                     </Footer>
                 </Layout>
             </div>
