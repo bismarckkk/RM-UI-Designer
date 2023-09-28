@@ -3,135 +3,10 @@ import { Tree, Card, Col, Row, Empty, Dropdown, Modal } from "antd";
 import { EllipsisOutlined, CheckOutlined } from '@ant-design/icons'
 import { ProDescriptions } from '@ant-design/pro-components';
 import { fabric } from 'fabric'
-
-const columns = {
-    id: {
-        title: 'Id',
-        key: 'id',
-        dataIndex: 'id',
-        valueType: 'digit',
-        editable: false
-    },
-    name: {
-        title: 'Name',
-        key: 'name',
-        dataIndex: 'name'
-    },
-    group: {
-        title: 'Group',
-        key: 'group',
-        dataIndex: 'group'
-    },
-    kind: {
-        title: 'Kind',
-        key: 'kind',
-        dataIndex: 'kind',
-        editable: false
-    },
-    lineWidth: {
-        title: 'Line Width',
-        key: 'lineWidth',
-        dataIndex: 'lineWidth',
-        valueType: 'digit',
-    },
-    layer: {
-        title: 'Layer',
-        key: 'layer',
-        dataIndex: 'layer',
-        valueType: 'digit',
-    },
-    x: {
-        title: 'X',
-        key: 'x',
-        dataIndex: 'x',
-        valueType: 'digit',
-    },
-    y: {
-        title: 'Y',
-        key: 'y',
-        dataIndex: 'y',
-        valueType: 'digit',
-    },
-    width: {
-        title: 'Width',
-        key: 'width',
-        dataIndex: 'width',
-        valueType: 'digit',
-    },
-    height: {
-        title: 'Height',
-        key: 'height',
-        dataIndex: 'height',
-        valueType: 'digit',
-    },
-    rx: {
-        title: 'Rx',
-        key: 'rx',
-        dataIndex: 'rx',
-        valueType: 'digit',
-    },
-    ry: {
-        title: 'Ry',
-        key: 'ry',
-        dataIndex: 'ry',
-        valueType: 'digit',
-    },
-    r: {
-        title: 'R',
-        key: 'r',
-        dataIndex: 'r',
-        valueType: 'digit',
-    },
-    startAngle: {
-        title: 'Start Angle',
-        key: 'startAngle',
-        dataIndex: 'startAngle',
-        valueType: 'digit',
-    },
-    endAngle: {
-        title: 'End Angle',
-        key: 'endAngle',
-        dataIndex: 'endAngle',
-        valueType: 'digit',
-    },
-    fontSize: {
-        title: 'Font Size',
-        key: 'fontSize',
-        dataIndex: 'fontSize',
-        valueType: 'digit',
-    },
-    decimalPlaces: {
-        title: 'Decimal Places',
-        key: 'decimalPlaces',
-        dataIndex: 'decimalPlaces',
-        valueType: 'digit',
-    },
-    number: {
-        title: 'Number',
-        key: 'number',
-        dataIndex: 'number',
-        valueType: 'digit',
-    },
-    text: {
-        title: 'Text',
-        key: 'text',
-        dataIndex: 'text',
-    }
-}
-
-function getColumnsFromData(data) {
-    const keys = Object.keys(data)
-    let _columns = []
-    for(let i = 0; i < keys.length; i++) {
-        if (columns[keys[i]]) {
-            _columns.push(columns[keys[i]])
-        }
-    }
-    return _columns
-}
+import { getColumnsFromData } from "../utils/columns";
 
 class Render extends Component {
-    data = [{name: "23", layer: 0, group: 2}, {name: "234", layer: 1, group: 3}]
+    data = {0: {name: "23", layer: 0, group: 2}, 1: {name: "234", layer: 1, group: 3}}
     state = {
         treeData: [],
         properties: null,
@@ -153,8 +28,9 @@ class Render extends Component {
     updateTree() {
         const key = this.state.groupKey
         let treeData = [{title: "UI Window", key: 'window'}]
-        for (let i = 0; i < this.data.length; i++) {
-            const node = this.data[i]
+        const keys = Object.keys(this.data)
+        for (let i = 0; i < keys.length; i++) {
+            const node = this.data[keys[i]]
 
             let pos = -1
             for (let j = 0; j < treeData.length; j++) {
@@ -171,7 +47,7 @@ class Render extends Component {
             }
 
             treeData[pos].children.push({
-                title: node.name, key: `E-${i}`
+                title: node.name, key: `E-${keys[i]}`
             })
         }
 
@@ -283,6 +159,11 @@ class Render extends Component {
         }
     }
 
+    onElementMenuClick(e) {
+        this.setState({rightClickMenuOpen: false})
+        console.log(e)
+    }
+
     onMenuOpenChange(e) {
         if (e) {
             const that = this
@@ -295,6 +176,12 @@ class Render extends Component {
             }, 100)
         } else {
             this.setState({rightClickMenuOpen: false})
+        }
+    }
+
+    onElementMenuContainerClick(e) {
+        if (e.target.localName === 'div') {
+            this.setState({rightClickMenuOpen: false, properties: null, selectedId: -1, selectedKey: []})
         }
     }
 
@@ -341,28 +228,31 @@ class Render extends Component {
                                     </Dropdown>
                                 }
                             >
-                                <Dropdown
-                                    menu={{
-                                        items: [
-                                            {key: 'D2-copy', label: 'Copy'},
-                                            {key: 'D2-delete', label: 'Delete', danger: true}
-                                        ],
-                                        onClick: ()=>{}
-                                    }}
-                                    trigger={['contextMenu']}
-                                    open={this.state.rightClickMenuOpen}
-                                    onOpenChange={(e)=>{this.onMenuOpenChange(e)}}
+                                <div
+                                    className="card-body"
+                                    onMouseUp={(e)=>this.onElementMenuContainerClick(e)}
                                 >
-                                    <div className="full">
+                                    <Dropdown
+                                        menu={{
+                                            items: [
+                                                {key: 'D2-copy', label: 'Copy'},
+                                                {key: 'D2-delete', label: 'Delete', danger: true}
+                                            ],
+                                            onClick: (e)=>{this.onElementMenuClick(e)}
+                                        }}
+                                        trigger={['contextMenu']}
+                                        open={this.state.rightClickMenuOpen}
+                                        onOpenChange={(e)=>{this.onMenuOpenChange(e)}}
+                                    >
                                         <Tree
-                                            className="card-body"
+                                            className="full"
                                             treeData={this.state.treeData}
                                             onSelect={(e)=>this.onSelect(e)}
                                             selectedKeys={this.state.selectedKey}
                                             onRightClick={(e)=>this.onElementRightClick(e)}
                                         />
-                                    </div>
-                                </Dropdown>
+                                    </Dropdown>
+                                </div>
                             </Card>
                         </div>
                         <Card size="small" title="Properties" style={{height: "50%"}}>
@@ -386,11 +276,6 @@ class Render extends Component {
                         </Card>
                     </Col>
                     <Col flex="auto" ref={this.canvasRef}>
-                        {/*<div className="full" id="ui" style={{backgroundColor: "#FFF"}} >*/}
-                        {/*    <h1 className="ds-font" style={{padding: 40}}>*/}
-                        {/*        UI Panel*/}
-                        {/*    </h1>*/}
-                        {/*</div>*/}
                         <canvas className="full" id="ui" />
                     </Col>
                 </Row>
