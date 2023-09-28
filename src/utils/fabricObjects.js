@@ -60,7 +60,7 @@ export const Rect = fabric.util.createClass(fabric.Rect, {
             y: this.top * this.ratio,
             color: this._color,
             lineWidth: this.strokeWidth * this.ratio,
-            team: this.team
+            _team: this.team
         }
     },
     fromObject: function (options) {
@@ -69,7 +69,7 @@ export const Rect = fabric.util.createClass(fabric.Rect, {
         this.name = options.name
         this.layer = options.layer
         this.groupName = options.group
-        this.team = options.team
+        this.team = options._team
         this.set('width', options.width / this.ratio)
         this.set('height', options.height / this.ratio)
         this.set('left', options.x / this.ratio)
