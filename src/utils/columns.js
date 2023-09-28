@@ -1,3 +1,5 @@
+import Color from "../components/Color";
+
 export const columns = {
     id: {
         title: 'Id',
@@ -110,6 +112,33 @@ export const columns = {
         title: 'Text',
         key: 'text',
         dataIndex: 'text',
+    },
+    color: {
+        title: 'Color',
+        key: 'color',
+        dataIndex: 'color',
+        valueType: 'select',
+        valueEnum: {
+            main: <Color color="Main" />,
+            yellow: <Color color="Yellow" />,
+            green: <Color color="Green" />,
+            orange: <Color color="Orange" />,
+            purple: <Color color="Purple" />,
+            pink: <Color color="Pink" />,
+            cyan: <Color color="Cyan" />,
+            black: <Color color="Black" />,
+            white: <Color color="White" />,
+        },
+    },
+    team: {
+        title: 'Team',
+        key: 'team',
+        dataIndex: 'team',
+        valueType: 'select',
+        valueEnum: {
+            red: <Color color="Red" />,
+            blue: <Color color="Blue" />,
+        },
     }
 }
 

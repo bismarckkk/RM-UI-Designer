@@ -1,10 +1,13 @@
 import React, {Component, createRef} from 'react';
-import { Tree, Card, Col, Row, Empty, Dropdown, Modal } from "antd";
-import { EllipsisOutlined, CheckOutlined } from '@ant-design/icons'
+import { Tree, Card, Col, Row, Empty, Dropdown, Modal, Upload, Divider } from "antd";
+import { EllipsisOutlined, CheckOutlined, InboxOutlined } from '@ant-design/icons'
 import { ProDescriptions } from '@ant-design/pro-components';
 import { fabric } from 'fabric'
 import { getColumnsFromData } from "../utils/columns";
+import { saveObj } from "../utils/utils";
 import { Rect } from "../utils/fabricObjects";
+
+const { Dragger } = Upload;
 
 class Render extends Component {
     data = {}
@@ -18,10 +21,12 @@ class Render extends Component {
         uiWindow: {
             height: 1080,
             width: 1920,
-            ratio: 1
+            ratio: 1,
+            team: 'red'
         },
         rightClickMenuOpen: false,
-        modalShow: false
+        infoModalShow: false,
+        uploadModalShow: false
     }
     editable = false;
     canvas = null
@@ -78,6 +83,8 @@ class Render extends Component {
         }
         if (nodes[0] === 'window') {
             this.setState({properties: this.state.uiWindow, selectedId: -1, selectedKey: nodes})
+            this.canvas.discardActiveObject()
+            this.canvas.renderAll()
             return
         }
         const node = this.getNodeFromId(nodes[0])
@@ -87,6 +94,8 @@ class Render extends Component {
     select(id) {
         if (id === -1) {
             this.setState({properties: null, selectedId: -1, selectedKey: []})
+            this.canvas.discardActiveObject()
+            this.canvas.renderAll()
         } else {
             this.setState({properties: this.data[id], selectedId: id, selectedKey: [`E-${id}`]})
             this.canvas.setActiveObject(this.objects[id])
@@ -105,7 +114,8 @@ class Render extends Component {
                     name: 'New Rect',
                     layer: 0,
                     groupName: 'Ungroup',
-                    ratio: this.state.uiWindow.ratio
+                    ratio: this.state.uiWindow.ratio,
+                    team: this.state.uiWindow.team
                 })
                 this.objects[nid] = _rect
                 this.canvas.add(_rect)
@@ -114,6 +124,19 @@ class Render extends Component {
             this.updateTree()
         } else if (first === 'D1-group') {
             this.setState({groupKey: key.key.slice(9)}, ()=>this.updateTree())
+        } else if (first === 'D1-reset') {
+            this.canvas.clear()
+            this.canvas.backgroundColor = '#fff'
+            this.objects = {}
+            this.data = {}
+            this.select(-1)
+            this.updateTree()
+            this.resetCanvasSize()
+        } else if (first === 'D1-save') {
+            this.objectsToData()
+            saveObj(this.data, 'ui.rmui')
+        } else if (first === 'D1-open') {
+            this.setState({uploadModalShow: true})
         }
     }
 
@@ -136,15 +159,15 @@ class Render extends Component {
         }
         this.canvas.renderAll()
         this.objectsToData()
-        this.setState({modalShow: false})
+        this.setState({infoModalShow: false})
     }
 
     onReSize() {
-        if (!this.state.modalShow) {
+        if (!this.state.infoModalShow) {
             this.canvas.setHeight(10)
             this.canvas.setWidth(10)
             this.canvas.renderAll()
-            this.setState({modalShow: true}, () => {
+            this.setState({infoModalShow: true}, () => {
                 Modal.info({
                     title: "Reset UI Window Size",
                     content: "Must reset UI window size after resize browser window.",
@@ -157,6 +180,13 @@ class Render extends Component {
 
     onPropertiesChange(key, info) {
         if (this.state.selectedKey[0] === 'window') {
+            if (info.team !== this.state.uiWindow.team) {
+                for (const key of Object.keys(this.objects)) {
+                    this.objects[key].setTeam(info.team)
+                }
+                this.canvas.renderAll()
+                this.objectsToData()
+            }
             this.setState({uiWindow: info, properties: info}, ()=> {
                 this.resetCanvasSize()
             })
@@ -186,7 +216,6 @@ class Render extends Component {
                 that.canvas.renderAll()
                 that.objectsToData()
                 const active = that.canvas.getActiveObject()
-                console.log(active)
                 if (active) {
                     that.select(active.id)
                 } else {
@@ -209,6 +238,36 @@ class Render extends Component {
         }
     }
 
+    updateObject(obj) {
+        if (this.objects[obj.id]) {
+            this.objects[obj.id].fromObject(obj)
+        } else if (obj.type === 'UiRect') {
+            let _rect = new Rect({
+                id: obj.id,
+                name: obj.name,
+                layer: obj.layer,
+                groupName: obj.group,
+                ratio: this.state.uiWindow.ratio,
+            })
+            this.objects[obj.id] = _rect
+            _rect.fromObject(obj)
+            this.canvas.add(_rect)
+        }
+        this.objectsToData()
+        this.updateTree()
+    }
+
+    removeObject(id) {
+        if (this.objects[id]) {
+            this.select(-1)
+            this.canvas.remove(this.objects[id])
+            this.canvas.renderAll()
+            delete this.objects[id]
+            this.objectsToData()
+            this.updateTree()
+        }
+    }
+
     onElementRightClick(e) {
         if (e.node.key[0] === 'E') {
             this.select(e.node.key.slice(2))
@@ -219,7 +278,13 @@ class Render extends Component {
 
     onElementMenuClick(e) {
         this.setState({rightClickMenuOpen: false})
-        console.log(e)
+        if (e.key === 'D2-copy') {
+            const obj = {...this.data[this.state.selectedId]}
+            obj.id = this.getNewDataId()
+            this.updateObject(obj)
+        } else if (e.key === 'D2-delete') {
+            this.removeObject(this.state.selectedId)
+        }
     }
 
     onMenuOpenChange(e) {
@@ -243,6 +308,24 @@ class Render extends Component {
         }
     }
 
+    onUploadModalCancel() {
+        this.setState({uploadModalShow: false})
+    }
+
+    onUploadFile(file) {
+        const reader = new FileReader()
+        reader.onload = e => {
+            let str = e.target.result
+            const data = JSON.parse(str)
+            this.setState({uploadModalShow: false})
+            for (const key of Object.keys(data)) {
+                this.updateObject(data[key])
+            }
+        }
+        reader.readAsText(file)
+        return true
+    }
+
     render() {
         let groupPos = 0
         const items = [
@@ -253,6 +336,10 @@ class Render extends Component {
                     {key: 'D1-group-layer', label: 'layer'},
                     {key: 'D1-group-group', label: 'group'}
                 ]
+            },
+            {
+                key: 'D1-reset',
+                label: "Reset Designer",
             }
         ];
         if (this.props.editable) {
@@ -263,6 +350,17 @@ class Render extends Component {
                     {key: 'D1-add-rect', label: 'Rect'}
                 ]
             })
+            items.push(
+                {type: 'divider'},
+                {
+                    key: 'D1-open',
+                    label: "Open .rmui"
+                },
+                {
+                    key: 'D1-save',
+                    label: "Save as .rmui"
+                }
+            )
             groupPos++;
         }
         for (let i = 0; i < items[groupPos].children.length; i++) {
@@ -338,6 +436,27 @@ class Render extends Component {
                         <canvas className="full" id="ui" />
                     </Col>
                 </Row>
+                <Modal
+                    title="Upload Your .rmui File"
+                    open={this.state.uploadModalShow}
+                    onCancel={()=>this.onUploadModalCancel()}
+                    footer={null}
+                    destroyOnClose={true}
+                >
+                    <Divider />
+                    <Dragger
+                        showUploadList={false}
+                        beforeUpload={e=>this.onUploadFile(e)}
+                        accept=".rmui"
+                    >
+                        <p className="ant-upload-drag-icon">
+                            <InboxOutlined />
+                        </p>
+                        <p className="ant-upload-text">
+                            Click or drag file to this area to upload
+                        </p>
+                    </Dragger>
+                </Modal>
             </div>
         );
     }
