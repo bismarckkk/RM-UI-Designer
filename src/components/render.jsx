@@ -305,6 +305,7 @@ class Render extends Component {
     onElementMenuContainerClick(e) {
         if (e.target.localName === 'div') {
             this.setState({rightClickMenuOpen: false, properties: null, selectedId: -1, selectedKey: []})
+            this.select(-1)
         }
     }
 
