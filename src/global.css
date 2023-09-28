@@ -22,7 +22,7 @@
 }
 
 .card-body {
-    height: calc((100vh - 256px) / 2);
+    height: calc((100vh - 280px) / 2);
     overflow: auto;
 }
 

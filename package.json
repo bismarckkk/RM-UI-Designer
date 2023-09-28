@@ -9,6 +9,7 @@
     "start": "npm run dev"
   },
   "dependencies": {
+    "@ant-design/pro-components": "^2.6.28",
     "@umijs/plugins": "^4.0.83",
     "antd": "^5.9.3",
     "fabric": "^5.3.0",

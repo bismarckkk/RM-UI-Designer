@@ -8,7 +8,7 @@ class Index extends Component {
                 {/*<p className="ds-font">*/}
                 {/*    Designer*/}
                 {/*</p>*/}
-                <Render className="full" />
+                <Render className="full" editable={true} />
             </div>
         );
     }

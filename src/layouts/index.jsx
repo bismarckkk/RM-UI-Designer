@@ -7,26 +7,24 @@ const { Header, Content, Footer } = Layout;
 
 class Index extends Component {
     state = { fullscreen: false, path: '/' };
-    modal = false;
+    modal = null;
 
     componentDidMount() {
         const that = this;
         let lastWidth = 0;
 
         function resizeHandle(width) {
-            if (!that.modal && width < 576 && width !== lastWidth) {
-                that.modal = true;
+            if (!that.modal && width < 650 && width !== lastWidth) {
                 lastWidth = width;
-                Modal.warning({
-                    title: '显示窗口过窄',
-                    content: '部分内容可能无法完美显示，请调整窗口大小或者将手机转为横屏',
-                    onOk: () => {
-                        that.modal = false;
-                    },
+                that.modal = Modal.warning({
+                    title: 'Display Aera too Small',
+                    content: 'Cannot show all contents on this window. Please resize this window or rotate your phone.',
+                    footer: null
                 });
             }
-            if (that.modal && width >= 576) {
-                Modal.destroyAll();
+            if (that.modal && width >= 650) {
+                that.modal.destroy()
+                that.modal = null
             }
         }
 
@@ -88,12 +86,12 @@ class Index extends Component {
                 <Layout>
                     <Header style={{ position: 'fixed', zIndex: 1, width: '100%', background: '#fff', paddingRight: 10 }}>
                         <Row>
-                            <Col lg={4} md={5} sm={7} xs={14}>
+                            <Col lg={5} md={6} sm={7} xs={14}>
                                 <div>
                                     <h3>RoboMaster UI Designer</h3>
                                 </div>
                             </Col>
-                            <Col lg={17} md={16} sm={13} xs={3}>
+                            <Col lg={16} md={15} sm={13} xs={3}>
                                 <Menu theme='light' mode='horizontal' selectedKeys={[this.state.path]}>
                                     <Menu.Item key='/'>
                                         <Link to='/' onClick={()=>this.onChange('/')}>Designer</Link>
