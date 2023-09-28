@@ -6,7 +6,7 @@ import { Link, Outlet } from 'umi'
 const { Header, Content, Footer } = Layout;
 
 class Index extends Component {
-    state = { fullscreen: false, path: '/' };
+    state = { fullscreen: false, path: `/${window.location.hash.slice(2)}` };
     modal = null;
 
     componentDidMount() {
