@@ -1,6 +1,6 @@
 import React, {Component, createRef} from 'react';
 import { Tree, Card, Col, Row, Empty, Dropdown, Modal } from "antd";
-import { EllipsisOutlined, CheckOutlined, ExclamationCircleFilled } from '@ant-design/icons'
+import { EllipsisOutlined, CheckOutlined } from '@ant-design/icons'
 import { ProDescriptions } from '@ant-design/pro-components';
 import { fabric } from 'fabric'
 
@@ -143,6 +143,7 @@ class Render extends Component {
             width: 1920,
             ratio: 1
         },
+        rightClickMenuOpen: false,
         modalShow: false
     }
     editable = false;
@@ -230,7 +231,6 @@ class Render extends Component {
             width = height * uiWindow.width / uiWindow.height
             uiWindow.ratio = uiWindow.height / height
         }
-        console.log(width, height)
         this.setState({ uiWindow })
         this.canvas.setHeight(height)
         this.canvas.setWidth(width)
@@ -273,6 +273,29 @@ class Render extends Component {
         window.addEventListener('resize', () => {
             this.onReSize();
         }, false);
+    }
+
+    onElementRightClick(e) {
+        if (e.node.key[0] === 'E') {
+            this.select(e.node.key.slice(2))
+        } else {
+            this.select(-1)
+        }
+    }
+
+    onMenuOpenChange(e) {
+        if (e) {
+            const that = this
+            setTimeout(()=>{
+                if (that.state.selectedId !== -1) {
+                    that.setState({rightClickMenuOpen: true})
+                } else {
+                    that.setState({rightClickMenuOpen: false})
+                }
+            }, 100)
+        } else {
+            this.setState({rightClickMenuOpen: false})
+        }
     }
 
     render() {
@@ -318,12 +341,28 @@ class Render extends Component {
                                     </Dropdown>
                                 }
                             >
-                                <Tree
-                                    className="card-body"
-                                    treeData={this.state.treeData}
-                                    onSelect={(e)=>this.onSelect(e)}
-                                    selectedKeys={this.state.selectedKey}
-                                />
+                                <Dropdown
+                                    menu={{
+                                        items: [
+                                            {key: 'D2-copy', label: 'Copy'},
+                                            {key: 'D2-delete', label: 'Delete', danger: true}
+                                        ],
+                                        onClick: ()=>{}
+                                    }}
+                                    trigger={['contextMenu']}
+                                    open={this.state.rightClickMenuOpen}
+                                    onOpenChange={(e)=>{this.onMenuOpenChange(e)}}
+                                >
+                                    <div className="full">
+                                        <Tree
+                                            className="card-body"
+                                            treeData={this.state.treeData}
+                                            onSelect={(e)=>this.onSelect(e)}
+                                            selectedKeys={this.state.selectedKey}
+                                            onRightClick={(e)=>this.onElementRightClick(e)}
+                                        />
+                                    </div>
+                                </Dropdown>
                             </Card>
                         </div>
                         <Card size="small" title="Properties" style={{height: "50%"}}>
