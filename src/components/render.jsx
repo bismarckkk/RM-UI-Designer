@@ -4,9 +4,11 @@ import { EllipsisOutlined, CheckOutlined } from '@ant-design/icons'
 import { ProDescriptions } from '@ant-design/pro-components';
 import { fabric } from 'fabric'
 import { getColumnsFromData } from "../utils/columns";
+import { Rect } from "../utils/fabricObjects";
 
 class Render extends Component {
-    data = {0: {name: "23", layer: 0, group: 2}, 1: {name: "234", layer: 1, group: 3}}
+    data = {}
+    objects = {}
     state = {
         treeData: [],
         properties: null,
@@ -25,16 +27,23 @@ class Render extends Component {
     canvas = null
     canvasRef = createRef()
 
+    getNewDataId() {
+        if (Object.keys(this.data).length === 0) {
+            return 0
+        }
+        return Math.max(...Object.keys(this.data)) + 1
+    }
+
     updateTree() {
         const key = this.state.groupKey
-        let treeData = [{title: "UI Window", key: 'window'}]
+        let treeData = []
         const keys = Object.keys(this.data)
         for (let i = 0; i < keys.length; i++) {
             const node = this.data[keys[i]]
 
             let pos = -1
             for (let j = 0; j < treeData.length; j++) {
-                if (treeData.key === `${key}-${node[key]}`) {
+                if (treeData[j].key === `${key}-${node[key]}`) {
                     pos = j
                     break
                 }
@@ -51,6 +60,8 @@ class Render extends Component {
             })
         }
 
+        treeData = treeData.sort((a, b) => a.key.toString().localeCompare(b.key.toString()))
+        treeData.unshift({title: "UI Window", key: 'window'})
         this.setState({treeData})
     }
 
@@ -63,7 +74,6 @@ class Render extends Component {
 
     onSelect(nodes) {
         if (nodes.length === 0) {
-            this.setState({properties: null})
             return
         }
         if (nodes[0] === 'window') {
@@ -71,11 +81,7 @@ class Render extends Component {
             return
         }
         const node = this.getNodeFromId(nodes[0])
-        if (node === -1) {
-            this.setState({properties: null, selectedId: -1, selectedKey: nodes})
-        } else {
-            this.setState({properties: this.data[node], selectedId: node, selectedKey: [nodes[0]]})
-        }
+        this.select(node)
     }
 
     select(id) {
@@ -83,16 +89,31 @@ class Render extends Component {
             this.setState({properties: null, selectedId: -1, selectedKey: []})
         } else {
             this.setState({properties: this.data[id], selectedId: id, selectedKey: [`E-${id}`]})
+            this.canvas.setActiveObject(this.objects[id])
+            this.canvas.renderAll()
         }
     }
 
     elementsMenuOnClick(key) {
         const first = key.keyPath[key.keyPath.length - 1]
         if (first === 'D1-add') {
-
+            const type = key.key.slice(7)
+            const nid = this.getNewDataId()
+            if (type === 'rect') {
+                let _rect = new Rect({
+                    id: nid,
+                    name: 'New Rect',
+                    layer: 0,
+                    groupName: 'Ungroup',
+                    ratio: this.state.uiWindow.ratio
+                })
+                this.objects[nid] = _rect
+                this.canvas.add(_rect)
+            }
+            this.objectsToData()
+            this.updateTree()
         } else if (first === 'D1-group') {
             this.setState({groupKey: key.key.slice(9)}, ()=>this.updateTree())
-
         }
     }
 
@@ -110,7 +131,11 @@ class Render extends Component {
         this.setState({ uiWindow })
         this.canvas.setHeight(height)
         this.canvas.setWidth(width)
+        for (const key of Object.keys(this.objects)) {
+            this.objects[key].setRatio(uiWindow.ratio)
+        }
         this.canvas.renderAll()
+        this.objectsToData()
         this.setState({modalShow: false})
     }
 
@@ -135,12 +160,16 @@ class Render extends Component {
             this.setState({uiWindow: info, properties: info}, ()=> {
                 this.resetCanvasSize()
             })
-        } else {
-
+        } else if (this.state.selectedId !== -1) {
+            this.objects[this.state.selectedId].fromObject(info)
+            this.canvas.renderAll()
+            this.objectsToData()
+            this.updateTree()
         }
     }
 
     componentDidMount() {
+        const that = this
         this.canvas = new fabric.Canvas('ui')
         this.canvas.backgroundColor = '#fff'
         this.resetCanvasSize()
@@ -149,6 +178,35 @@ class Render extends Component {
         window.addEventListener('resize', () => {
             this.onReSize();
         }, false);
+        this.canvas.on({
+            "mouse:up": () => {
+                for (const key of Object.keys(that.objects)) {
+                    that.objects[key].resizeScale()
+                }
+                that.canvas.renderAll()
+                that.objectsToData()
+                const active = that.canvas.getActiveObject()
+                console.log(active)
+                if (active) {
+                    that.select(active.id)
+                } else {
+                    that.select(-1)
+                }
+            }
+        })
+    }
+
+    objectsToData() {
+        this.data = {}
+        for (const key of Object.keys(this.objects)) {
+            const info = this.objects[key].toObject()
+            this.data[info.id] = info
+        }
+        if (this.state.selectedId !== -1) {
+            this.setState({
+                properties: this.data[this.state.selectedId]
+            })
+        }
     }
 
     onElementRightClick(e) {
@@ -202,7 +260,7 @@ class Render extends Component {
                 key: 'D1-add',
                 label: "Add Element",
                 children: [
-                    {key: 'D1-add-rect', label: 'rect'}
+                    {key: 'D1-add-rect', label: 'Rect'}
                 ]
             })
             groupPos++;
@@ -250,6 +308,7 @@ class Render extends Component {
                                             onSelect={(e)=>this.onSelect(e)}
                                             selectedKeys={this.state.selectedKey}
                                             onRightClick={(e)=>this.onElementRightClick(e)}
+                                            defaultExpandParent={true}
                                         />
                                     </Dropdown>
                                 </div>
