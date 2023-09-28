@@ -96,7 +96,7 @@ class Index extends Component {
                                     <Menu.Item key='/'>
                                         <Link to='/' onClick={()=>this.onChange('/')}>Designer</Link>
                                     </Menu.Item>
-                                    <Menu.Item key='/sim' disabled={false}>
+                                    <Menu.Item key='/sim' disabled={true}>
                                         <Link to='/sim' onClick={()=>this.onChange('/sim')}>Simulator</Link>
                                     </Menu.Item>
                                 </Menu>
