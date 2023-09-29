@@ -39,7 +39,6 @@ export const Rect = fabric.util.createClass(fabric.Rect, {
         this.moveTo(options.layer)
         this.setControlVisible('mtr', false)
         this.transparentCorners = false
-        console.log(options)
     },
     resizeScale: function() {
         this.set('width', this.width * this.scaleX)
@@ -75,7 +74,6 @@ export const Rect = fabric.util.createClass(fabric.Rect, {
         this.set('left', options.x / this.ratio)
         this.set('top', options.y / this.ratio)
         this.set('strokeWidth', options.lineWidth / this.ratio)
-        console.log(options)
         if (this._color === 'main') {
             this.set('stroke', ColorMap[this.team])
         } else {

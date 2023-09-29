@@ -208,6 +208,32 @@ class Render extends Component {
         window.addEventListener('resize', () => {
             this.onReSize();
         }, false);
+        window.addEventListener('copy', e => {
+            e.preventDefault()
+            let info = null
+            if (e.target.localName === 'input') {
+                info = e.target.ariaValueNow
+            } else if (that.state.selectedId !== -1) {
+                info = JSON.stringify(that.data[that.state.selectedId])
+            }
+            e.clipboardData.setData('text', info)
+        })
+        window.addEventListener("paste", e => {
+            e.preventDefault()
+            if (e.target.localName === 'input') {
+                e.target.value = e.clipboardData.getData('text')
+            } else {
+                try {
+                    let str = e.clipboardData.getData('text')
+                    let obj = JSON.parse(str)
+                    obj.id = that.getNewDataId()
+                    that.updateObject(obj)
+                    that.select(obj.id)
+                } catch (e) {
+
+                }
+            }
+        })
         this.canvas.on({
             "mouse:up": () => {
                 for (const key of Object.keys(that.objects)) {
