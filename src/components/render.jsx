@@ -6,7 +6,7 @@ import Generator from './generator'
 import { fabric } from 'fabric'
 import { getColumnsFromData } from "../utils/columns";
 import { saveObj, createObjUrl } from "../utils/utils";
-import { Rect } from "../utils/fabricObjects";
+import { createUiElement, getMenuProps } from "../utils/fabricObjects";
 
 const { Dragger } = Upload;
 
@@ -113,18 +113,19 @@ class Render extends Component {
         if (first === 'D1-add') {
             const type = key.key.slice(7)
             const nid = this.getNewDataId()
-            if (type === 'rect') {
-                let _rect = new Rect({
-                    id: nid,
-                    name: 'New Rect',
-                    layer: 0,
-                    groupName: 'Ungroup',
-                    ratio: this.state.uiWindow.ratio,
-                    team: this.state.uiWindow.team
-                })
-                this.objects[nid] = _rect
-                this.canvas.add(_rect)
+            const options = {
+                id: nid,
+                name: 'New Rect',
+                layer: 0,
+                groupName: 'Ungroup',
+                ratio: this.state.uiWindow.ratio,
+                team: this.state.uiWindow.team,
+                type: `Ui${type}`
             }
+            let element = createUiElement(options)
+            this.objects[nid] = element
+            this.canvas.add(element)
+
             this.objectsToData()
             this.updateTree()
         } else if (first === 'D1-group') {
@@ -333,18 +334,21 @@ class Render extends Component {
     updateObject(obj) {
         if (this.objects[obj.id]) {
             this.objects[obj.id].fromObject(obj)
-        } else if (obj.type === 'UiRect') {
-            let _rect = new Rect({
+        } else {
+            let options = {
                 id: obj.id,
                 name: obj.name,
                 layer: obj.layer,
                 groupName: obj.group,
+                type: obj.type,
                 ratio: this.state.uiWindow.ratio,
-            })
-            this.objects[obj.id] = _rect
-            _rect.fromObject(obj)
-            _rect.setRatio(this.state.uiWindow.ratio)
-            this.canvas.add(_rect)
+                team: this.state.uiWindow.team,
+            }
+            let element = createUiElement(options)
+            this.objects[obj.id] = element
+            element.fromObject(obj)
+            element.setRatio(this.state.uiWindow.ratio)
+            this.canvas.add(element)
         }
         this.objectsToData()
         this.updateTree()
@@ -452,9 +456,7 @@ class Render extends Component {
             items.unshift({
                 key: 'D1-add',
                 label: "Add Element",
-                children: [
-                    {key: 'D1-add-rect', label: 'Rect'}
-                ]
+                children: getMenuProps()
             })
             items.push(
                 {type: 'divider'},

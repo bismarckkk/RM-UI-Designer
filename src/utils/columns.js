@@ -48,6 +48,18 @@ export const columns = {
         dataIndex: 'y',
         valueType: 'digit',
     },
+    x2: {
+        title: 'X2',
+        key: 'x2',
+        dataIndex: 'x2',
+        valueType: 'digit',
+    },
+    y2: {
+        title: 'Y2',
+        key: 'y2',
+        dataIndex: 'y2',
+        valueType: 'digit',
+    },
     width: {
         title: 'Width',
         key: 'width',
