@@ -23,7 +23,8 @@ class Render extends Component {
             height: 1080,
             width: 1920,
             ratio: 1,
-            team: 'red'
+            team: 'red',
+            backgroundImage: true
         },
         rightClickMenuOpen: false,
         infoModalShow: false,
@@ -33,6 +34,7 @@ class Render extends Component {
     canvas = null
     canvasRef = createRef()
     generatorRef = createRef()
+    background = null
 
     getNewDataId() {
         if (Object.keys(this.data).length === 0) {
@@ -141,6 +143,9 @@ class Render extends Component {
     reset() {
         this.canvas.clear()
         this.canvas.backgroundColor = '#fff'
+        if (this.state.uiWindow.backgroundImage) {
+            this.canvas.setBackgroundImage(this.background)
+        }
         this.objects = {}
         this.data = {}
         this.select(-1)
@@ -166,6 +171,7 @@ class Render extends Component {
         for (const key of Object.keys(this.objects)) {
             this.objects[key].setRatio(uiWindow.ratio)
         }
+        this.background?.set({scaleX: 1 / uiWindow.ratio, scaleY: 1 / uiWindow.ratio})
         this.canvas.renderAll()
         this.objectsToData()
         this.setState({infoModalShow: false})
@@ -199,6 +205,23 @@ class Render extends Component {
             this.setState({uiWindow: info, properties: info}, ()=> {
                 this.resetCanvasSize()
             })
+            if (info.backgroundImage !== this.state.uiWindow.backgroundImage) {
+                if (info.backgroundImage) {
+                    const ratio = this.state.uiWindow.ratio
+                    this.background?.set({scaleX: 1 / ratio, scaleY: 1 / ratio})
+                    this.canvas.setBackgroundImage(this.background)
+                    this.canvas.renderAll()
+                } else {
+                    this.canvas.setBackgroundImage(null)
+                    this.canvas.renderAll()
+                }
+            }
+            if (info.width !== this.state.uiWindow.width || info.height !== this.state.uiWindow.height) {
+                Modal.warning({
+                    title: 'Warning',
+                    content: 'Modify UI window width and height may cause unknown error.'
+                })
+            }
         } else if (this.state.selectedId !== -1) {
             this.objects[this.state.selectedId].fromObject(info)
             this.canvas.renderAll()
@@ -210,7 +233,17 @@ class Render extends Component {
     componentDidMount() {
         const that = this
         this.canvas = new fabric.Canvas('ui')
+        fabric.Image.fromURL(require("../../public/background.png"), (image, _) => {
+            that.background = image
+            const ratio = that.state.uiWindow.ratio
+            that.background?.set({scaleX: 1 / ratio, scaleY: 1 / ratio})
+            if (that.state.uiWindow.backgroundImage) {
+                that.canvas.setBackgroundImage(that.background)
+                that.canvas.renderAll()
+            }
+        })
         this.canvas.backgroundColor = '#fff'
+
         this.updateTree()
         window.addEventListener('resize', () => {
             this.onReSize();

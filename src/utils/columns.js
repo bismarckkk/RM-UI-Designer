@@ -139,6 +139,12 @@ export const columns = {
             red: <Color color="Red" />,
             blue: <Color color="Blue" />,
         },
+    },
+    backgroundImage: {
+        title: 'Background Image',
+        key: 'backgroundImage',
+        dataIndex: 'backgroundImage',
+        valueType: 'switch'
     }
 }
 
