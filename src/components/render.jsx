@@ -92,7 +92,7 @@ class Render extends Component {
     }
 
     select(id) {
-        if (id === -1) {
+        if (typeof id === 'undefined' || id === -1) {
             this.setState({properties: null, selectedId: -1, selectedKey: []})
             this.canvas.discardActiveObject()
             this.canvas.renderAll()
@@ -223,6 +223,7 @@ class Render extends Component {
                 }
             }
         })
+        this.canvas.selection = false
     }
 
     objectsToData() {
