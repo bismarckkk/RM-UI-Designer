@@ -1,7 +1,8 @@
 import React, {Component, createRef} from 'react';
 import { Tree, Card, Col, Row, Empty, Dropdown, Modal, Upload, Divider } from "antd";
-import { EllipsisOutlined, CheckOutlined, InboxOutlined } from '@ant-design/icons'
+import { EllipsisOutlined, CheckOutlined, InboxOutlined, ThunderboltOutlined } from '@ant-design/icons'
 import { ProDescriptions } from '@ant-design/pro-components';
+import Generator from './generator'
 import { fabric } from 'fabric'
 import { getColumnsFromData } from "../utils/columns";
 import { saveObj } from "../utils/utils";
@@ -31,6 +32,7 @@ class Render extends Component {
     editable = false;
     canvas = null
     canvasRef = createRef()
+    generatorRef = createRef()
 
     getNewDataId() {
         if (Object.keys(this.data).length === 0) {
@@ -131,6 +133,8 @@ class Render extends Component {
             saveObj(this.data, 'ui.rmui')
         } else if (first === 'D1-open') {
             this.setState({uploadModalShow: true})
+        } else if (first === "D1-generate") {
+            this.generatorRef.current.gen(this.data)
         }
     }
 
@@ -414,7 +418,13 @@ class Render extends Component {
                 {
                     key: 'D1-save',
                     label: "Save as .rmui"
-                }
+                },
+                {type: 'divider'},
+                {
+                    key: 'D1-generate',
+                    label: "Generate Code",
+                    icon: <ThunderboltOutlined />
+                },
             )
             groupPos++;
         }
@@ -512,6 +522,7 @@ class Render extends Component {
                         </p>
                     </Dragger>
                 </Modal>
+                <Generator ref={this.generatorRef} />
             </div>
         );
     }
