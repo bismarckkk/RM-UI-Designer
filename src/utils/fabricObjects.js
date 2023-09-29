@@ -41,8 +41,10 @@ export const Rect = fabric.util.createClass(fabric.Rect, {
         this.transparentCorners = false
     },
     resizeScale: function() {
-        this.set('width', this.width * this.scaleX)
-        this.set('height', this.height * this.scaleY)
+        this.set('width', Math.round(this.width * this.scaleX * this.ratio) / this.ratio)
+        this.set('height', Math.round(this.height * this.scaleY * this.ratio) / this.ratio)
+        this.set('left', Math.round(this.left * this.ratio) / this.ratio)
+        this.set('top', Math.round(this.top * this.ratio) / this.ratio)
         this.set('scaleX', 1)
         this.set('scaleY', 1)
     },
