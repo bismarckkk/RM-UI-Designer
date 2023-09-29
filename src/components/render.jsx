@@ -125,19 +125,24 @@ class Render extends Component {
         } else if (first === 'D1-group') {
             this.setState({groupKey: key.key.slice(9)}, ()=>this.updateTree())
         } else if (first === 'D1-reset') {
-            this.canvas.clear()
-            this.canvas.backgroundColor = '#fff'
-            this.objects = {}
-            this.data = {}
-            this.select(-1)
-            this.updateTree()
-            this.resetCanvasSize()
+            this.reset()
         } else if (first === 'D1-save') {
             this.objectsToData()
             saveObj(this.data, 'ui.rmui')
         } else if (first === 'D1-open') {
             this.setState({uploadModalShow: true})
         }
+    }
+
+    reset() {
+        this.canvas.clear()
+        this.canvas.backgroundColor = '#fff'
+        this.objects = {}
+        this.data = {}
+        this.select(-1)
+        this.updateTree()
+        this.resetCanvasSize()
+        localStorage.setItem('data', "{}")
     }
 
     resetCanvasSize() {
@@ -202,8 +207,6 @@ class Render extends Component {
         const that = this
         this.canvas = new fabric.Canvas('ui')
         this.canvas.backgroundColor = '#fff'
-        this.resetCanvasSize()
-        this.canvas.renderAll()
         this.updateTree()
         window.addEventListener('resize', () => {
             this.onReSize();
@@ -255,6 +258,20 @@ class Render extends Component {
             }
         })
         this.canvas.selection = false
+
+        let data = localStorage.getItem('data')
+        if (data) {
+            data = JSON.parse(data)
+            for (const key of Object.keys(data)) {
+                this.updateObject(data[key])
+            }
+        }
+        this.resetCanvasSize()
+        this.canvas.renderAll()
+        for (const key of Object.keys(data)) {
+            this.select(key)
+        }
+        this.select(-1)
     }
 
     objectsToData() {
@@ -267,6 +284,9 @@ class Render extends Component {
             this.setState({
                 properties: this.data[this.state.selectedId]
             })
+        }
+        if (Object.keys(this.data).length !== 0) {
+            localStorage.setItem('data', JSON.stringify(this.data))
         }
     }
 
@@ -283,6 +303,7 @@ class Render extends Component {
             })
             this.objects[obj.id] = _rect
             _rect.fromObject(obj)
+            _rect.setRatio(this.state.uiWindow.ratio)
             this.canvas.add(_rect)
         }
         this.objectsToData()
@@ -350,6 +371,7 @@ class Render extends Component {
         reader.onload = e => {
             let str = e.target.result
             const data = JSON.parse(str)
+            this.reset()
             this.setState({uploadModalShow: false})
             for (const key of Object.keys(data)) {
                 this.updateObject(data[key])
