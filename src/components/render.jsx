@@ -115,9 +115,9 @@ class Render extends Component {
             const nid = this.getNewDataId()
             const options = {
                 id: nid,
-                name: 'New Rect',
+                name: `New${type}`,
                 layer: 0,
-                groupName: 'Ungroup',
+                group: 'Ungroup',
                 ratio: this.state.uiWindow.ratio,
                 team: this.state.uiWindow.team,
                 type: `Ui${type}`
