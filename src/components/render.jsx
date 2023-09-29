@@ -1,11 +1,11 @@
 import React, {Component, createRef} from 'react';
-import { Tree, Card, Col, Row, Empty, Dropdown, Modal, Upload, Divider } from "antd";
+import { Tree, Card, Col, Row, Empty, Dropdown, Modal, Upload, Divider, Button } from "antd";
 import { EllipsisOutlined, CheckOutlined, InboxOutlined, ThunderboltOutlined } from '@ant-design/icons'
 import { ProDescriptions } from '@ant-design/pro-components';
 import Generator from './generator'
 import { fabric } from 'fabric'
 import { getColumnsFromData } from "../utils/columns";
-import { saveObj } from "../utils/utils";
+import { saveObj, createObjUrl } from "../utils/utils";
 import { Rect } from "../utils/fabricObjects";
 
 const { Dragger } = Upload;
@@ -28,7 +28,8 @@ class Render extends Component {
         },
         rightClickMenuOpen: false,
         infoModalShow: false,
-        uploadModalShow: false
+        uploadModalShow: false,
+        imageUploadShow: false
     }
     editable = false;
     canvas = null
@@ -403,6 +404,10 @@ class Render extends Component {
         this.setState({uploadModalShow: false})
     }
 
+    onImageUploadModalCancel() {
+        this.setState({imageUploadShow: false})
+    }
+
     onUploadFile(file) {
         const reader = new FileReader()
         reader.onload = e => {
@@ -416,6 +421,13 @@ class Render extends Component {
         }
         reader.readAsText(file)
         return true
+    }
+
+    onUploadImage(file) {
+        this.setState({imageUploadShow: false})
+        this.background.setSrc(createObjUrl(file), ()=>{
+            this.canvas.renderAll()
+        })
     }
 
     render() {
@@ -527,6 +539,13 @@ class Render extends Component {
                                         /> :
                                         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
                                 }
+                                {
+                                    this.state.selectedKey[0] === 'window' ?
+                                        <Button onClick={()=>this.setState({imageUploadShow: true})}>
+                                            Upload Background
+                                        </Button> :
+                                        <div />
+                                }
                             </div>
                         </Card>
                     </Col>
@@ -546,6 +565,27 @@ class Render extends Component {
                         showUploadList={false}
                         beforeUpload={e=>this.onUploadFile(e)}
                         accept=".rmui"
+                    >
+                        <p className="ant-upload-drag-icon">
+                            <InboxOutlined />
+                        </p>
+                        <p className="ant-upload-text">
+                            Click or drag file to this area to upload
+                        </p>
+                    </Dragger>
+                </Modal>
+                <Modal
+                    title="Upload Your Background Image"
+                    open={this.state.imageUploadShow}
+                    onCancel={()=>this.onImageUploadModalCancel()}
+                    footer={null}
+                    destroyOnClose={true}
+                >
+                    <Divider />
+                    <Dragger
+                        showUploadList={false}
+                        beforeUpload={e=>this.onUploadImage(e)}
+                        accept="image/*"
                     >
                         <p className="ant-upload-drag-icon">
                             <InboxOutlined />
