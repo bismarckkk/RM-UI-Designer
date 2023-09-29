@@ -306,10 +306,12 @@ class Render extends Component {
         }
         this.resetCanvasSize()
         this.canvas.renderAll()
-        for (const key of Object.keys(data)) {
-            this.select(key)
+        if (data) {
+            for (const key of Object.keys(data)) {
+                this.select(key)
+            }
+            this.select(-1)
         }
-        this.select(-1)
     }
 
     objectsToData() {
