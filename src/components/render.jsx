@@ -234,6 +234,11 @@ class Render extends Component {
                 }
             }
         })
+        window.addEventListener('keyup', e => {
+            if (e.key === "Delete" && that.state.selectedId !== -1) {
+                that.removeObject(that.state.selectedId)
+            }
+        })
         this.canvas.on({
             "mouse:up": () => {
                 for (const key of Object.keys(that.objects)) {
