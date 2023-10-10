@@ -1,24 +1,19 @@
 import React, {Component, createRef} from 'react';
-import { Tree, Card, Col, Row, Empty, Dropdown, Modal, Upload, Divider, Button } from "antd";
-import { EllipsisOutlined, CheckOutlined, InboxOutlined, ThunderboltOutlined } from '@ant-design/icons'
+import { Card, Col, Row, Empty, Modal, Button } from "antd";
 import { ProDescriptions } from '@ant-design/pro-components';
-import Generator from './generator'
-import { fabric } from 'fabric'
-import { getColumnsFromData } from "../utils/columns";
-import { saveObj, createObjUrl } from "../utils/utils";
-import { createUiElement, getMenuProps } from "../utils/fabricObjects";
+import UpdateModal from './updateModal'
+import Elements from "./elements";
 
-const { Dragger } = Upload;
+import { fabric } from 'fabric'
+import { getColumnsFromData } from "@/utils/columns";
+import { createObjUrl } from "@/utils/utils";
+import { createUiElement } from "@/utils/fabricObjects";
 
 class Render extends Component {
-    data = {}
     objects = {}
     state = {
-        treeData: [],
         properties: null,
-        groupKey: 'layer',
         selectedId: -1,
-        selectedKey: [],
         uiWindow: {
             height: 1080,
             width: 1920,
@@ -26,121 +21,33 @@ class Render extends Component {
             team: 'red',
             backgroundImage: true
         },
-        rightClickMenuOpen: false,
         infoModalShow: false,
-        uploadModalShow: false,
-        imageUploadShow: false
+        data: {}
     }
-    editable = false;
     canvas = null
     canvasRef = createRef()
-    generatorRef = createRef()
+    uploadRef = createRef()
     background = null
 
     getNewDataId() {
-        if (Object.keys(this.data).length === 0) {
+        if (Object.keys(this.state.data).length === 0) {
             return 0
         }
-        return Math.max(...Object.keys(this.data)) + 1
-    }
-
-    updateTree() {
-        const key = this.state.groupKey
-        let treeData = []
-        const keys = Object.keys(this.data)
-        for (let i = 0; i < keys.length; i++) {
-            const node = this.data[keys[i]]
-
-            let pos = -1
-            for (let j = 0; j < treeData.length; j++) {
-                if (treeData[j].key === `${key}-${node[key]}`) {
-                    pos = j
-                    break
-                }
-            }
-            if (pos === -1) {
-                treeData.push({
-                    title: `${key} ${node[key]}`, key: `${key}-${node[key]}`, children: [], isLeaf: false
-                })
-                pos = treeData.length - 1
-            }
-
-            treeData[pos].children.push({
-                title: node.name, key: `E-${keys[i]}`
-            })
-        }
-
-        treeData = treeData.sort((a, b) => a.key.toString().localeCompare(b.key.toString()))
-        treeData.unshift({title: "UI Window", key: 'window'})
-        this.setState({treeData})
-    }
-
-    getNodeFromId(id) {
-        if (id[0] === 'E') {
-            return id.slice(2)
-        }
-        return -1
-    }
-
-    onSelect(nodes) {
-        if (nodes.length === 0) {
-            return
-        }
-        if (nodes[0] === 'window') {
-            this.setState({properties: this.state.uiWindow, selectedId: -1, selectedKey: nodes})
-            this.canvas.discardActiveObject()
-            this.canvas.renderAll()
-            return
-        }
-        const node = this.getNodeFromId(nodes[0])
-        this.select(node)
+        return Math.max(...Object.keys(this.state.data)) + 1
     }
 
     select(id) {
-        if (typeof id === 'undefined' || id === -1) {
-            this.setState({properties: null, selectedId: -1, selectedKey: []})
+        if (typeof id === 'undefined' || id === -1 || id === -2) {
+            this.setState({properties: null, selectedId: -1})
             this.canvas.discardActiveObject()
             this.canvas.renderAll()
         } else {
-            this.setState({properties: this.data[id], selectedId: id, selectedKey: [`E-${id}`]})
+            this.setState({properties: this.state.data[id], selectedId: id})
             this.canvas.setActiveObject(this.objects[id])
             this.canvas.renderAll()
         }
     }
 
-    elementsMenuOnClick(key) {
-        const first = key.keyPath[key.keyPath.length - 1]
-        if (first === 'D1-add') {
-            const type = key.key.slice(7)
-            const nid = this.getNewDataId()
-            const options = {
-                id: nid,
-                name: `New${type}`,
-                layer: 0,
-                group: 'Ungroup',
-                ratio: this.state.uiWindow.ratio,
-                team: this.state.uiWindow.team,
-                type: `Ui${type}`
-            }
-            let element = createUiElement(options)
-            this.objects[nid] = element
-            this.canvas.add(element)
-
-            this.objectsToData()
-            this.updateTree()
-        } else if (first === 'D1-group') {
-            this.setState({groupKey: key.key.slice(9)}, ()=>this.updateTree())
-        } else if (first === 'D1-reset') {
-            this.reset()
-        } else if (first === 'D1-save') {
-            this.objectsToData()
-            saveObj(this.data, 'ui.rmui')
-        } else if (first === 'D1-open') {
-            this.setState({uploadModalShow: true})
-        } else if (first === "D1-generate") {
-            this.generatorRef.current.gen(this.data)
-        }
-    }
 
     reset() {
         this.canvas.clear()
@@ -149,10 +56,9 @@ class Render extends Component {
             this.canvas.setBackgroundImage(this.background)
         }
         this.objects = {}
-        this.data = {}
         this.select(-1)
-        this.updateTree()
         this.resetCanvasSize()
+        this.setState({data: {}})
         localStorage.setItem('data', "{}")
     }
 
@@ -228,7 +134,6 @@ class Render extends Component {
             this.objects[this.state.selectedId].fromObject(info)
             this.canvas.renderAll()
             this.objectsToData()
-            this.updateTree()
         }
     }
 
@@ -246,7 +151,6 @@ class Render extends Component {
         })
         this.canvas.backgroundColor = '#fff'
 
-        this.updateTree()
         window.addEventListener('resize', () => {
             this.onReSize();
         }, false);
@@ -269,7 +173,7 @@ class Render extends Component {
                     let str = e.clipboardData.getData('text')
                     let obj = JSON.parse(str)
                     obj.id = that.getNewDataId()
-                    that.updateObject(obj)
+                    that.onObjectEvent('_update', obj)
                     that.select(obj.id)
                 } catch (e) {
 
@@ -278,7 +182,7 @@ class Render extends Component {
         })
         window.addEventListener('keyup', e => {
             if (e.key === "Delete" && that.state.selectedId !== -1) {
-                that.removeObject(that.state.selectedId)
+                that.onObjectEvent('remove', {id: this.state.selectedId})
             }
         })
         this.canvas.on({
@@ -302,7 +206,7 @@ class Render extends Component {
         if (data) {
             data = JSON.parse(data)
             for (const key of Object.keys(data)) {
-                this.updateObject(data[key])
+                this.onObjectEvent('_update', data[key])
             }
         }
         this.resetCanvasSize()
@@ -316,215 +220,91 @@ class Render extends Component {
     }
 
     objectsToData() {
-        this.data = {}
+        let data = {}
         for (const key of Object.keys(this.objects)) {
             const info = this.objects[key].toObject()
-            this.data[info.id] = info
+            data[info.id] = info
         }
         if (this.state.selectedId !== -1) {
             this.setState({
-                properties: this.data[this.state.selectedId]
+                properties: data[this.state.selectedId]
             })
         }
-        if (Object.keys(this.data).length !== 0) {
-            localStorage.setItem('data', JSON.stringify(this.data))
+        this.setState({data})
+        if (Object.keys(data).length !== 0) {
+            localStorage.setItem('data', JSON.stringify(data))
         }
     }
 
-    updateObject(obj) {
-        if (this.objects[obj.id]) {
-            this.objects[obj.id].fromObject(obj)
-        } else {
+    onObjectEvent(type, obj) {
+        const that = this
+        function addObject(_obj, complete=true) {
             let options = {
-                id: obj.id,
-                name: obj.name,
-                layer: obj.layer,
-                groupName: obj.group,
-                type: obj.type,
-                ratio: this.state.uiWindow.ratio,
-                team: this.state.uiWindow.team,
+                id: _obj.id,
+                name: _obj.name,
+                layer: _obj.layer,
+                groupName: _obj.group,
+                type: _obj.type,
+                ratio: that.state.uiWindow.ratio,
+                team: that.state.uiWindow.team,
             }
             let element = createUiElement(options)
-            this.objects[obj.id] = element
-            element.fromObject(obj)
-            element.setRatio(this.state.uiWindow.ratio)
-            this.canvas.add(element)
+            that.objects[_obj.id] = element
+            if (complete) {
+                element.fromObject(_obj)
+            }
+            element.setRatio(that.state.uiWindow.ratio)
+            that.canvas.add(element)
         }
-        this.objectsToData()
-        this.updateTree()
-    }
 
-    removeObject(id) {
-        if (this.objects[id]) {
-            this.select(-1)
-            this.canvas.remove(this.objects[id])
-            this.canvas.renderAll()
-            delete this.objects[id]
-            this.objectsToData()
-            this.updateTree()
-        }
-    }
-
-    onElementRightClick(e) {
-        if (e.node.key[0] === 'E') {
-            this.select(e.node.key.slice(2))
-        } else {
-            this.select(-1)
-        }
-    }
-
-    onElementMenuClick(e) {
-        this.setState({rightClickMenuOpen: false})
-        if (e.key === 'D2-copy') {
-            const obj = {...this.data[this.state.selectedId]}
+        if (type === 'add') {
+            if (!obj.id || this.objects[obj.id]) {
+                obj.id = this.getNewDataId()
+                addObject(obj)
+            }
+        } else if (type === '_add') {
             obj.id = this.getNewDataId()
-            this.updateObject(obj)
-        } else if (e.key === 'D2-delete') {
-            this.removeObject(this.state.selectedId)
-        }
-    }
-
-    onMenuOpenChange(e) {
-        if (e) {
-            const that = this
-            setTimeout(()=>{
-                if (that.state.selectedId !== -1) {
-                    that.setState({rightClickMenuOpen: true})
-                } else {
-                    that.setState({rightClickMenuOpen: false})
-                }
-            }, 100)
-        } else {
-            this.setState({rightClickMenuOpen: false})
-        }
-    }
-
-    onElementMenuContainerClick(e) {
-        if (e.target.localName === 'div') {
-            this.setState({rightClickMenuOpen: false, properties: null, selectedId: -1, selectedKey: []})
-            this.select(-1)
-        }
-    }
-
-    onUploadModalCancel() {
-        this.setState({uploadModalShow: false})
-    }
-
-    onImageUploadModalCancel() {
-        this.setState({imageUploadShow: false})
-    }
-
-    onUploadFile(file) {
-        const reader = new FileReader()
-        reader.onload = e => {
-            let str = e.target.result
-            const data = JSON.parse(str)
-            this.reset()
-            this.setState({uploadModalShow: false})
-            for (const key of Object.keys(data)) {
-                this.updateObject(data[key])
+            obj.ratio = this.state.uiWindow.ratio
+            obj.team = this.state.uiWindow.team
+            addObject(obj, false)
+        } else if(type === 'update') {
+            if (this.objects[obj.id]) {
+                this.objects[obj.id].fromObject(obj)
+            }
+        } else if (type === '_update') {
+            if (obj.id >= 0 && this.objects[obj.id]) {
+                this.objects[obj.id].fromObject(obj)
+            } else {
+                addObject(obj)
+            }
+        } else if (type === 'remove') {
+            const id = obj.id
+            if (this.objects[id]) {
+                this.select(-1)
+                this.canvas.remove(this.objects[id])
+                this.canvas.renderAll()
+                delete this.objects[id]
+                this.objectsToData()
             }
         }
-        reader.readAsText(file)
-        return true
-    }
 
-    onUploadImage(file) {
-        this.setState({imageUploadShow: false})
-        this.background.setSrc(createObjUrl(file), ()=>{
-            this.canvas.renderAll()
-        })
+        this.objectsToData()
     }
 
     render() {
-        let groupPos = 0
-        const items = [
-            {
-                key: 'D1-group',
-                label: "Group by",
-                children: [
-                    {key: 'D1-group-layer', label: 'layer'},
-                    {key: 'D1-group-group', label: 'group'}
-                ]
-            },
-            {
-                key: 'D1-reset',
-                label: "Reset Designer",
-            }
-        ];
-        if (this.props.editable) {
-            items.unshift({
-                key: 'D1-add',
-                label: "Add Element",
-                children: getMenuProps()
-            })
-            items.push(
-                {type: 'divider'},
-                {
-                    key: 'D1-open',
-                    label: "Open .rmui"
-                },
-                {
-                    key: 'D1-save',
-                    label: "Save as .rmui"
-                },
-                {type: 'divider'},
-                {
-                    key: 'D1-generate',
-                    label: "Generate Code",
-                    icon: <ThunderboltOutlined />
-                },
-            )
-            groupPos++;
-        }
-        for (let i = 0; i < items[groupPos].children.length; i++) {
-            if (items[groupPos].children[i].label === this.state.groupKey) {
-                items[groupPos].children[i].icon = <CheckOutlined />
-            }
-        }
-
         return (
             <div className="full">
                 <Row warp={false} className="container" gutter={12}>
                     <Col flex="300px">
                         <div style={{height: "50%", paddingBottom: 12}}>
-                            <Card
-                                size="small"
-                                title="Elements"
-                                style={{height: "100%"}}
-                                extra={
-                                    <Dropdown menu={{ items, onClick: (e)=>this.elementsMenuOnClick(e) }}>
-                                        <EllipsisOutlined />
-                                    </Dropdown>
-                                }
-                            >
-                                <div
-                                    className="card-body"
-                                    onMouseUp={(e)=>this.onElementMenuContainerClick(e)}
-                                >
-                                    <Dropdown
-                                        menu={{
-                                            items: [
-                                                {key: 'D2-copy', label: 'Copy'},
-                                                {key: 'D2-delete', label: 'Delete', danger: true}
-                                            ],
-                                            onClick: (e)=>{this.onElementMenuClick(e)}
-                                        }}
-                                        trigger={['contextMenu']}
-                                        open={this.state.rightClickMenuOpen}
-                                        onOpenChange={(e)=>{this.onMenuOpenChange(e)}}
-                                    >
-                                        <Tree
-                                            className="full"
-                                            treeData={this.state.treeData}
-                                            onSelect={(e)=>this.onSelect(e)}
-                                            selectedKeys={this.state.selectedKey}
-                                            onRightClick={(e)=>this.onElementRightClick(e)}
-                                            defaultExpandParent={true}
-                                        />
-                                    </Dropdown>
-                                </div>
-                            </Card>
+                            <Elements
+                                onSelect={e=>this.select(e)}
+                                onObjectEvent={(t, e)=>this.onObjectEvent(t, e)}
+                                onReset={()=>this.reset()}
+                                data={this.state.data}
+                                editable={this.props.editable}
+                                selectedId={this.state.selectedId}
+                            />
                         </div>
                         <Card size="small" title="Properties" style={{height: "50%"}}>
                             <div className="card-body">
@@ -544,8 +324,18 @@ class Render extends Component {
                                         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
                                 }
                                 {
-                                    this.state.selectedKey[0] === 'window' ?
-                                        <Button onClick={()=>this.setState({imageUploadShow: true})}>
+                                    this.state.selectedId[0] === -2 ?
+                                        <Button onClick={()=>
+                                            this.uploadRef.current.upload(
+                                                'Upload Your Background Image',
+                                                'image/*'
+                                            ).then(file=>{
+                                                this.setState({imageUploadShow: false})
+                                                this.background.setSrc(createObjUrl(file), ()=>{
+                                                    this.canvas.renderAll()
+                                                })
+                                            })
+                                        }>
                                             Upload Background
                                         </Button> :
                                         <div />
@@ -557,49 +347,7 @@ class Render extends Component {
                         <canvas className="full" id="ui" />
                     </Col>
                 </Row>
-                <Modal
-                    title="Upload Your .rmui File"
-                    open={this.state.uploadModalShow}
-                    onCancel={()=>this.onUploadModalCancel()}
-                    footer={null}
-                    destroyOnClose={true}
-                >
-                    <Divider />
-                    <Dragger
-                        showUploadList={false}
-                        beforeUpload={e=>this.onUploadFile(e)}
-                        accept=".rmui"
-                    >
-                        <p className="ant-upload-drag-icon">
-                            <InboxOutlined />
-                        </p>
-                        <p className="ant-upload-text">
-                            Click or drag file to this area to upload
-                        </p>
-                    </Dragger>
-                </Modal>
-                <Modal
-                    title="Upload Your Background Image"
-                    open={this.state.imageUploadShow}
-                    onCancel={()=>this.onImageUploadModalCancel()}
-                    footer={null}
-                    destroyOnClose={true}
-                >
-                    <Divider />
-                    <Dragger
-                        showUploadList={false}
-                        beforeUpload={e=>this.onUploadImage(e)}
-                        accept="image/*"
-                    >
-                        <p className="ant-upload-drag-icon">
-                            <InboxOutlined />
-                        </p>
-                        <p className="ant-upload-text">
-                            Click or drag file to this area to upload
-                        </p>
-                    </Dragger>
-                </Modal>
-                <Generator ref={this.generatorRef} />
+                <UpdateModal ref={this.uploadRef}/>
             </div>
         );
     }
