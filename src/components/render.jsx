@@ -37,8 +37,12 @@ class Render extends Component {
     }
 
     select(id) {
-        if (typeof id === 'undefined' || id === -1 || id === -2) {
+        if (typeof id === 'undefined' || id === -1) {
             this.setState({properties: null, selectedId: -1})
+            this.canvas.discardActiveObject()
+            this.canvas.renderAll()
+        } else if (id === -2) {
+            this.setState({properties: this.state.uiWindow, selectedId: -2})
             this.canvas.discardActiveObject()
             this.canvas.renderAll()
         } else {

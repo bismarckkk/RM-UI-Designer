@@ -9,7 +9,7 @@ function selectId2Key(id) {
     if (id === -1) {
         return []
     } if (id === -2) {
-        return ['uiWindow']
+        return ['window']
     } else {
         return [`E-${id}`]
     }
@@ -190,8 +190,6 @@ class Elements extends Component {
                 items[groupPos].children[i].icon = <CheckOutlined />
             }
         }
-        console.log(selectId2Key(this.props.selectedId))
-        console.log(this.props.selectedId)
         return (
             <Card
                 size="small"
