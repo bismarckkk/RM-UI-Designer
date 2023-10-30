@@ -12,7 +12,7 @@
 }
 
 .container {
-    height: calc(100vh - 140px);
+    height: calc(100vh - 30px);
     width: 100%;
 }
 
@@ -22,8 +22,9 @@
 }
 
 .card-body {
-    height: calc((100vh - 280px) / 2);
+    height: calc((100vh - 172px) / 2);
     overflow: auto;
+    background-color: #fff;
 }
 
 .card-body::-webkit-scrollbar {

@@ -6,8 +6,9 @@ import Elements from "./elements";
 
 import { fabric } from 'fabric'
 import { getColumnsFromData } from "@/utils/columns";
-import { createObjUrl } from "@/utils/utils";
+import { saveObj } from "@/utils/utils";
 import { createUiElement } from "@/utils/fabricObjects";
+import Generator from "@/components/generator";
 
 class Render extends Component {
     objects = {}
@@ -27,6 +28,7 @@ class Render extends Component {
     canvas = null
     canvasRef = createRef()
     uploadRef = createRef()
+    generatorRef = createRef()
     background = null
 
     getNewDataId() {
@@ -34,6 +36,14 @@ class Render extends Component {
             return 0
         }
         return Math.max(...Object.keys(this.state.data)) + 1
+    }
+
+    save() {
+        saveObj(this.state.data, 'ui.rmui')
+    }
+
+    generate() {
+        this.generatorRef.current.gen(this.state.data)
     }
 
     select(id) {
@@ -67,7 +77,7 @@ class Render extends Component {
     }
 
     resetCanvasSize() {
-        let width = this.canvasRef.current.clientWidth - 12
+        let width = this.canvasRef.current.clientWidth - 14
         let height = this.canvasRef.current.clientHeight
         let uiWindow = {...this.state.uiWindow}
         if (width / height < uiWindow.width / uiWindow.height) {
@@ -298,7 +308,7 @@ class Render extends Component {
     render() {
         return (
             <div className="full">
-                <Row warp={false} className="container" gutter={12}>
+                <Row warp={false} className="container" gutter={12} style={{paddingTop: 12, paddingLeft: 12, paddingBottom: 12}}>
                     <Col flex="300px">
                         <div style={{height: "50%", paddingBottom: 12}}>
                             <Elements
@@ -352,6 +362,7 @@ class Render extends Component {
                     </Col>
                 </Row>
                 <UpdateModal ref={this.uploadRef}/>
+                <Generator ref={this.generatorRef} />
             </div>
         );
     }

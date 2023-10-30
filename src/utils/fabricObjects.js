@@ -25,7 +25,7 @@ export function createUiElement(options) {
 export function getMenuProps() {
     let info = []
     for (let key of Object.keys(Controller)) {
-        info.push({key: `D1-add-${key}`, label: key})
+        info.push({key: `Insert-${key}`, label: key})
     }
     return info
 }

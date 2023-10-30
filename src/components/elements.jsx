@@ -1,9 +1,6 @@
-import React, {Component, createRef} from 'react';
-import {Card, Dropdown, Tree} from "antd";
-import {CheckOutlined, EllipsisOutlined, ThunderboltOutlined} from "@ant-design/icons";
-import {getMenuProps} from "@/utils/fabricObjects";
-import {saveObj} from "@/utils/utils";
-import Generator from "@/components/generator";
+import React, { Component } from 'react';
+import {Card, Dropdown, Tree, Space} from "antd";
+import {DownOutlined} from "@ant-design/icons";
 
 function selectId2Key(id) {
     if (id === -1) {
@@ -25,13 +22,17 @@ function selectKey2id(key) {
     }
 }
 
+const items = [
+    {key: 'D1-group-layer', label: 'layer'},
+    {key: 'D1-group-group', label: 'group'}
+]
+
 class Elements extends Component {
     state = {
         treeData: [], 
         rightClickMenuOpen: false,
         groupKey: 'layer',
     }
-    generatorRef = createRef()
 
     onElementMenuContainerClick(e) {
         if (e.target.localName === 'div') {
@@ -78,39 +79,7 @@ class Elements extends Component {
     }
 
     elementsMenuOnClick(key) {
-        const first = key.keyPath[key.keyPath.length - 1]
-        if (first === 'D1-add') {
-            const type = key.key.slice(7)
-            const options = {
-                id: -1,
-                name: `New${type}`,
-                layer: 0,
-                group: 'Ungroup',
-                type: `Ui${type}`
-            }
-            this.props.onObjectEvent('_add', options)
-        } else if (first === 'D1-group') {
-            this.setState({groupKey: key.key.slice(9)}, ()=>this.updateTree())
-        } else if (first === 'D1-reset') {
-            this.props.onReset()
-        } else if (first === 'D1-save') {
-            saveObj(this.data, 'ui.rmui')
-        } else if (first === 'D1-open') {
-            this.uploadRef.current.upload('Upload Your .rmui File', '.rmui').then(file=>{
-                const reader = new FileReader()
-                reader.onload = e => {
-                    let str = e.target.result
-                    const data = JSON.parse(str)
-                    this.reset()
-                    for (const key of Object.keys(data)) {
-                        this.props.onObjectEvent('_update', data[key])
-                    }
-                }
-                reader.readAsText(file)
-            })
-        } else if (first === "D1-generate") {
-            this.generatorRef.current.gen(this.data)
-        }
+        this.setState({groupKey: key.key.slice(9)}, ()=>this.updateTree())
     }
 
     updateTree() {
@@ -145,59 +114,24 @@ class Elements extends Component {
     }
 
     render() {
-        let groupPos = 0
-        const items = [
-            {
-                key: 'D1-group',
-                label: "Group by",
-                children: [
-                    {key: 'D1-group-layer', label: 'layer'},
-                    {key: 'D1-group-group', label: 'group'}
-                ]
-            },
-            {
-                key: 'D1-reset',
-                label: "Reset Designer",
-            }
-        ];
-        if (this.props.editable) {
-            items.unshift({
-                key: 'D1-add',
-                label: "Add Element",
-                children: getMenuProps()
-            })
-            items.push(
-                {type: 'divider'},
-                {
-                    key: 'D1-open',
-                    label: "Open .rmui"
-                },
-                {
-                    key: 'D1-save',
-                    label: "Save as .rmui"
-                },
-                {type: 'divider'},
-                {
-                    key: 'D1-generate',
-                    label: "Generate Code",
-                    icon: <ThunderboltOutlined />
-                },
-            )
-            groupPos++;
-        }
-        for (let i = 0; i < items[groupPos].children.length; i++) {
-            if (items[groupPos].children[i].label === this.state.groupKey) {
-                items[groupPos].children[i].icon = <CheckOutlined />
-            }
-        }
         return (
             <Card
                 size="small"
                 title="Elements"
                 style={{height: "100%"}}
                 extra={
-                    <Dropdown menu={{ items, onClick: (e)=>this.elementsMenuOnClick(e) }}>
-                        <EllipsisOutlined />
+                    <Dropdown
+                        menu={{
+                            items,
+                            onClick: (e)=>this.elementsMenuOnClick(e),
+                            selectable: true,
+                            selectedKeys: [`D1-group-${this.state.groupKey}`]
+                        }}
+                    >
+                        <Space style={{fontSize: 11}}>
+                            Group by
+                            <DownOutlined size="small" />
+                        </Space>
                     </Dropdown>
                 }
             >
@@ -227,7 +161,6 @@ class Elements extends Component {
                         />
                     </Dropdown>
                 </div>
-                <Generator ref={this.generatorRef} />
             </Card>
         );
     }
