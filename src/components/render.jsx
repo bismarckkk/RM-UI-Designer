@@ -136,6 +136,7 @@ class Render extends Component {
             }
             this.setState({uiWindow: info, properties: info}, ()=> {
                 this.resetCanvasSize()
+                this.select(-2)
             })
             if (info.backgroundImage !== this.state.uiWindow.backgroundImage) {
                 if (info.backgroundImage) {
