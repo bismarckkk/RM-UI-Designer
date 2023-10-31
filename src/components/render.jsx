@@ -136,7 +136,6 @@ class Render extends Component {
             }
             this.setState({uiWindow: info, properties: info}, ()=> {
                 this.resetCanvasSize()
-                this.select(-2)
             })
             if (info.backgroundImage !== this.state.uiWindow.backgroundImage) {
                 if (info.backgroundImage) {
@@ -263,8 +262,12 @@ class Render extends Component {
             }
         }
         if (this.state.selectedId !== -1) {
+            let _d = data[this.state.frame][this.state.selectedId]
+            if (this.state.selectedId === -2) {
+                _d = this.state.uiWindow
+            }
             this.setState({
-                properties: data[this.state.frame][this.state.selectedId]
+                properties: _d
             }, ()=>{
                 this.propertiesRef.current?.reload()
             })
