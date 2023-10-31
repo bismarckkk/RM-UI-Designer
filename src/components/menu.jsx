@@ -1,7 +1,6 @@
 import React, { Component, createRef } from 'react';
 import { Flex, Button, Dropdown, Modal } from "antd";
 import { FullscreenExitOutlined, FullscreenOutlined, ThunderboltOutlined, GithubOutlined } from "@ant-design/icons";
-import { Link } from 'umi'
 import Markdown from 'react-markdown'
 import FormModal from "@/components/formModal";
 import { getMenuProps } from "@/utils/fabricObjects";
@@ -203,13 +202,13 @@ class Menu extends Component {
                 </Flex>
                 <div style={{ alignItems: 'right', float: 'right', marginRight: 5, marginTop: -4}}>
                     <div style={{ display: 'inline', marginRight: 15, fontSize: 10 }}>Created by&nbsp;
-                        <Link to="https://github.com/bismarckkk"><Button type="link" style={{padding: 0}}>
+                        <a href="https://github.com/bismarckkk"><Button type="link" style={{padding: 0}}>
                             Bismarckkk
-                        </Button></Link>
+                        </Button></a>
                     </div>
-                    <Link to="https://github.com/bismarckkk/RM-UI-Designer"><Button type="text" style={{padding: 5}}>
+                    <a href="https://github.com/bismarckkk/RM-UI-Designer"><Button type="text" style={{padding: 5}}>
                         <GithubOutlined style={{ color: 'black' }} />
-                    </Button></Link>
+                    </Button></a>
                     {
                         this.state.fullscreen ?
                             unFullButton :
