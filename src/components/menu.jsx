@@ -3,7 +3,7 @@ import { Flex, Button, Dropdown, Modal } from "antd";
 import { FullscreenExitOutlined, FullscreenOutlined, ThunderboltOutlined, GithubOutlined } from "@ant-design/icons";
 import { Link } from 'umi'
 import Markdown from 'react-markdown'
-import UpdateModal from "@/components/updateModal";
+import FormModal from "@/components/formModal";
 import { getMenuProps } from "@/utils/fabricObjects";
 
 const fileItems = [
@@ -50,8 +50,8 @@ const simulateItems = [
 ]
 
 class Menu extends Component {
-    state = {fullscreen: false}
-    uploadRef = createRef()
+    state = {fullscreen: false, frames: ['default'], selectedFrame: 'default'}
+    formRef = createRef()
 
     fullScreen() {
         let element = document.documentElement;
@@ -84,7 +84,11 @@ class Menu extends Component {
         });
     }
 
-    onMenuClick(key) {
+    setFrames(info) {
+        this.setState({frames: info.frames, selectedFrame: info.selected})
+    }
+
+    async onMenuClick(key) {
         const first = key.keyPath[key.keyPath.length - 1]
         if (first.slice(0, 6) === 'Insert') {
             const type = key.key.slice(7)
@@ -101,28 +105,46 @@ class Menu extends Component {
         } else if (first === 'File-save') {
             this.props.save()
         } else if (first === 'File-open') {
-            this.uploadRef.current.upload('Upload Your .rmui File', '.rmui').then(file=>{
-                const reader = new FileReader()
-                reader.onload = e => {
-                    let str = e.target.result
-                    const data = JSON.parse(str)
-                    this.props.reset()
-                    for (const key of Object.keys(data)) {
-                        this.props.onObjectEvent('_update', data[key])
-                    }
-                }
-                reader.readAsText(file)
-            })
+            this.props.upload()
         } else if (first === "File-generate") {
             this.props.generate(this.data)
+        } else if (first === 'FrameOp-add') {
+            const name = await this.formRef.current.open('New Frame', this.state.frames)
+            this.props.setFrame('add', name)
+        } else if (first === 'FrameOp-remove') {
+            this.props.setFrame('remove', this.state.selectedFrame)
+        } else if (first === 'FrameOp-copy') {
+            const name = await this.formRef.current.open('Copy Frame To', this.state.frames)
+            this.props.setFrame('copy', name)
+        } else if (first === 'FrameOp-change') {
+            const name = key.key.slice(7)
+            this.props.setFrame('change', name)
         }
     }
 
     getFramesMenu() {
-        const frames = this.props.getFrames()
-        const menu = []
-        for (const frame of frames) {
-            menu.push({
+        const menu = [
+            {
+                key: 'FrameOp-add',
+                label: "New Frame"
+            },
+            {
+                key: 'FrameOp-remove',
+                label: "Remove This Frame"
+            },
+            {
+                key: 'FrameOp-copy',
+                label: "Copy This Frame"
+            },
+            {
+                key: 'FrameOp-change',
+                label: 'Change to',
+                selectable: 'true',
+                children: []
+            },
+        ]
+        for (const frame of this.state.frames) {
+            menu[3].children.push({
                 key: `Frames-${frame}`,
                 label: frame
             })
@@ -170,8 +192,7 @@ class Menu extends Component {
                     <Dropdown menu={{
                         items: this.getFramesMenu(),
                         onClick: e=>this.onMenuClick(e),
-                        selectable: true,
-                        selectedKeys: [`Frames-${this.props.selectedFrame}`]
+                        selectedKeys: [`Frames-${this.state.selectedFrame}`]
                     }}>
                         <Button type="text" size="small">Frames</Button>
                     </Dropdown>
@@ -195,7 +216,7 @@ class Menu extends Component {
                             fullButton
                     }
                 </div>
-                <UpdateModal ref={this.uploadRef}/>
+                <FormModal ref={this.formRef} />
             </div>
         );
     }

@@ -7,6 +7,7 @@ class Index extends Component {
     state = { simulate: false }
     modal = null;
     renderRef = React.createRef();
+    menuRef = React.createRef();
 
     componentDidMount() {
         const that = this;
@@ -45,10 +46,16 @@ class Index extends Component {
                     onObjectEvent={(t, e)=>this.renderRef.current.onObjectEvent(t, e)}
                     generate={()=>this.renderRef.current.generate()}
                     reset={()=>this.renderRef.current.reset()}
-                    getFrames={()=>['default']}
-                    selectedFrame={'default'}
+                    setFrame={(t, f)=>this.renderRef.current.onFrameEvent(t, f)}
+                    upload={(e)=>this.renderRef.current.upload(e)}
+                    ref={this.menuRef}
                 />
-                <Render className="full" editable={true} ref={this.renderRef} />
+                <Render
+                    className="full"
+                    editable={true}
+                    ref={this.renderRef}
+                    onFrameChange={e=>this.menuRef.current.setFrames(e)}
+                />
             </div>
         );
     }

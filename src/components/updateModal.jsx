@@ -9,6 +9,7 @@ class UpdateModal extends Component {
 
     onCancel() {
         this.setState({show: false})
+        this.state.promise.reject()
     }
 
     onUpload(e) {

@@ -1,20 +1,22 @@
 import React, {Component, createRef} from 'react';
-import { Card, Col, Row, Empty, Modal, Button } from "antd";
-import { ProDescriptions } from '@ant-design/pro-components';
+import {Button, Card, Col, Empty, message, Modal, Row} from "antd";
+import {ProDescriptions} from '@ant-design/pro-components';
 import UpdateModal from './updateModal'
 import Elements from "./elements";
 
-import { fabric } from 'fabric'
-import { getColumnsFromData } from "@/utils/columns";
-import { saveObj } from "@/utils/utils";
-import { createUiElement } from "@/utils/fabricObjects";
+import {fabric} from 'fabric'
+import {getColumnsFromData} from "@/utils/columns";
+import {saveObj} from "@/utils/utils";
+import {createUiElement} from "@/utils/fabricObjects";
 import Generator from "@/components/generator";
+import {readUiFile} from "@/utils/rmuiReader";
 
 class Render extends Component {
-    objects = {}
+    objects = {default: {}}
     state = {
         properties: null,
         selectedId: -1,
+        frame: "default",
         uiWindow: {
             height: 1080,
             width: 1920,
@@ -29,6 +31,7 @@ class Render extends Component {
     canvasRef = createRef()
     uploadRef = createRef()
     generatorRef = createRef()
+    propertiesRef = createRef()
     background = null
 
     getNewDataId() {
@@ -39,7 +42,7 @@ class Render extends Component {
     }
 
     save() {
-        saveObj(this.state.data, 'ui.rmui')
+        saveObj(this.state.data, 'ui.rmui', this.state.frame)
     }
 
     generate() {
@@ -47,6 +50,9 @@ class Render extends Component {
     }
 
     select(id) {
+        if (this.state.selectedId >= 0) {
+            this.propertiesRef.current?.cancelText()
+        }
         if (typeof id === 'undefined' || id === -1) {
             this.setState({properties: null, selectedId: -1})
             this.canvas.discardActiveObject()
@@ -57,23 +63,27 @@ class Render extends Component {
             this.canvas.renderAll()
         } else {
             this.setState({properties: this.state.data[id], selectedId: id})
-            this.canvas.setActiveObject(this.objects[id])
+            this.canvas.setActiveObject(this.objects[this.state.frame][id])
             this.canvas.renderAll()
         }
     }
 
-
-    reset() {
+    async reset() {
         this.canvas.clear()
         this.canvas.backgroundColor = '#fff'
         if (this.state.uiWindow.backgroundImage) {
             this.canvas.setBackgroundImage(this.background)
         }
-        this.objects = {}
+        if (!Object.keys(this.objects).includes('default')) {
+            await this.onFrameEvent('add', 'default')
+        }
+        this.objects.default = {}
+        await this.onFrameEvent('change', 'default')
+        this.objects = {default: {}}
         this.select(-1)
         this.resetCanvasSize()
-        this.setState({data: {}})
-        localStorage.setItem('data', "{}")
+        this.objectsToData()
+        localStorage.setItem('data', JSON.stringify({version: 2, data: {default: {}}, selected: 'default'}))
     }
 
     resetCanvasSize() {
@@ -90,8 +100,8 @@ class Render extends Component {
         this.setState({ uiWindow })
         this.canvas.setHeight(height)
         this.canvas.setWidth(width)
-        for (const key of Object.keys(this.objects)) {
-            this.objects[key].setRatio(uiWindow.ratio)
+        for (const key of Object.keys(this.objects[this.state.frame])) {
+            this.objects[this.state.frame][key].setRatio(uiWindow.ratio)
         }
         this.background?.set({scaleX: 1 / uiWindow.ratio, scaleY: 1 / uiWindow.ratio})
         this.canvas.renderAll()
@@ -116,10 +126,10 @@ class Render extends Component {
     }
 
     onPropertiesChange(key, info) {
-        if (this.state.selectedKey[0] === 'window') {
+        if (this.state.selectedId === -2) {
             if (info.team !== this.state.uiWindow.team) {
-                for (const key of Object.keys(this.objects)) {
-                    this.objects[key].setTeam(info.team)
+                for (const key of Object.keys(this.objects[this.state.frame])) {
+                    this.objects[this.state.frame][key].setTeam(info.team)
                 }
                 this.canvas.renderAll()
                 this.objectsToData()
@@ -145,7 +155,7 @@ class Render extends Component {
                 })
             }
         } else if (this.state.selectedId !== -1) {
-            this.objects[this.state.selectedId].fromObject(info)
+            this.objects[this.state.frame][this.state.selectedId].fromObject(info)
             this.canvas.renderAll()
             this.objectsToData()
         }
@@ -201,8 +211,8 @@ class Render extends Component {
         })
         this.canvas.on({
             "mouse:up": () => {
-                for (const key of Object.keys(that.objects)) {
-                    that.objects[key].resizeScale()
+                for (const key of Object.keys(that.objects[that.state.frame])) {
+                    that.objects[that.state.frame][key].resizeScale()
                 }
                 that.canvas.renderAll()
                 that.objectsToData()
@@ -216,37 +226,52 @@ class Render extends Component {
         })
         this.canvas.selection = false
 
-        let data = localStorage.getItem('data')
-        if (data) {
-            data = JSON.parse(data)
-            for (const key of Object.keys(data)) {
-                this.onObjectEvent('_update', data[key])
-            }
-        }
+        readUiFile(
+            localStorage.getItem('data'),
+            (t, e)=>this.onObjectEvent(t, e),
+            frame=>that.onFrameEvent('change', frame),
+            ()=>this.canvas.renderAll()
+        )
         this.resetCanvasSize()
-        this.canvas.renderAll()
-        if (data) {
-            for (const key of Object.keys(data)) {
-                this.select(key)
+    }
+
+    upload() {
+        const that = this
+        this.uploadRef.current.upload('Upload Your .rmui File', '.rmui').then(file=>{
+            const reader = new FileReader()
+            reader.onload = e => {
+                that.reset()
+                readUiFile(
+                    e.target.result,
+                    (t, e)=>that.onObjectEvent(t, e),
+                    frame=>that.onFrameEvent('change', frame),
+                    ()=>that.canvas.renderAll()
+                )
             }
-            this.select(-1)
-        }
+            reader.readAsText(file)
+        }).catch(_=>{})
     }
 
     objectsToData() {
         let data = {}
-        for (const key of Object.keys(this.objects)) {
-            const info = this.objects[key].toObject()
-            data[info.id] = info
+        for (const frame of Object.keys(this.objects)) {
+            data[frame] = {}
+            for (const key of Object.keys(this.objects[frame])) {
+                const info = this.objects[frame][key].toObject()
+                data[frame][info.id] = info
+            }
         }
         if (this.state.selectedId !== -1) {
             this.setState({
-                properties: data[this.state.selectedId]
+                properties: data[this.state.frame][this.state.selectedId]
+            }, ()=>{
+                this.propertiesRef.current?.reload()
             })
         }
-        this.setState({data})
+        this.setState({data: data[this.state.frame]})
         if (Object.keys(data).length !== 0) {
-            localStorage.setItem('data', JSON.stringify(data))
+            let _data = {version: 2, data: data, selected: this.state.frame}
+            localStorage.setItem('data', JSON.stringify(_data))
         }
     }
 
@@ -263,16 +288,27 @@ class Render extends Component {
                 team: that.state.uiWindow.team,
             }
             let element = createUiElement(options)
-            that.objects[_obj.id] = element
+            that.objects[that.state.frame][_obj.id] = element
             if (complete) {
                 element.fromObject(_obj)
             }
             element.setRatio(that.state.uiWindow.ratio)
+
+            const fabricObjs = that.canvas.getObjects()
+            let ok = true
+            for (const key of Object.keys(fabricObjs)) {
+                if (fabricObjs[key].id === element.id) {
+                    ok = false
+                    break
+                }
+            }
+            if (ok) {
+            }
             that.canvas.add(element)
         }
 
         if (type === 'add') {
-            if (!obj.id || this.objects[obj.id]) {
+            if (!obj.id || this.objects[this.state.frame][obj.id]) {
                 obj.id = this.getNewDataId()
                 addObject(obj)
             }
@@ -282,30 +318,105 @@ class Render extends Component {
             obj.team = this.state.uiWindow.team
             addObject(obj, false)
         } else if(type === 'update') {
-            if (this.objects[obj.id]) {
-                this.objects[obj.id].fromObject(obj)
+            if (this.objects[this.state.frame][obj.id]) {
+                this.objects[this.state.frame][obj.id].fromObject(obj)
             }
         } else if (type === '_update') {
-            if (obj.id >= 0 && this.objects[obj.id]) {
-                this.objects[obj.id].fromObject(obj)
+            if (obj.id >= 0 && this.objects[this.state.frame][obj.id]) {
+                this.objects[this.state.frame][obj.id].fromObject(obj)
             } else {
                 addObject(obj)
             }
         } else if (type === 'remove') {
             const id = obj.id
-            if (this.objects[id]) {
+            if (this.objects[this.state.frame][id]) {
                 this.select(-1)
-                this.canvas.remove(this.objects[id])
+                this.canvas.remove(this.objects[this.state.frame][id])
                 this.canvas.renderAll()
-                delete this.objects[id]
+                delete this.objects[this.state.frame][id]
                 this.objectsToData()
             }
         }
 
         this.objectsToData()
+        this.canvas.renderAll()
+    }
+
+    setFrame(frame) {
+        if (!this.objects[frame]) {
+            this.objects[frame] = {}
+        }
+        for (const it of Object.keys(this.objects[this.state.frame])) {
+            this.canvas.remove(this.objects[this.state.frame][it])
+            console.log('remove!!', this.canvas.getObjects())
+        }
+        this.canvas.renderAll()
+        const that = this
+        return new Promise((resolve, _) => {
+            that.setState({frame}, () => {
+                const fabricObjs = that.canvas.getObjects()
+                for (const it of Object.keys(that.objects[that.state.frame])) {
+                    let ok = true
+                    for (const key of Object.keys(fabricObjs)) {
+                        if (fabricObjs[key].id === that.objects[that.state.frame][it].id) {
+                            ok = false
+                            break
+                        }
+                    }
+                    if (ok) {
+                        that.canvas.add(that.objects[that.state.frame][it])
+                        console.log('add!!', that.canvas.getObjects())
+                    }
+                }
+                that.objectsToData()
+                that.canvas.renderAll()
+                console.log(that.objects)
+                resolve()
+            })
+        })
+    }
+
+    async onFrameEvent(type, frame) {
+        if (type === 'add') {
+            this.objects[frame] = {}
+            await this.setFrame(frame)
+        } else if (type === 'remove') {
+            if (Object.keys(this.objects).length === 1) {
+                message.error('Cannot remove last frame!')
+                return
+            }
+            const _frame = frame
+            frame = Object.keys(this.objects)[0]
+            if (frame === _frame) {
+                frame = Object.keys(this.objects)[1]
+            }
+            await this.setFrame(frame)
+            delete this.objects[_frame]
+        } else if (type === 'change') {
+            await this.setFrame(frame)
+        } else if (type === 'copy') {
+            this.objects[frame] = {}
+            const old = this.objects[this.state.frame]
+            await this.setFrame(frame)
+            for (const key of Object.keys(old)) {
+                this.onObjectEvent('_update', old[key].toObject())
+            }
+            this.objectsToData()
+            this.canvas.renderAll()
+            console.log(this)
+        } else if (type === 'rename') {
+            this.objects[frame] = this.objects[this.state.frame]
+            delete this.objects[this.state.frame]
+            this.setState({frame})
+        }
+        this.props.onFrameChange({frames: Object.keys(this.objects), selected: frame})
+        this.objectsToData()
     }
 
     render() {
+        console.log('res!!', this.canvas && this.canvas.getObjects())
+        console.log(this)
+        this.canvas?.renderAll()
         return (
             <div className="full">
                 <Row warp={false} className="container" gutter={12} style={{paddingTop: 12, paddingLeft: 12, paddingBottom: 12}}>
@@ -327,9 +438,14 @@ class Render extends Component {
                                         <ProDescriptions
                                             dataSource={this.state.properties}
                                             columns={getColumnsFromData(this.state.properties)}
+                                            ref={this.propertiesRef}
                                             editable={
                                                 this.props.editable ?
-                                                {onSave: (key, info)=>this.onPropertiesChange(key, info)}:
+                                                {
+                                                    onSave: (key, info)=>
+                                                        this.onPropertiesChange(key, info)
+                                                }
+                                                :
                                                 null
                                             }
                                             column={1}
@@ -348,7 +464,7 @@ class Render extends Component {
                                                 this.background.setSrc(createObjUrl(file), ()=>{
                                                     this.canvas.renderAll()
                                                 })
-                                            })
+                                            }).catch(_=>{})
                                         }>
                                             Upload Background
                                         </Button> :

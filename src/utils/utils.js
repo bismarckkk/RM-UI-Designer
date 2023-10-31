@@ -13,8 +13,9 @@ export const ColorMap = {
     'red': 'rgb(255, 69, 70)',
 }
 
-export function saveObj(data, fileName) {
-    const str = JSON.stringify(data)
+export function saveObj(data, fileName, selected) {
+    let _data = {version: 2, data: data, selected}
+    const str = JSON.stringify(_data)
     a.href = `data:,${str}`
     a.download = fileName
     a.click()
