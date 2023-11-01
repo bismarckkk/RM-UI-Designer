@@ -1,9 +1,9 @@
 import React, { Component, createRef } from 'react';
-import { Flex, Button, Dropdown, Modal } from "antd";
+import { Flex, Button, Dropdown } from "antd";
 import { FullscreenExitOutlined, FullscreenOutlined, ThunderboltOutlined, GithubOutlined } from "@ant-design/icons";
-import Markdown from 'react-markdown'
-import FormModal from "@/components/formModal";
+import FormModal from "@/components/modals/formModal";
 import { getMenuProps } from "@/utils/fabricObjects";
+import AboutModal from "@/components/modals/aboutModal";
 
 const fileItems = [
     {
@@ -51,6 +51,7 @@ const simulateItems = [
 class Menu extends Component {
     state = {fullscreen: false, frames: ['default'], selectedFrame: 'default'}
     formRef = createRef()
+    aboutRef = createRef()
 
     fullScreen() {
         let element = document.documentElement;
@@ -151,15 +152,6 @@ class Menu extends Component {
         return menu
     }
 
-    async about() {
-        Modal.info({
-            title: 'About',
-            content: <Markdown>
-                {await (await fetch(require('../assets/about.md'))).text()}
-            </Markdown>
-        })
-    }
-
     render() {
         const fullButton = (
             <Button type='text' onClick={() => this.fullScreen()} style={{padding: 5}}>
@@ -198,7 +190,10 @@ class Menu extends Component {
                     <Dropdown menu={{ items: simulateItems, onClick: e=>this.onMenuClick(e) }}>
                         <Button type="text" size="small">Simulate🚧</Button>
                     </Dropdown>
-                    <Button type="text" size="small" onClick={this.about}>About</Button>
+                    <Button type="text" size="small" onClick={()=> {
+                        console.log(this.aboutRef.current)
+                        this.aboutRef.current?.show()
+                    }}>About</Button>
                 </Flex>
                 <div style={{ alignItems: 'right', float: 'right', marginRight: 5, marginTop: -4}}>
                     <div style={{ display: 'inline', marginRight: 15, fontSize: 10 }}>Created by&nbsp;
@@ -216,6 +211,7 @@ class Menu extends Component {
                     }
                 </div>
                 <FormModal ref={this.formRef} />
+                <AboutModal ref={this.aboutRef} />
             </div>
         );
     }

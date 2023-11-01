@@ -1,7 +1,7 @@
 import React, {Component, createRef} from 'react';
 import {Button, Card, Col, Empty, message, Modal, Row} from "antd";
 import {ProDescriptions} from '@ant-design/pro-components';
-import UpdateModal from './updateModal'
+import UpdateModal from './modals/updateModal'
 import Elements from "./elements";
 
 import {fabric} from 'fabric'
