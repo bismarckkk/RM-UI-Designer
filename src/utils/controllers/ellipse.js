@@ -58,8 +58,8 @@ export const Ellipse = fabric.util.createClass(fabric.Ellipse, {
             group: this.groupName,
             rx: this.rx * this.ratio,
             ry: this.ry * this.ratio,
-            x: this.left * this.ratio,
-            y: this.top * this.ratio,
+            x: (this.left + this.rx) * this.ratio,
+            y: (this.top + this.ry) * this.ratio,
             color: this._color,
             lineWidth: this.strokeWidth * this.ratio,
         }
@@ -72,8 +72,8 @@ export const Ellipse = fabric.util.createClass(fabric.Ellipse, {
         this.groupName = options.group
         this.set('rx', options.rx / this.ratio)
         this.set('ry', options.ry / this.ratio)
-        this.set('left', options.x / this.ratio)
-        this.set('top', options.y / this.ratio)
+        this.set('left', (options.x - options.rx) / this.ratio)
+        this.set('top', (options.y - options.ry) / this.ratio)
         this.set('strokeWidth', options.lineWidth / this.ratio)
         if (this._color === 'main') {
             this.set('stroke', ColorMap[this.team])

@@ -2,12 +2,14 @@ import { Rect } from "@/utils/controllers/rect";
 import { Line } from "@/utils/controllers/line";
 import { Round } from "@/utils/controllers/round";
 import { Ellipse } from "@/utils/controllers/ellipse";
+import { Arc } from "@/utils/controllers/arc";
 
 const Controller = {
     Rect,
     Line,
     Round,
     Ellipse,
+    Arc,
 }
 
 export function createUiElement(options) {

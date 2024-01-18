@@ -51,7 +51,7 @@ class Render extends Component {
 
     select(id) {
         if (this.state.selectedId >= 0) {
-            this.propertiesRef.current?.cancelText()
+            this.propertiesRef.current?.cancel()
         }
         if (typeof id === 'undefined' || id === -1) {
             this.setState({properties: null, selectedId: -1})
@@ -155,6 +155,7 @@ class Render extends Component {
                 })
             }
         } else if (this.state.selectedId !== -1) {
+            console.log(info)
             this.objects[this.state.frame][this.state.selectedId].fromObject(info)
             this.canvas.renderAll()
             this.objectsToData()
@@ -219,11 +220,13 @@ class Render extends Component {
                 that.canvas.renderAll()
                 that.objectsToData()
                 const active = that.canvas.getActiveObject()
-                if (active) {
-                    that.select(active.id)
-                } else {
-                    that.select(-1)
-                }
+                setTimeout(()=>{
+                    if (active) {
+                        that.select(active.id)
+                    } else {
+                        that.select(-1)
+                    }
+                }, 100)
             }
         })
         this.canvas.selection = false
@@ -270,13 +273,11 @@ class Render extends Component {
             if (this.state.selectedId === -2) {
                 _d = this.state.uiWindow
             }
-            setTimeout(() => {
-                this.setState({
-                    properties: { ..._d }
-                }, () => {
-                    this.propertiesRef.current?.reload()
-                })
-            }, 50)
+            this.setState({
+                properties: { ..._d }
+            }, () => {
+                this.propertiesRef.current?.reload()
+            })
         }
         if (Object.keys(data).length !== 0) {
             let _data = {version: 2, data: data, selected: this.state.frame}

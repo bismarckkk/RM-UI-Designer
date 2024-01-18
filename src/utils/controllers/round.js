@@ -23,8 +23,8 @@ export const Round = fabric.util.createClass(Ellipse, {
             layer: this.layer,
             group: this.groupName,
             r: this.rx * this.ratio,
-            x: this.left * this.ratio,
-            y: this.top * this.ratio,
+            x: (this.left + this.rx) * this.ratio,
+            y: (this.top + this.ry) * this.ratio,
             color: this._color,
             lineWidth: this.strokeWidth * this.ratio,
         }
