@@ -191,7 +191,6 @@ class Menu extends Component {
                         <Button type="text" size="small">Simulate🚧</Button>
                     </Dropdown>
                     <Button type="text" size="small" onClick={()=> {
-                        console.log(this.aboutRef.current)
                         this.aboutRef.current?.show()
                     }}>About</Button>
                 </Flex>
