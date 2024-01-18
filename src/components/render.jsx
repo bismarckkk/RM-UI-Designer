@@ -1,12 +1,12 @@
 import React, {Component, createRef} from 'react';
-import {Button, Card, Col, Empty, message, Modal, Row} from "antd";
+import {Button, Card, Col, Empty, message, Modal, Row, Space} from "antd";
 import {ProDescriptions} from '@ant-design/pro-components';
 import UpdateModal from './modals/updateModal'
 import Elements from "./elements";
 
 import {fabric} from 'fabric'
 import {getColumnsFromData} from "@/utils/columns";
-import {saveObj} from "@/utils/utils";
+import {createObjUrl, saveObj} from "@/utils/utils";
 import {createUiElement} from "@/utils/fabricObjects";
 import Generator from "@/components/generator";
 import {readUiFile} from "@/utils/rmuiReader";
@@ -71,9 +71,7 @@ class Render extends Component {
     async reset() {
         this.canvas.clear()
         this.canvas.backgroundColor = '#fff'
-        if (this.state.uiWindow.backgroundImage) {
-            this.canvas.setBackgroundImage(this.background)
-        }
+        this.setBackground(require("../../public/background.png"))
         if (!Object.keys(this.objects).includes('default')) {
             await this.onFrameEvent('add', 'default')
         }
@@ -162,12 +160,9 @@ class Render extends Component {
         }
     }
 
-
-
-    componentDidMount() {
+    setBackground(url) {
         const that = this
-        this.canvas = new fabric.Canvas('ui')
-        fabric.Image.fromURL(require("../../public/background.png"), (image, _) => {
+        fabric.Image.fromURL(url, (image, _) => {
             that.background = image
             const ratio = that.state.uiWindow.ratio
             that.background?.set({scaleX: 1 / ratio, scaleY: 1 / ratio})
@@ -176,6 +171,12 @@ class Render extends Component {
                 that.canvas.renderAll()
             }
         })
+    }
+
+    componentDidMount() {
+        const that = this
+        this.canvas = new fabric.Canvas('ui')
+        this.setBackground(require("../../public/background.png"))
         this.canvas.backgroundColor = '#fff'
 
         window.addEventListener('resize', () => {
@@ -186,24 +187,39 @@ class Render extends Component {
             let info = null
             if (e.target.localName === 'input') {
                 info = e.target.ariaValueNow
-            } else if (that.state.selectedId !== -1) {
-                info = JSON.stringify(that.data[that.state.selectedId])
+            } else if (that.state.selectedId !== -1 && that.state.selectedId !== -2) {
+                info = JSON.stringify(that.state.data[that.state.selectedId])
             }
             e.clipboardData.setData('text', info)
         })
         window.addEventListener("paste", e => {
             e.preventDefault()
-            if (e.target.localName === 'input') {
-                e.target.value = e.clipboardData.getData('text')
-            } else {
-                try {
-                    let str = e.clipboardData.getData('text')
-                    let obj = JSON.parse(str)
-                    obj.id = that.getNewDataId()
-                    that.onObjectEvent('_update', obj)
-                    that.select(obj.id)
-                } catch (e) {
+            if (e.clipboardData.items.length === 0) {
+                if (e.target.localName === 'input') {
+                    e.target.value = e.clipboardData.getData('text')
+                } else {
+                    try {
+                        let str = e.clipboardData.getData('text')
+                        let obj = JSON.parse(str)
+                        obj.id = that.getNewDataId()
+                        that.onObjectEvent('_update', obj)
+                        that.select(obj.id)
+                    } catch (e) {
 
+                    }
+                }
+            } else {
+                const items = e.clipboardData.items;
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf("image") === 0) {
+                        const blob = items[i].getAsFile();
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            console.log(e)
+                            that.setBackground(e.target.result)
+                        };
+                        reader.readAsDataURL(blob);
+                    }
                 }
             }
         })
@@ -460,21 +476,26 @@ class Render extends Component {
                                         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>
                                 }
                                 {
-                                    this.state.selectedId[0] === -2 ?
-                                        <Button onClick={() =>
-                                            this.uploadRef.current.upload(
-                                                'Upload Your Background Image',
-                                                'image/*'
-                                            ).then(file => {
-                                                this.setState({imageUploadShow: false})
-                                                this.background.setSrc(createObjUrl(file), () => {
-                                                    this.canvas.renderAll()
+                                    this.state.selectedId === -2 ?
+                                        <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
+                                            <Button onClick={() =>
+                                                this.uploadRef.current.upload(
+                                                    'Upload Your Background Image',
+                                                    'image/*'
+                                                ).then(file => {
+                                                    this.setState({imageUploadShow: false})
+                                                    this.setBackground(createObjUrl(file))
+                                                }).catch(_ => {
                                                 })
-                                            }).catch(_ => {
-                                            })
-                                        }>
-                                            Upload Background
-                                        </Button> :
+                                            }>
+                                                Upload Background
+                                            </Button>
+                                            <Button onClick={() =>
+                                                this.setBackground(require("../../public/background.png"))
+                                            }>
+                                                Reset Background
+                                            </Button>
+                                        </Space> :
                                         <div/>
                                 }
                             </div>
