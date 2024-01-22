@@ -50,9 +50,6 @@ class Render extends Component {
     }
 
     select(id) {
-        if (this.state.selectedId >= 0) {
-            this.propertiesRef.current?.cancel()
-        }
         if (typeof id === 'undefined' || id === -1) {
             this.setState({properties: null, selectedId: -1})
             this.canvas.discardActiveObject()
@@ -153,7 +150,6 @@ class Render extends Component {
                 })
             }
         } else if (this.state.selectedId !== -1) {
-            console.log(info)
             this.objects[this.state.frame][this.state.selectedId].fromObject(info)
             this.canvas.renderAll()
             this.objectsToData()
@@ -461,6 +457,7 @@ class Render extends Component {
                                             dataSource={this.state.properties}
                                             columns={getColumnsFromData(this.state.properties)}
                                             ref={this.propertiesRef}
+                                            key={this.state.selectedId}
                                             editable={
                                                 this.props.editable ?
                                                     {
