@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import { Modal, ConfigProvider, theme } from "antd";
+import { Modal, ConfigProvider, Space, theme } from "antd";
+import { WarningFilled } from '@ant-design/icons'
 import Render from "@/components/render";
 import Menu from "@/components/menu";
 import enUS from "antd/locale/en_US";
@@ -7,27 +8,29 @@ import enUS from "antd/locale/en_US";
 const { darkAlgorithm, compactAlgorithm } = theme;
 
 class Index extends Component {
-    state = { simulate: false, darkMode: false }
-    modal = null;
+    state = { simulate: false, darkMode: this.isBrowserDarkMode(), tooSmall: false }
     renderRef = React.createRef();
     menuRef = React.createRef();
+
+    isBrowserDarkMode() {
+        try {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches
+        } catch (_) {
+            return false
+        }
+    }
 
     componentDidMount() {
         const that = this;
         let lastWidth = 0;
 
         function resizeHandle(width) {
-            if (!that.modal && width < 792 && width !== lastWidth) {
+            if (!that.state.tooSmall && width < 792 && width !== lastWidth) {
                 lastWidth = width;
-                that.modal = Modal.warning({
-                    title: 'Display Aera too Small',
-                    content: 'Cannot show all contents on this window. Please resize this window or rotate your phone.',
-                    footer: null
-                });
+                that.setState({tooSmall: true})
             }
-            if (that.modal && width >= 792) {
-                that.modal.destroy()
-                that.modal = null
+            if (that.state.tooSmall && width >= 792) {
+                that.setState({tooSmall: false})
             }
         }
 
@@ -36,6 +39,12 @@ class Index extends Component {
         window.addEventListener('resize', () => {
             resizeHandle(window.innerWidth);
         }, false);
+
+        const mqList = window.matchMedia('(prefers-color-scheme: dark)');
+
+        mqList.addEventListener('change', (event) => {
+            that.setState({darkMode: event.matches})
+        });
     }
 
     setDarkMode(dark) {
@@ -72,6 +81,24 @@ class Index extends Component {
                         />
                     </div>
                 </div>
+                <Modal
+                    title={
+                        <Space size="large" style={{display: 'flex', alignItems: 'center'}}>
+                            <WarningFilled style={{color: "orange", fontSize: 25}} />
+                            <h3>Display Aera too Small</h3>
+                        </Space>}
+                    open={this.state.tooSmall}
+                    closeIcon={null}
+                    footer={null}
+                    keyboard={false}
+                    maskClosable={false}
+                    style={{padding: 50}}
+                    zIndex={20}
+                >
+                    <div style={{marginLeft: 40}}>
+                        Cannot show all contents on this window. Please resize this window or rotate your phone.
+                    </div>
+                </Modal>
             </ConfigProvider>
         );
     }

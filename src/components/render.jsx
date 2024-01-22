@@ -121,7 +121,8 @@ class Render extends Component {
                     title: "Reset UI Window Size",
                     content: "Must reset UI window size after resize browser window.",
                     onOk: () => this.resetCanvasSize(),
-                    okText: 'Reset'
+                    okText: 'Reset',
+                    zIndex: 10
                 })
             })
         }
