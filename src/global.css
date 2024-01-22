@@ -1,27 +1,17 @@
-:root {
-    --solid-gray: 255;
-    --ant-color-bg-layout: #f5f5f5;
-    --text-color: rgb(calc(255 - var(--solid-gray)), calc(255 - var(--solid-gray)), calc(255 - var(--solid-gray)));
-    --scroll-main-color: rgba(var(--solid-gray), var(--solid-gray), var(--solid-gray), 0.2);
-    --scroll-accent-color: rgba(var(--solid-gray), var(--solid-gray), var(--solid-gray), 0.1);
-}
-
-/*:root {*/
-/*    --solid-gray: 20;*/
-/*    --text-color: rgb(calc(255 - var(--solid-gray)), calc(255 - var(--solid-gray)), calc(255 - var(--solid-gray)));*/
-/*    --solid-color: rgb(var(--solid-gray), var(--solid-gray), var(--solid-gray));*/
-/*    --ant-color-bg-layout: #090909;*/
-/*    --scroll-main-color: rgba(255, 255, 255, 0.2);*/
-/*    --scroll-accent-color: rgba(255, 255, 255, 0.1);*/
-/*}*/
-
 @font-face {
     font-family: 'ds-digitalnormal';
     src: url('/ds-digi-webfont.woff2') format('woff2'),
     url('/ds-digi-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+}
 
+@font-face {
+    font-family: 'YouSheBiaoTiHei';
+    src: url('/YouSheBiaoTiHei.woff2') format('woff2'),
+    url('/YouSheBiaoTiHei.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
 }
 
 .ds-font {

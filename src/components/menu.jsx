@@ -157,33 +157,39 @@ class Menu extends Component {
 
     render() {
         const fullButton = (
-            <Button type='text' onClick={() => this.fullScreen()}>
-                <FullscreenOutlined style={{ color: 'var(--ant-color-text)' }} />
+            <Button type='text' onClick={() => this.fullScreen()} size="small" >
+                <FullscreenOutlined style={{ color: 'var(--ant-color-text)' }}/>
             </Button>
         );
         const unFullButton = (
-            <Button type='text' onClick={() => this.exitFullscreen()}>
-                <FullscreenExitOutlined style={{ color: 'var(--ant-color-text)' }} />
+            <Button type='text' onClick={() => this.exitFullscreen()} size="small" >
+                <FullscreenExitOutlined style={{ color: 'var(--ant-color-text)' }}/>
             </Button>
         );
         const moonButton = (
-            <Button type='text' onClick={() => this.props.setDarkMode(true)}>
+            <Button type='text' onClick={() => this.props.setDarkMode(true)} size="small">
                 <Icon component={MoonSvg} />
             </Button>
         )
         const sunButton = (
-            <Button type='text' onClick={() => this.props.setDarkMode(false)}>
+            <Button type='text' onClick={() => this.props.setDarkMode(false)} size="small">
                 <Icon component={SunSvg} />
             </Button>
         )
         return (
-            <div style={{width: "100%", height: 30, padding: 5}} className="solid-color">
-                <Flex style={{width: "calc(100% - 200px)", display: 'inline'}} justify="flex-start" align="center">
-                    <img
-                        style={{display: 'inline', paddingLeft: 12, paddingRight: 6, height: 22, marginTop: -4}}
-                        src={require('../../public/logo.png')}
-                        alt="logo"
-                    />
+            <div style={{width: "100%", height: 30}} className="solid-color">
+                <Flex style={{width: "100vw", display: 'flex', paddingTop: -5}} justify="flex-start" align="center">
+                    <div
+                        style={{
+                            fontFamily: 'YouSheBiaoTiHei',
+                            fontSize: 20,
+                            paddingLeft: 6, paddingRight: 6, paddingTop: 3,
+                            display: 'flex',
+                            color: 'var(--ant-color-text)'
+                        }}
+                    >
+                        RoboMaster UI Designer
+                    </div>
                     <Dropdown menu={{ items: fileItems, onClick: e=>this.onMenuClick(e) }}>
                         <Button type="text" size="small">File</Button>
                     </Dropdown>
@@ -206,27 +212,27 @@ class Menu extends Component {
                     <Button type="text" size="small" onClick={()=> {
                         this.aboutRef.current?.show()
                     }}>About</Button>
-                </Flex>
-                <div style={{ alignItems: 'right', float: 'right', marginRight: 5, marginTop: -4}}>
-                    <div style={{ display: 'inline', marginRight: 15, fontSize: 10, color: 'var(--ant-color-text)' }}>Created by&nbsp;
-                        <a href="https://github.com/bismarckkk"><Button type="link" style={{padding: 0}}>
-                            Bismarckkk
+                    <div style={{ marginRight: 5, justifyContent: 'flex-end', marginLeft: 'auto', marginTop: 4}}>
+                        <div style={{ display: 'inline', marginRight: 15, fontSize: 10, color: 'var(--ant-color-text)' }}>Created by&nbsp;
+                            <a href="https://github.com/bismarckkk"><Button type="link" style={{padding: 0}} size="small">
+                                Bismarckkk
+                            </Button></a>
+                        </div>
+                        {
+                            this.props.darkMode ?
+                                sunButton :
+                                moonButton
+                        }
+                        <a href="https://github.com/bismarckkk/RM-UI-Designer"><Button type="text" size="small">
+                            <GithubOutlined style={{ color: 'var(--ant-color-text)' }} />
                         </Button></a>
+                        {
+                            this.state.fullscreen ?
+                                unFullButton :
+                                fullButton
+                        }
                     </div>
-                    {
-                        this.props.darkMode ?
-                            sunButton :
-                            moonButton
-                    }
-                    <a href="https://github.com/bismarckkk/RM-UI-Designer"><Button type="text">
-                        <GithubOutlined style={{ color: 'var(--ant-color-text)' }} />
-                    </Button></a>
-                    {
-                        this.state.fullscreen ?
-                            unFullButton :
-                            fullButton
-                    }
-                </div>
+                </Flex>
                 <FormModal ref={this.formRef} />
                 <AboutModal ref={this.aboutRef} />
             </div>
