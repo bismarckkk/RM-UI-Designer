@@ -1,9 +1,12 @@
 import React, { Component, createRef } from 'react';
 import { Flex, Button, Dropdown } from "antd";
 import { FullscreenExitOutlined, FullscreenOutlined, ThunderboltOutlined, GithubOutlined } from "@ant-design/icons";
+import Icon from '@ant-design/icons';
 import FormModal from "@/components/modals/formModal";
 import { getMenuProps } from "@/utils/fabricObjects";
 import AboutModal from "@/components/modals/aboutModal";
+import { ReactComponent as MoonSvg } from "@/assets/moon.svg"
+import { ReactComponent as SunSvg } from "@/assets/sun.svg"
 
 const fileItems = [
     {
@@ -49,7 +52,7 @@ const simulateItems = [
 ]
 
 class Menu extends Component {
-    state = {fullscreen: false, frames: ['default'], selectedFrame: 'default'}
+    state = {fullscreen: false, frames: ['default'], selectedFrame: 'default', darkMode: false}
     formRef = createRef()
     aboutRef = createRef()
 
@@ -154,17 +157,27 @@ class Menu extends Component {
 
     render() {
         const fullButton = (
-            <Button type='text' onClick={() => this.fullScreen()} style={{padding: 5}}>
-                <FullscreenOutlined style={{ color: 'black' }} />
+            <Button type='text' onClick={() => this.fullScreen()}>
+                <FullscreenOutlined style={{ color: 'var(--text-color)' }} />
             </Button>
         );
         const unFullButton = (
-            <Button type='text' onClick={() => this.exitFullscreen()} style={{padding: 5}}>
-                <FullscreenExitOutlined style={{ color: 'black' }} />
+            <Button type='text' onClick={() => this.exitFullscreen()}>
+                <FullscreenExitOutlined style={{ color: 'var(--text-color)' }} />
             </Button>
         );
+        const moonButton = (
+            <Button type='text' onClick={() => this.props.setDarkMode(true)}>
+                <Icon component={MoonSvg} />
+            </Button>
+        )
+        const sunButton = (
+            <Button type='text' onClick={() => this.props.setDarkMode(false)}>
+                <Icon component={SunSvg} />
+            </Button>
+        )
         return (
-            <div style={{width: "100%", height: 30, backgroundColor: '#fff', padding: 5}}>
+            <div style={{width: "100%", height: 30, padding: 5}} className="solid-color">
                 <Flex style={{width: "calc(100% - 200px)", display: 'inline'}} justify="flex-start" align="center">
                     <img
                         style={{display: 'inline', paddingLeft: 12, paddingRight: 6, height: 22, marginTop: -4}}
@@ -195,13 +208,18 @@ class Menu extends Component {
                     }}>About</Button>
                 </Flex>
                 <div style={{ alignItems: 'right', float: 'right', marginRight: 5, marginTop: -4}}>
-                    <div style={{ display: 'inline', marginRight: 15, fontSize: 10 }}>Created by&nbsp;
+                    <div style={{ display: 'inline', marginRight: 15, fontSize: 10, color: 'var(--text-color)' }}>Created by&nbsp;
                         <a href="https://github.com/bismarckkk"><Button type="link" style={{padding: 0}}>
                             Bismarckkk
                         </Button></a>
                     </div>
-                    <a href="https://github.com/bismarckkk/RM-UI-Designer"><Button type="text" style={{padding: 5}}>
-                        <GithubOutlined style={{ color: 'black' }} />
+                    {
+                        this.props.darkMode ?
+                            sunButton :
+                            moonButton
+                    }
+                    <a href="https://github.com/bismarckkk/RM-UI-Designer"><Button type="text">
+                        <GithubOutlined style={{ color: 'var(--text-color)' }} />
                     </Button></a>
                     {
                         this.state.fullscreen ?

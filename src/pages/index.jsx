@@ -1,10 +1,13 @@
 import React, {Component} from 'react';
-import { Modal } from "antd";
+import { Modal, ConfigProvider, theme } from "antd";
 import Render from "@/components/render";
 import Menu from "@/components/menu";
+import enUS from "antd/locale/en_US";
+
+const { darkAlgorithm, compactAlgorithm } = theme;
 
 class Index extends Component {
-    state = { simulate: false }
+    state = { simulate: false, darkMode: false }
     modal = null;
     renderRef = React.createRef();
     menuRef = React.createRef();
@@ -35,28 +38,44 @@ class Index extends Component {
         }, false);
     }
 
+    setDarkMode(dark) {
+        let element = document.documentElement;
+        if (dark) {
+            element.style.setProperty('--solid-gray', '20');
+            element.style.setProperty('--background-color', '#090909');
+        } else {
+            element.style.setProperty('--solid-gray', '255');
+            element.style.setProperty('--background-color', '#f5f5f5');
+        }
+        this.setState({darkMode: dark})
+    }
+
     render() {
         return (
-            <div className="container" style={{backgroundColor: '#f5f5f5', height: '100vh', paddingBottom: 12, overflow: 'hidden'}}>
-                {/*<p className="ds-font">*/}
-                {/*    Designer*/}
-                {/*</p>*/}
-                <Menu
-                    save={()=>this.renderRef.current.save()}
-                    onObjectEvent={(t, e)=>this.renderRef.current.onObjectEvent(t, e)}
-                    generate={()=>this.renderRef.current.generate()}
-                    reset={()=>this.renderRef.current.reset()}
-                    setFrame={(t, f)=>this.renderRef.current.onFrameEvent(t, f)}
-                    upload={(e)=>this.renderRef.current.upload(e)}
-                    ref={this.menuRef}
-                />
-                <Render
-                    className="full"
-                    editable={true}
-                    ref={this.renderRef}
-                    onFrameChange={e=>this.menuRef.current.setFrames(e)}
-                />
-            </div>
+            <ConfigProvider
+                locale={enUS}
+                theme={{algorithm: this.state.darkMode ? [darkAlgorithm, compactAlgorithm] : compactAlgorithm, cssVar: { key: 'app' }}}
+            >
+                <div className="container background-color" style={{height: '100vh', paddingBottom: 12, overflow: 'hidden'}}>
+                    <Menu
+                        save={()=>this.renderRef.current.save()}
+                        onObjectEvent={(t, e)=>this.renderRef.current.onObjectEvent(t, e)}
+                        generate={()=>this.renderRef.current.generate()}
+                        reset={()=>this.renderRef.current.reset()}
+                        setFrame={(t, f)=>this.renderRef.current.onFrameEvent(t, f)}
+                        upload={(e)=>this.renderRef.current.upload(e)}
+                        ref={this.menuRef}
+                        setDarkMode={(e)=>this.setDarkMode(e)}
+                        darkMode={this.state.darkMode}
+                    />
+                    <Render
+                        className="full"
+                        editable={true}
+                        ref={this.renderRef}
+                        onFrameChange={e=>this.menuRef.current.setFrames(e)}
+                    />
+                </div>
+            </ConfigProvider>
         );
     }
 }

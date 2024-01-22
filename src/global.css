@@ -1,3 +1,21 @@
+:root {
+    --solid-gray: 255;
+    --background-color: #f5f5f5;
+    --text-color: rgb(calc(255 - var(--solid-gray)), calc(255 - var(--solid-gray)), calc(255 - var(--solid-gray)));
+    --solid-color: rgb(var(--solid-gray), var(--solid-gray), var(--solid-gray));
+    --scroll-main-color: rgba(var(--solid-gray), var(--solid-gray), var(--solid-gray), 0.2);
+    --scroll-accent-color: rgba(var(--solid-gray), var(--solid-gray), var(--solid-gray), 0.1);
+}
+
+/*:root {*/
+/*    --solid-gray: 20;*/
+/*    --text-color: rgb(calc(255 - var(--solid-gray)), calc(255 - var(--solid-gray)), calc(255 - var(--solid-gray)));*/
+/*    --solid-color: rgb(var(--solid-gray), var(--solid-gray), var(--solid-gray));*/
+/*    --background-color: #090909;*/
+/*    --scroll-main-color: rgba(255, 255, 255, 0.2);*/
+/*    --scroll-accent-color: rgba(255, 255, 255, 0.1);*/
+/*}*/
+
 @font-face {
     font-family: 'ds-digitalnormal';
     src: url('/ds-digi-webfont.woff2') format('woff2'),
@@ -24,7 +42,15 @@
 .card-body {
     height: calc((100vh - 172px) / 2);
     overflow: auto;
-    background-color: #fff;
+    background-color: var(--solid-color);
+}
+
+.background-color {
+    background-color: var(--background-color);
+}
+
+.solid-color {
+    background-color: var(--solid-color);
 }
 
 .card-body::-webkit-scrollbar {
@@ -37,10 +63,20 @@
 
 .card-body::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--scroll-main-color);
 }
 
 .card-body::-webkit-scrollbar-track {
     border-radius: 10px;
-    background: rgba(0, 0, 0, 0.1);
+    background: var(--scroll-accent-color);
+}
+
+#coordinateDisplay {
+    background-color: var(--background-color);
+    border-radius: 5px;
+    color: var(--text-color);
+    padding: 5px;
+    margin: 10px 2px 10px 10px;
+    pointer-events: none;
+    position: absolute;
 }

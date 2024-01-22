@@ -11,10 +11,12 @@
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
     "@ant-design/pro-components": "^2.6.28",
+    "@svgr/webpack": "^8.1.0",
     "@umijs/plugins": "^4.0.83",
     "antd": "^5.9.3",
     "fabric": "^5.3.0",
     "react-markdown": "^9.0.0",
+    "svg-react-loader": "^0.4.6",
     "umi": "^4.0.83"
   },
   "devDependencies": {

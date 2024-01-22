@@ -95,6 +95,13 @@ class Render extends Component {
         this.setState({uiWindow})
         this.canvas.setHeight(height)
         this.canvas.setWidth(width)
+        const parentWidth = this.canvasRef.current.clientWidth;
+        const parentHeight = this.canvasRef.current.clientHeight;
+        const right = parentWidth - width;
+        const bottom = parentHeight - height;
+        const coordinateDisplay = document.getElementById('coordinateDisplay');
+        coordinateDisplay.style.right = `${right}px`;
+        coordinateDisplay.style.bottom = `${bottom}px`;
         for (const key of Object.keys(this.objects[this.state.frame])) {
             this.objects[this.state.frame][key].setRatio(uiWindow.ratio)
         }
@@ -239,7 +246,20 @@ class Render extends Component {
                         that.select(-1)
                     }
                 }, 100)
-            }
+            },
+            "mouse:move": (event) => {
+                const pointer = this.canvas.getPointer(event.e);
+                const ratio = this.state.uiWindow.ratio;
+                const x = Math.round(pointer.x * ratio);
+                const y = Math.round(pointer.y * ratio);
+                const coordinateDisplay = document.getElementById('coordinateDisplay');
+                coordinateDisplay.style.display = 'block';
+                coordinateDisplay.textContent = `x: ${x}, y: ${y}`;
+            },
+            "mouse:out": () => {
+                const coordinateDisplay = document.getElementById('coordinateDisplay');
+                coordinateDisplay.style.display = 'none';
+            },
         })
         this.canvas.selection = false
 
@@ -500,6 +520,7 @@ class Render extends Component {
                     </Col>
                     <Col flex="auto" ref={this.canvasRef}>
                         <canvas className="full" id="ui"/>
+                        <div id="coordinateDisplay" style={{bottom: 0, right: 0, display: 'none'}}/>
                     </Col>
                 </Row>
                 <UpdateModal ref={this.uploadRef}/>
