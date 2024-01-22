@@ -158,12 +158,12 @@ class Menu extends Component {
     render() {
         const fullButton = (
             <Button type='text' onClick={() => this.fullScreen()}>
-                <FullscreenOutlined style={{ color: 'var(--text-color)' }} />
+                <FullscreenOutlined style={{ color: 'var(--ant-color-text)' }} />
             </Button>
         );
         const unFullButton = (
             <Button type='text' onClick={() => this.exitFullscreen()}>
-                <FullscreenExitOutlined style={{ color: 'var(--text-color)' }} />
+                <FullscreenExitOutlined style={{ color: 'var(--ant-color-text)' }} />
             </Button>
         );
         const moonButton = (
@@ -208,7 +208,7 @@ class Menu extends Component {
                     }}>About</Button>
                 </Flex>
                 <div style={{ alignItems: 'right', float: 'right', marginRight: 5, marginTop: -4}}>
-                    <div style={{ display: 'inline', marginRight: 15, fontSize: 10, color: 'var(--text-color)' }}>Created by&nbsp;
+                    <div style={{ display: 'inline', marginRight: 15, fontSize: 10, color: 'var(--ant-color-text)' }}>Created by&nbsp;
                         <a href="https://github.com/bismarckkk"><Button type="link" style={{padding: 0}}>
                             Bismarckkk
                         </Button></a>
@@ -219,7 +219,7 @@ class Menu extends Component {
                             moonButton
                     }
                     <a href="https://github.com/bismarckkk/RM-UI-Designer"><Button type="text">
-                        <GithubOutlined style={{ color: 'var(--text-color)' }} />
+                        <GithubOutlined style={{ color: 'var(--ant-color-text)' }} />
                     </Button></a>
                     {
                         this.state.fullscreen ?

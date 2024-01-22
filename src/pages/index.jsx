@@ -39,14 +39,6 @@ class Index extends Component {
     }
 
     setDarkMode(dark) {
-        let element = document.documentElement;
-        if (dark) {
-            element.style.setProperty('--solid-gray', '20');
-            element.style.setProperty('--background-color', '#090909');
-        } else {
-            element.style.setProperty('--solid-gray', '255');
-            element.style.setProperty('--background-color', '#f5f5f5');
-        }
         this.setState({darkMode: dark})
     }
 
@@ -54,26 +46,31 @@ class Index extends Component {
         return (
             <ConfigProvider
                 locale={enUS}
-                theme={{algorithm: this.state.darkMode ? [darkAlgorithm, compactAlgorithm] : compactAlgorithm, cssVar: { key: 'app' }}}
+                theme={{
+                    cssVar: {key: 'rmui'}, hashed: false,
+                    algorithm: this.state.darkMode ? [darkAlgorithm, compactAlgorithm] : compactAlgorithm
+                }}
             >
-                <div className="container background-color" style={{height: '100vh', paddingBottom: 12, overflow: 'hidden'}}>
-                    <Menu
-                        save={()=>this.renderRef.current.save()}
-                        onObjectEvent={(t, e)=>this.renderRef.current.onObjectEvent(t, e)}
-                        generate={()=>this.renderRef.current.generate()}
-                        reset={()=>this.renderRef.current.reset()}
-                        setFrame={(t, f)=>this.renderRef.current.onFrameEvent(t, f)}
-                        upload={(e)=>this.renderRef.current.upload(e)}
-                        ref={this.menuRef}
-                        setDarkMode={(e)=>this.setDarkMode(e)}
-                        darkMode={this.state.darkMode}
-                    />
-                    <Render
-                        className="full"
-                        editable={true}
-                        ref={this.renderRef}
-                        onFrameChange={e=>this.menuRef.current.setFrames(e)}
-                    />
+                <div className="rmui">
+                    <div className="container background-color" style={{height: '100vh', paddingBottom: 12, overflow: 'hidden'}}>
+                        <Menu
+                            save={()=>this.renderRef.current.save()}
+                            onObjectEvent={(t, e)=>this.renderRef.current.onObjectEvent(t, e)}
+                            generate={()=>this.renderRef.current.generate()}
+                            reset={()=>this.renderRef.current.reset()}
+                            setFrame={(t, f)=>this.renderRef.current.onFrameEvent(t, f)}
+                            upload={(e)=>this.renderRef.current.upload(e)}
+                            ref={this.menuRef}
+                            setDarkMode={(e)=>this.setDarkMode(e)}
+                            darkMode={this.state.darkMode}
+                        />
+                        <Render
+                            className="full"
+                            editable={true}
+                            ref={this.renderRef}
+                            onFrameChange={e=>this.menuRef.current.setFrames(e)}
+                        />
+                    </div>
                 </div>
             </ConfigProvider>
         );
