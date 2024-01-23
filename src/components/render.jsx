@@ -1,5 +1,5 @@
 import React, {Component, createRef} from 'react';
-import {Button, Card, Col, Empty, message, Modal, Row, Space} from "antd";
+import {Button, Card, Col, Empty, message, Row, Space} from "antd";
 import {ProDescriptions} from '@ant-design/pro-components';
 import UpdateModal from './modals/updateModal'
 import WarningModal from "./modals/warningModal";
@@ -70,7 +70,7 @@ class Render extends Component {
     async reset() {
         this.canvas.clear()
         this.canvas.backgroundColor = '#fff'
-        this.setBackground(require("../../public/background.png"))
+        this.setBackground(require("../assets/background.png"))
         if (!Object.keys(this.objects).includes('default')) {
             await this.onFrameEvent('add', 'default')
         }
@@ -183,7 +183,7 @@ class Render extends Component {
     componentDidMount() {
         const that = this
         this.canvas = new fabric.Canvas('ui')
-        this.setBackground(require("../../public/background.png"))
+        this.setBackground(require("../assets/background.png"))
         this.canvas.backgroundColor = '#fff'
 
         window.addEventListener('resize', () => {
@@ -513,7 +513,7 @@ class Render extends Component {
                                                 Upload Background
                                             </Button>
                                             <Button onClick={() =>
-                                                this.setBackground(require("../../public/background.png"))
+                                                this.setBackground(require("../assets/background.png"))
                                             }>
                                                 Reset Background
                                             </Button>

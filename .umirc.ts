@@ -1,5 +1,4 @@
 import { defineConfig } from "umi";
-import enUS from 'antd/locale/en_US';
 
 export default defineConfig({
   npmClient: 'pnpm',
@@ -7,4 +6,18 @@ export default defineConfig({
   antd: {},
   title: 'RM UI Designer',
   history: {type: "hash"},
+  links: [{
+    href: '/manifest.json',
+    rel: 'manifest'
+  }],
+  chainWebpack(memo) {
+    const { GenerateSW } = require("workbox-webpack-plugin");
+    memo.plugin('workbox').use(GenerateSW, [{
+      cacheId: 'rmui-pwa',
+      clientsClaim: true,
+      skipWaiting: true,
+      cleanupOutdatedCaches: true,
+      swDest: 'sw.js'
+    }])
+  }
 });

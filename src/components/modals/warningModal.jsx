@@ -30,7 +30,6 @@ class WarningModal extends Component {
         } else if (this.info.type === 'error') {
             icon = <CloseCircleFilled style={{color: "red", fontSize: 25}} />
         }
-        console.log(this.info)
         return (
             <Modal
                 title={

@@ -1,15 +1,15 @@
 @font-face {
     font-family: 'ds-digitalnormal';
-    src: url('/ds-digi-webfont.woff2') format('woff2'),
-    url('/ds-digi-webfont.woff') format('woff');
+    src: url('assets/ds-digi-webfont.woff2') format('woff2'),
+    url('assets/ds-digi-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'YouSheBiaoTiHei';
-    src: url('/YouSheBiaoTiHei.woff2') format('woff2'),
-    url('/YouSheBiaoTiHei.woff') format('woff');
+    src: url('assets/YouSheBiaoTiHei.woff2') format('woff2'),
+    url('assets/YouSheBiaoTiHei.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
