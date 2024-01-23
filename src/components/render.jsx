@@ -2,6 +2,7 @@ import React, {Component, createRef} from 'react';
 import {Button, Card, Col, Empty, message, Modal, Row, Space} from "antd";
 import {ProDescriptions} from '@ant-design/pro-components';
 import UpdateModal from './modals/updateModal'
+import WarningModal from "./modals/warningModal";
 import Elements from "./elements";
 
 import {fabric} from 'fabric'
@@ -32,6 +33,7 @@ class Render extends Component {
     uploadRef = createRef()
     generatorRef = createRef()
     propertiesRef = createRef()
+    modalRef = createRef()
     background = null
 
     getNewDataId() {
@@ -117,12 +119,12 @@ class Render extends Component {
             this.canvas.setWidth(10)
             this.canvas.renderAll()
             this.setState({infoModalShow: true}, () => {
-                Modal.info({
+                this.modalRef.current.open({
                     title: "Reset UI Window Size",
                     content: "Must reset UI window size after resize browser window.",
-                    onOk: () => this.resetCanvasSize(),
+                    onOK: () => this.resetCanvasSize(),
                     okText: 'Reset',
-                    zIndex: 10
+                    type: 'info'
                 })
             })
         }
@@ -152,9 +154,10 @@ class Render extends Component {
                 }
             }
             if (info.width !== this.state.uiWindow.width || info.height !== this.state.uiWindow.height) {
-                Modal.warning({
+                this.modalRef.current.open({
                     title: 'Warning',
-                    content: 'Modify UI window width and height may cause unknown error.'
+                    content: 'Modify UI window width and height may cause unknown error.',
+                    type: 'warning'
                 })
             }
         } else if (this.state.selectedId !== -1) {
@@ -411,6 +414,7 @@ class Render extends Component {
                     }
                 }
                 that.objectsToData()
+                that.select(-1)
                 that.canvas.renderAll()
                 resolve()
             })
@@ -526,6 +530,7 @@ class Render extends Component {
                 </Row>
                 <UpdateModal ref={this.uploadRef}/>
                 <Generator ref={this.generatorRef}/>
+                <WarningModal ref={this.modalRef} couldClose={false} />
             </div>
         );
     }
