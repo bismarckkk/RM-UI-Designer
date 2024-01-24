@@ -204,7 +204,21 @@ class Render extends Component {
         })
         window.addEventListener("paste", e => {
             e.preventDefault()
-            if (e.clipboardData.items.length === 0) {
+            let findImage = false
+            const items = e.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf("image") === 0) {
+                    findImage = true
+                    const blob = items[i].getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        console.log(e)
+                        that.setBackground(e.target.result)
+                    };
+                    reader.readAsDataURL(blob);
+                }
+            }
+            if (!findImage) {
                 if (e.target.localName === 'input') {
                     e.target.value = e.clipboardData.getData('text')
                 } else {
@@ -216,19 +230,6 @@ class Render extends Component {
                         that.select(obj.id)
                     } catch (e) {
 
-                    }
-                }
-            } else {
-                const items = e.clipboardData.items;
-                for (let i = 0; i < items.length; i++) {
-                    if (items[i].type.indexOf("image") === 0) {
-                        const blob = items[i].getAsFile();
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            console.log(e)
-                            that.setBackground(e.target.result)
-                        };
-                        reader.readAsDataURL(blob);
                     }
                 }
             }
