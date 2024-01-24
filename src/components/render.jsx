@@ -104,8 +104,6 @@ class Render extends Component {
         const coordinateDisplay = document.getElementById('coordinateDisplay');
         coordinateDisplay.style.right = `${right}px`;
         coordinateDisplay.style.bottom = `${bottom}px`;
-        console.log(this.objects)
-        console.log(this.state.frame)
         for (const key of Object.keys(this.objects[this.state.frame])) {
             this.objects[this.state.frame][key].setRatio(uiWindow.ratio)
         }
@@ -214,7 +212,6 @@ class Render extends Component {
                     const blob = items[i].getAsFile();
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        console.log(e)
                         that.setBackground(e.target.result)
                     };
                     reader.readAsDataURL(blob);

@@ -9,7 +9,6 @@ export default () => {
     message = staticFunction.message;
     modal = staticFunction.modal;
     notification = staticFunction.notification;
-    console.log(message)
     return null;
 };
 
