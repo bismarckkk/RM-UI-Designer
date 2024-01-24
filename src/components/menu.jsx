@@ -177,7 +177,7 @@ class Menu extends Component {
             </Button>
         )
         return (
-            <div style={{width: "100%", height: 30}} className="solid-color">
+            <div style={{width: "100%", height: 32, marginTop: -5}} className="solid-color">
                 <Flex style={{width: "100vw", display: 'flex', paddingTop: -5}} justify="flex-start" align="center">
                     <div
                         style={{
@@ -212,7 +212,7 @@ class Menu extends Component {
                     <Button type="text" size="small" onClick={()=> {
                         this.aboutRef.current?.show()
                     }}>About</Button>
-                    <div style={{ marginRight: 5, justifyContent: 'flex-end', marginLeft: 'auto', marginTop: 4}}>
+                    <div style={{ marginRight: 5, justifyContent: 'flex-end', marginLeft: 'auto', marginTop: 2}}>
                         <div style={{ display: 'inline', marginRight: 15, fontSize: 10, color: 'var(--ant-color-text)' }}>Created by&nbsp;
                             <a href="https://github.com/bismarckkk"><Button type="link" style={{padding: 0}} size="small">
                                 Bismarckkk
