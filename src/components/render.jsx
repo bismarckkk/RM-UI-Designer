@@ -44,11 +44,11 @@ class Render extends Component {
     }
 
     save() {
-        saveObj(this.state.data, 'ui.rmui', this.state.frame)
+        saveObj(this.objects, 'ui.rmui', this.state.frame)
     }
 
     generate() {
-        this.generatorRef.current.gen(this.state.data)
+        this.generatorRef.current.gen(this.objects)
     }
 
     select(id) {
@@ -77,6 +77,7 @@ class Render extends Component {
         this.objects.default = {}
         await this.onFrameEvent('change', 'default')
         this.objects = {default: {}}
+        this.props.onFrameChange({frames: ['default'], selected: 'default'})
         this.select(-1)
         this.resetCanvasSize()
         this.objectsToData()
@@ -104,6 +105,8 @@ class Render extends Component {
         const coordinateDisplay = document.getElementById('coordinateDisplay');
         coordinateDisplay.style.right = `${right}px`;
         coordinateDisplay.style.bottom = `${bottom}px`;
+        console.log(this.objects)
+        console.log(this.state.frame)
         for (const key of Object.keys(this.objects[this.state.frame])) {
             this.objects[this.state.frame][key].setRatio(uiWindow.ratio)
         }
@@ -280,9 +283,9 @@ class Render extends Component {
         const that = this
         this.uploadRef.current.upload('Upload Your .rmui File', '.rmui').then(file => {
             const reader = new FileReader()
-            reader.onload = e => {
-                that.reset()
-                readUiFile(
+            reader.onload = async e => {
+                await that.reset()
+                await readUiFile(
                     e.target.result,
                     (t, e) => that.onObjectEvent(t, e),
                     frame => that.onFrameEvent('change', frame),
