@@ -26,7 +26,15 @@ class AboutModal extends Component {
                 open={this.state.open}
             >
                 {
-                    this.state.content ? <Markdown>{this.state.content}</Markdown> : <Loading />
+                    this.state.content ?
+                        <Markdown
+                            components={{
+                                a: ({node, ...props}) => <a {...props} target="_blank" />
+                            }}
+                        >
+                            {this.state.content}
+                        </Markdown> :
+                        <Loading />
                 }
             </Modal>
         );

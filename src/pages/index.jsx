@@ -26,6 +26,10 @@ class Index extends Component {
         const that = this;
         let lastWidth = 0;
 
+        window.addEventListener("drop", (e) => e.preventDefault(), false);
+        window.addEventListener("dragover", (e) => e.preventDefault(), false);
+        window.addEventListener("contextmenu", (e) => e.preventDefault(), false);
+
         function resizeHandle(width) {
             if (!that.modal && width < 792 && width !== lastWidth) {
                 lastWidth = width;

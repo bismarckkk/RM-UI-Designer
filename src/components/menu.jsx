@@ -1,12 +1,16 @@
 import React, { Component, createRef } from 'react';
 import { Flex, Button, Dropdown } from "antd";
-import { FullscreenExitOutlined, FullscreenOutlined, ThunderboltOutlined, GithubOutlined } from "@ant-design/icons";
+import { FullscreenExitOutlined, FullscreenOutlined, ThunderboltOutlined,
+    GithubOutlined, CloseOutlined, MinusOutlined } from "@ant-design/icons";
 import Icon from '@ant-design/icons';
 import FormModal from "@/components/modals/formModal";
 import { getMenuProps } from "@/utils/fabricObjects";
 import AboutModal from "@/components/modals/aboutModal";
 import { ReactComponent as MoonSvg } from "@/assets/moon.svg"
 import { ReactComponent as SunSvg } from "@/assets/sun.svg"
+import { appWindow } from '@tauri-apps/api/window';
+import { exit } from '@tauri-apps/api/process';
+import { isTauri } from "@/utils/utils";
 
 const fileItems = [
     {
@@ -52,20 +56,32 @@ const simulateItems = [
 ]
 
 class Menu extends Component {
-    state = {fullscreen: false, frames: ['default'], selectedFrame: 'default', darkMode: false}
+    state = { fullscreen: false, frames: ['default'], selectedFrame: 'default', darkMode: false }
     formRef = createRef()
     aboutRef = createRef()
+    tauri = isTauri()
+
+    async componentDidMount() {
+        if (this.tauri) {
+            const maximized = await appWindow.isMaximized()
+            this.setState({fullscreen: maximized})
+        }
+    }
 
     fullScreen() {
-        let element = document.documentElement;
-        if (element.requestFullscreen) {
-            element.requestFullscreen();
-        } else if (element.msRequestFullscreen) {
-            element.msRequestFullscreen();
-        } else if (element.mozRequestFullScreen) {
-            element.mozRequestFullScreen();
-        } else if (element.webkitRequestFullscreen) {
-            element.webkitRequestFullscreen();
+        if (this.tauri) {
+            appWindow.maximize()
+        } else {
+            let element = document.documentElement;
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen();
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            }
         }
         this.setState({
             fullscreen: true,
@@ -73,14 +89,18 @@ class Menu extends Component {
     }
 
     exitFullscreen() {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
+        if (this.tauri) {
+            appWindow.unmaximize()
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
         }
         this.setState({
             fullscreen: false,
@@ -177,16 +197,22 @@ class Menu extends Component {
             </Button>
         )
         return (
-            <div style={{width: "100%", height: 32, marginTop: -5}} className="solid-color">
-                <Flex style={{width: "100vw", display: 'flex', paddingTop: -5}} justify="flex-start" align="center">
+            <div style={{width: "100%", height: 32, marginTop: -5}} className="solid-color" data-tauri-drag-region>
+                <Flex
+                    style={{width: "100vw", display: 'flex', paddingTop: -5}}
+                    justify="flex-start" align="center" data-tauri-drag-region
+                >
                     <div
                         style={{
                             fontFamily: 'YouSheBiaoTiHei',
                             fontSize: 20,
                             paddingLeft: 6, paddingRight: 6, paddingTop: 3,
                             display: 'flex',
-                            color: 'var(--ant-color-text)'
+                            color: 'var(--ant-color-text)',
+                            userSelect: false,
+                            cursor: 'default'
                         }}
+                        data-tauri-drag-region
                     >
                         RoboMaster UI Designer
                     </div>
@@ -212,11 +238,23 @@ class Menu extends Component {
                     <Button type="text" size="small" onClick={()=> {
                         this.aboutRef.current?.show()
                     }}>About</Button>
-                    <div style={{ marginRight: 5, justifyContent: 'flex-end', marginLeft: 'auto', marginTop: 2}}>
-                        <div style={{ display: 'inline', marginRight: 15, fontSize: 10, color: 'var(--ant-color-text)' }}>Created by&nbsp;
-                            <a href="https://github.com/bismarckkk"><Button type="link" style={{padding: 0}} size="small">
-                                Bismarckkk
-                            </Button></a>
+                    <div
+                        style={{ marginRight: 5, justifyContent: 'flex-end', marginLeft: 'auto', marginTop: 2}}
+                        data-tauri-drag-region
+                    >
+                        <div
+                            style={{
+                                display: 'inline', marginRight: 15, fontSize: 10, cursor: 'default',
+                                color: 'var(--ant-color-text)', userSelect: false
+                            }}
+                            data-tauri-drag-region
+                        >
+                            Created by&nbsp;
+                            <a href="https://github.com/bismarckkk" target="_blank">
+                                <Button type="link" style={{padding: 0}} size="small" data-tauri-drag-region>
+                                    Bismarckkk
+                                </Button>
+                            </a>
                         </div>
                         {
                             this.props.darkMode ?
@@ -226,11 +264,26 @@ class Menu extends Component {
                         <a href="https://github.com/bismarckkk/RM-UI-Designer"><Button type="text" size="small">
                             <GithubOutlined style={{ color: 'var(--ant-color-text)' }} />
                         </Button></a>
+                        <Button
+                            type="text" size="small"
+                            onClick={() => appWindow.minimize()}
+                            style={{display: this.tauri ? 'inline' : 'none'}}
+                        >
+                            <MinusOutlined style={{ color: 'var(--ant-color-text)' }} />
+                        </Button>
                         {
                             this.state.fullscreen ?
                                 unFullButton :
                                 fullButton
                         }
+
+                        <Button
+                            type="text" size="small"
+                            onClick={() => exit()}
+                            style={{display: this.tauri ? 'inline' : 'none'}}
+                        >
+                            <CloseOutlined style={{ color: 'var(--ant-color-text)' }} />
+                        </Button>
                     </div>
                 </Flex>
                 <FormModal ref={this.formRef} />

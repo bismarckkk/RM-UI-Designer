@@ -32,3 +32,7 @@ export function createObjUrl(file) {
     }
     return url
 }
+
+export function isTauri() {
+    return window !== undefined && window.__TAURI__ !== undefined
+}

@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import {Divider, Modal, Upload} from "antd";
 import {InboxOutlined} from "@ant-design/icons";
+import { dialog, fs } from '@tauri-apps/api';
+import { isTauri } from "@/utils/utils";
 
 const { Dragger } = Upload;
 
@@ -19,9 +21,36 @@ class UpdateModal extends Component {
     }
 
     upload(title, accept) {
-        return new Promise((resolve, reject) => {
-            this.setState({show: true, promise: {resolve, reject}, title, accept})
-        })
+        if (isTauri()) {
+            let _accept = [accept.slice(1)]
+            let _acceptType = `${_accept} file`
+            if (accept === 'image/*') {
+                _accept = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'ico', 'svg']
+                _acceptType = 'image'
+            }
+            return new Promise((resolve, reject) => {
+                (async ()=> {
+                    const path = await dialog.open({
+                        multiple: false,
+                        directory: false,
+                        filters: [{ name: _acceptType, extensions: _accept }]
+                    })
+                    if (path !== null && path.length > 0) {
+                        const _path = path.replace(/\\/g, '/')
+                        const fileName = _path.split('/').pop()
+                        const blob = new Blob([await fs.readBinaryFile(path)]);
+                        const file = new File([blob], fileName);
+                        resolve(file)
+                    } else {
+                        reject();
+                    }
+                })()
+            })
+        } else {
+            return new Promise((resolve, reject) => {
+                this.setState({show: true, promise: {resolve, reject}, title, accept})
+            })
+        }
     }
 
     render() {

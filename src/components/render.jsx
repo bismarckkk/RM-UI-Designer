@@ -508,6 +508,7 @@ class Render extends Component {
                                                     'Upload Your Background Image',
                                                     'image/*'
                                                 ).then(file => {
+                                                    console.log(file)
                                                     this.setState({imageUploadShow: false})
                                                     this.setBackground(createObjUrl(file))
                                                 }).catch(_ => {
