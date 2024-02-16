@@ -2,9 +2,8 @@ name: Release CI
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - 'v*'
 
 jobs:
   create-release:
@@ -85,17 +84,7 @@ jobs:
 
       - name: pack
         if: matrix.platform == 'ubuntu-latest'
-        run: |
-          tar -czvf gh_pages.tar.gz dist
-          touch dist/.nojekyll
-
-      - name: deploy
-        if: matrix.platform == 'ubuntu-latest'
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          branch: gh-pages
-          folder: dist
-          clean: true
+        run: tar -czvf gh_pages.tar.gz dist
 
       - name: upload
         if: matrix.platform == 'ubuntu-latest'
