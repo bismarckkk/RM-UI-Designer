@@ -3,15 +3,19 @@
 ### Online Demo: [https://ui.bismarck.xyz/](https://ui.bismarck.xyz/)
 
 ## 自行部署
-本项目为纯前端项目，可直接部署在任何静态服务器上，如Nginx、Apache等，在线demo使用Github Pages托管，
-在`gh-pages`分支上可以找到自动构建的静态文件，
+本项目为纯前端项目，可直接部署在任何静态服务器上，如Nginx、Apache等，
+在线demo使用Github Pages托管，同时还提供了tauri的本地应用版本，
+本地应用程序和自动构建的代码可在release中下载，
 如需自行构建可以参考以下步骤：
 ```shell
 git clone https://github.com/bismarckkk/RM-UI-Designer.git
 cd RM-UI-Designer
 yarn
 yarn build
+yarn tauri build  # 构建tauri应用，需要配置tauri构建环境
 ```
+
+同时，本应用还提供了PWA应用，可以通过浏览器直接安装以供离线使用。
 
 ## 路线图
 - 基本组件
@@ -41,4 +45,5 @@ yarn build
   - [ ] 生成代码
   - [ ] UI模拟器
   - [x] PWA应用
+  - [x] Tauri应用
 
