@@ -1,7 +1,7 @@
 import { defineConfig } from "umi";
 
 export default defineConfig({
-  npmClient: 'pnpm',
+  npmClient: 'yarn',
   plugins: ['@umijs/plugins/dist/antd'],
   antd: {},
   title: 'RM UI Designer',

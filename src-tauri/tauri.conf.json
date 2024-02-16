@@ -12,7 +12,28 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true
+      "all": false,
+      "fs": {
+        "readFile": true,
+        "writeFile": true
+      },
+      "dialog": {
+        "open": true,
+        "save": true
+      },
+      "window": {
+        "maximize": true,
+        "unmaximize": true,
+        "minimize": true,
+        "setDecorations": true,
+        "startDragging": true
+      },
+      "process": {
+        "exit": true
+      },
+      "shell": {
+        "open": true
+      }
     },
     "bundle": {
       "active": true,
@@ -29,7 +50,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.bismarck.rmUiDesigner",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
