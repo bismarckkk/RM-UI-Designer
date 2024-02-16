@@ -1,3 +1,5 @@
+import { dialog, fs } from '@tauri-apps/api';
+
 const a = document.createElement('a')
 
 export const ColorMap = {
@@ -16,9 +18,23 @@ export const ColorMap = {
 export function saveObj(data, fileName, selected) {
     let _data = {version: 2, data: data, selected}
     const str = JSON.stringify(_data)
-    a.href = `data:,${str}`
-    a.download = fileName
-    a.click()
+    if (isTauri()) {
+        (async ()=> {
+            const path = await dialog.save({
+                filters: [{
+                    name: 'rmui file',
+                    extensions: ['rmui']
+                }]
+            });
+            if (path !== null && path.length > 0) {
+                await fs.writeTextFile(path, str)
+            }
+        })()
+    } else {
+        a.href = `data:,${str}`
+        a.download = fileName
+        a.click()
+    }
 }
 
 export function createObjUrl(file) {

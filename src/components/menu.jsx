@@ -261,9 +261,11 @@ class Menu extends Component {
                                 sunButton :
                                 moonButton
                         }
-                        <a href="https://github.com/bismarckkk/RM-UI-Designer"><Button type="text" size="small">
-                            <GithubOutlined style={{ color: 'var(--ant-color-text)' }} />
-                        </Button></a>
+                        <a href="https://github.com/bismarckkk/RM-UI-Designer" target="_blank">
+                            <Button type="text" size="small">
+                                <GithubOutlined style={{ color: 'var(--ant-color-text)' }} />
+                            </Button>
+                        </a>
                         <Button
                             type="text" size="small"
                             onClick={() => appWindow.minimize()}

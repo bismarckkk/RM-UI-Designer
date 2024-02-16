@@ -1,11 +1,11 @@
 [package]
-name = "RM_UI_Designer"
+name = "rm_ui_designer"
 version = "0.1.0"
 description = "An Easy Way to Design UI for RM"
 authors = ["bismarckkk"]
 license = "GPL-3.0-only"
 repository = "https://github.com/bismarckkk/RM-UI-Designer"
-default-run = "RM_UI_Designer"
+default-run = "rm_ui_designer"
 edition = "2021"
 rust-version = "1.60"
 
@@ -17,7 +17,7 @@ tauri-build = { version = "1.5.1", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.5.4", features = ["api-all"] }
+tauri = { version = "1.5.4", features = [ "fs-write-file", "shell-open", "window-start-dragging", "fs-read-file", "window-set-decorations", "window-maximize", "window-minimize", "window-unmaximize", "dialog-save", "process-exit", "dialog-open"] }
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.
