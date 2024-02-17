@@ -14,6 +14,7 @@ import {readUiFile} from "@/utils/rmuiReader";
 
 class Render extends Component {
     objects = {default: {}}
+    data = {}
     state = {
         properties: null,
         selectedId: -1,
@@ -43,11 +44,11 @@ class Render extends Component {
     }
 
     save() {
-        saveObj(this.objects, 'ui.rmui', this.state.frame)
+        saveObj(this.data, 'ui.rmui', this.state.frame)
     }
 
     generate() {
-        this.generatorRef.current.gen(this.objects)
+        this.generatorRef.current.gen(this.data)
     }
 
     select(id) {
@@ -191,21 +192,19 @@ class Render extends Component {
             this.onReSize();
         }, false);
         window.addEventListener('copy', e => {
-            e.preventDefault()
             let info = null
-            if (e.target.localName === 'input') {
-                info = e.target.ariaValueNow
-            } else if (that.state.selectedId !== -1 && that.state.selectedId !== -2) {
+            if (e.target.localName !== 'input' && that.state.selectedId >= 0) {
+                e.preventDefault()
                 info = JSON.stringify(that.state.data[that.state.selectedId])
+                e.clipboardData.setData('text', info)
             }
-            e.clipboardData.setData('text', info)
         })
         window.addEventListener("paste", e => {
-            e.preventDefault()
             let findImage = false
             const items = e.clipboardData.items;
             for (let i = 0; i < items.length; i++) {
                 if (items[i].type.indexOf("image") === 0) {
+                    e.preventDefault()
                     findImage = true
                     const blob = items[i].getAsFile();
                     const reader = new FileReader();
@@ -216,10 +215,9 @@ class Render extends Component {
                 }
             }
             if (!findImage) {
-                if (e.target.localName === 'input') {
-                    e.target.value = e.clipboardData.getData('text')
-                } else {
+                if (e.target.localName !== 'input') {
                     try {
+                        e.preventDefault()
                         let str = e.clipboardData.getData('text')
                         let obj = JSON.parse(str)
                         obj.id = that.getNewDataId()
@@ -304,6 +302,7 @@ class Render extends Component {
                 data[frame][info.id] = info
             }
         }
+        this.data = data
         this.setState({data: data[this.state.frame]})
         if (this.state.selectedId !== -1) {
             let _d = data[this.state.frame][this.state.selectedId]

@@ -1,5 +1,3 @@
-import Object from "./object";
-
 const N = "\n";
 const fabricType2type = {
     "UiArc": "arc",
@@ -35,8 +33,25 @@ const fabricKey2key = {
     'number': 'number',
     'color': 'color'
 }
+const color2id = {
+    main: 0,
+    yellow: 1,
+    green: 2,
+    orange: 3,
+    purple: 4,
+    pink: 5,
+    cyan: 6,
+    black: 7,
+    white: 8,
+}
 
 export function ui_h_group(frame_name, group_name, split_num) {
+    let res = ''
+
+    for (let i = 0; i < split_num; i++) {
+        res = res + `\n#include "ui_${frame_name}_${group_name}_${i}.h"`
+    }
+
     let res_init = `\n#define ui_init_${frame_name}_${group_name}() \\\n`
     let res_update = `\n#define ui_update_${frame_name}_${group_name}() \\\n`
     let res_remove = `\n#define ui_remove_${frame_name}_${group_name}() \\\n`
@@ -45,14 +60,11 @@ export function ui_h_group(frame_name, group_name, split_num) {
         res_update += `_ui_update_${frame_name}_${group_name}_${i}(); \\\n`
         res_remove += `_ui_remove_${frame_name}_${group_name}_${i}(); \\\n`
     }
-    let res = `${
+    res += `${
         N}${res_init.slice(0, -4)}${
         N}${res_update.slice(0, -4)}${
         N}${res_remove.slice(0, -4)}
     `
-    for (let i = 0; i < split_num; i++) {
-        res = res + `#include "ui_${frame_name}_${group_name}_${i}.h"\n`
-    }
     return `${res}\n`
 }
 
@@ -65,29 +77,25 @@ export function ui_h_frame(frame_name, groups) {
 }
 
 export function ui_h(frames) {
-    let res = `${
-        N}//${
+    let res = `//${
         N}// Created by RM UI Designer${
         N}//${
         N}${
         N}#ifndef UI_H${
-        N}${
         N}#define UI_H${
         N}${
         N}#include "ui_interface.h"${
-        N}${
         N}`
 
     for (let frame of frames) {
-        res += frame
+        res += ui_h_frame(frame.name, frame.groups)
     }
 
     return `${res}\n#endif //UI_H\n`
 }
 
 export function ui_h_split(frame_name, group_name, split_id, objs) {
-    let res = `${
-        N}//${
+    let res = `//${
         N}// Created by RM UI Designer${
         N}//${
         N}${
@@ -125,6 +133,7 @@ export function ui_c_obj(frame_name, group_name, _obj) {
         delete obj.width
         delete obj.height
     }
+    obj.color = color2id[obj.color]
     delete obj.type
     delete obj.id
     delete obj.name
@@ -133,8 +142,12 @@ export function ui_c_obj(frame_name, group_name, _obj) {
     const pointer = `ui_${frame_name}_${group_name}_${name}`
 
     let res = `    ${pointer}->figure_tpye = ${typeId};\n`
-    for (let key in Object.keys(obj)) {
-        res += `    ${pointer}->${fabricKey2key[key]} = ${obj[key]};\n`
+    for (let key in obj) {
+        let value = obj[key]
+        if (typeof value === "number") {
+            value = Math.round(value)
+        }
+        res += `    ${pointer}->${fabricKey2key[key]} = ${value};\n`
     }
     return `${res}\n`
 }
@@ -142,8 +155,7 @@ export function ui_c_obj(frame_name, group_name, _obj) {
 export function ui_c_split(frame_name, frame_id, group_name, group_id,
                            split_id, start_id, objs, frame_obj_sum) {
     const split_name = `${frame_name}_${group_name}_${split_id}`
-    let res = `${
-        N}//${
+    let res = `//${
         N}// Created by RM UI Designer${
         N}//${
         N}${
@@ -166,6 +178,7 @@ export function ui_c_split(frame_name, frame_id, group_name, group_id,
     }
     
     res += `${
+    N}void _ui_init_${split_name}() {${
     N}    for (int i = 0; i < OBJ_NUM; i++) {${
     N}        ui_${split_name}.data[i].figure_name[0] = FRAME_ID;${
     N}        ui_${split_name}.data[i].figure_name[1] = GROUP_ID;${
@@ -212,8 +225,7 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
                                     split_id, start_id, objs) {
     const split_name = `${frame_name}_${group_name}_${split_id}`
     const name = objs[0].name
-    return `${
-        N}//${
+    return `//${
         N}// Created by RM UI Designer${
         N}//${
         N}${

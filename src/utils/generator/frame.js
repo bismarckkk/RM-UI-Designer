@@ -7,7 +7,8 @@ class Frame {
         this.groups = []
 
         let _groups = {}
-        for (let obj of objs) {
+        for (let obj_name in objs) {
+            const obj = objs[obj_name]
             if (obj.group in _groups) {
                 _groups[obj.group].push(obj)
             } else {
