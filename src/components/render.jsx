@@ -97,6 +97,8 @@ class Render extends Component {
         this.setState({uiWindow})
         this.canvas.setHeight(height)
         this.canvas.setWidth(width)
+        this.canvas.viewportTransform[5] = height;
+        this.canvas.viewportTransform[3] = -1;
         const parentWidth = this.canvasRef.current.clientWidth;
         const parentHeight = this.canvasRef.current.clientHeight;
         const right = parentWidth - width;
@@ -171,7 +173,7 @@ class Render extends Component {
         fabric.Image.fromURL(url, (image, _) => {
             that.background = image
             const ratio = that.state.uiWindow.ratio
-            that.background?.set({scaleX: 1 / ratio, scaleY: 1 / ratio})
+            that.background?.set({scaleX: 1 / ratio, scaleY: -1 / ratio})
             if (that.state.uiWindow.backgroundImage) {
                 that.canvas.setBackgroundImage(that.background)
                 that.canvas.renderAll()
@@ -184,10 +186,6 @@ class Render extends Component {
         this.canvas = new fabric.Canvas('ui')
         this.setBackground(require("../assets/background.png"))
         this.canvas.backgroundColor = '#fff'
-
-        // message.config({
-        //     duration: 0
-        // })
 
         window.addEventListener('resize', () => {
             this.onReSize();

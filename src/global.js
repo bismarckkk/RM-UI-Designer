@@ -1,3 +1,7 @@
+import { fabric } from "fabric";
+
+fabric.Object.prototype.isOnScreen = () => true
+
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations()
         .then(function(registrations) {
