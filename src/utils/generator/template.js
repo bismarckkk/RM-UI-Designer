@@ -85,7 +85,7 @@ export function ui_h(frames) {
     return `${res}\n#endif //UI_H\n`
 }
 
-export function ui_split_h(frame_name, group_name, split_id, objs) {
+export function ui_h_split(frame_name, group_name, split_id, objs) {
     let res = `${
         N}//${
         N}// Created by RM UI Designer${
