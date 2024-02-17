@@ -6,5 +6,4 @@
 /src/.umi-production
 /src/.umi-test
 /dist
-/serial_test
 .swc
