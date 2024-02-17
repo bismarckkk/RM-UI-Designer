@@ -15,7 +15,7 @@ ui_string_frame_t ui_default_ungroup_2;
 
 char* ui_default_ungroup_string = ui_default_ungroup_2.string;
 
-void ui_init_default_ungroup_2() {
+void _ui_init_default_ungroup_2() {
     ui_default_ungroup_2.option.figure_name[0] = FRAME_ID;
     ui_default_ungroup_2.option.figure_name[1] = GROUP_ID;
     ui_default_ungroup_2.option.figure_name[2] = START_ID;
@@ -27,14 +27,14 @@ void ui_init_default_ungroup_2() {
     SEND_MESSAGE((uint8_t *) &ui_default_ungroup_2, sizeof(ui_default_ungroup_2));
 }
 
-void ui_update_default_ungroup_2() {
+void _ui_update_default_ungroup_2() {
     ui_default_ungroup_2.option.operate_tpyel = 2;
 
     ui_proc_string_frame(&ui_default_ungroup_2);
     SEND_MESSAGE((uint8_t *) &ui_default_ungroup_2, sizeof(ui_default_ungroup_2));
 }
 
-void ui_remove_default_ungroup_2() {
+void _ui_remove_default_ungroup_2() {
     ui_default_ungroup_2.option.operate_tpyel = 2;
 
     ui_proc_string_frame(&ui_default_ungroup_2);

@@ -16,7 +16,7 @@ CAT(ui_, CAT(FRAME_OBJ_NUM, _frame_t)) ui_default_ungroup_1;
 ui_interface_rect_t *ui_default_ungroup_rect = (ui_interface_rect_t *)&(ui_default_ungroup_1.data[0]);
 ui_interface_arc_t *ui_default_ungroup_arc = (ui_interface_arc_t *)&(ui_default_ungroup_1.data[1]);
 
-void ui_init_default_ungroup_1() {
+void _ui_init_default_ungroup_1() {
     for (int i = 0; i < OBJ_NUM; i++) {
         ui_default_ungroup_1.data[i].figure_name[0] = FRAME_ID;
         ui_default_ungroup_1.data[i].figure_name[1] = GROUP_ID;
@@ -51,7 +51,7 @@ void ui_init_default_ungroup_1() {
     SEND_MESSAGE((uint8_t *) &ui_default_ungroup_1, sizeof(ui_default_ungroup_1));
 }
 
-void ui_update_default_ungroup_1() {
+void _ui_update_default_ungroup_1() {
     for (int i = 0; i < OBJ_NUM; i++) {
         ui_default_ungroup_1.data[i].operate_tpyel = 2;
     }
@@ -60,7 +60,7 @@ void ui_update_default_ungroup_1() {
     SEND_MESSAGE((uint8_t *) &ui_default_ungroup_1, sizeof(ui_default_ungroup_1));
 }
 
-void ui_remove_default_ungroup_1() {
+void _ui_remove_default_ungroup_1() {
     for (int i = 0; i < OBJ_NUM; i++) {
         ui_default_ungroup_1.data[i].operate_tpyel = 3;
     }
