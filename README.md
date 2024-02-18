@@ -42,7 +42,7 @@ yarn tauri build  # 构建tauri应用，需要配置tauri构建环境
   - [x] 保存/读取文件
   - [x] 在同一工程中切换frame
 - 高级功能
-  - [ ] 生成代码
+  - [x] 生成代码
   - [ ] UI模拟器
   - [x] PWA应用
   - [x] Tauri应用
