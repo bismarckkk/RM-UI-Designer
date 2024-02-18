@@ -7,9 +7,27 @@ class Group {
         this.group_name = group_name
         this.group_id = group_id
         this.splits = []
+        this.errors = []
 
         let start_id = 0
+        let namesSet = new Set()
+
         for (let obj of _objs) {
+            if (!/^[a-zA-Z_]+\w+$/.test(obj.name)) {
+                this.errors.push({
+                    level: 'error',
+                    info: `Name of Frame "${this.frame_name}" Group "${this.group_name}" Object "${obj.name}" does not compliant.`
+                })
+            }
+            if (namesSet.has(obj.name)) {
+                this.errors.push({
+                    level: 'error',
+                    info: `Name of Frame "${this.frame_name}" Group "${this.group_name}" Object "${obj.name}" is duplicate.`
+                })
+            } else {
+                namesSet.add(obj.name)
+            }
+
             if (obj.type === "UiText") {
                 this.splits.push(new GroupSplit(
                     this.frame_name, this.frame_id, this.group_name, this.group_id,
@@ -31,7 +49,7 @@ class Group {
     }
 
     check() {
-        let res = []
+        let res = this.errors
         for (let split of this.splits) {
             res = res.concat(split.check())
         }

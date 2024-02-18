@@ -157,7 +157,7 @@ class Elements extends Component {
                             onSelect={(e)=>this.onSelect(e)}
                             selectedKeys={selectId2Key(this.props.selectedId)}
                             onRightClick={(e)=>this.onElementRightClick(e)}
-                            defaultExpandParent={true}
+                            treeDefaultExpandAll={true}
                         />
                     </Dropdown>
                 </div>

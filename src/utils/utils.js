@@ -1,4 +1,5 @@
-import { dialog, fs } from '@tauri-apps/api';
+import {dialog, fs} from '@tauri-apps/api';
+import JSZip from 'jszip';
 
 const a = document.createElement('a')
 
@@ -15,26 +16,61 @@ export const ColorMap = {
     'red': 'rgb(255, 69, 70)',
 }
 
-export function saveObj(data, fileName, selected) {
-    let _data = {version: 2, data: data, selected}
-    const str = JSON.stringify(_data)
+function getFilter(name) {
+    let suffix = name.split('.').pop()
+    return {
+        name: suffix + ' file',
+        extensions: [suffix]
+    }
+}
+
+export function saveText(text, fileName) {
     if (isTauri()) {
         (async ()=> {
             const path = await dialog.save({
-                filters: [{
-                    name: 'rmui file',
-                    extensions: ['rmui']
-                }]
+                filters: [getFilter(fileName)],
+                defaultPath: fileName
             });
             if (path !== null && path.length > 0) {
-                await fs.writeTextFile(path, str)
+                await fs.writeTextFile(path, text)
             }
         })()
     } else {
-        a.href = `data:,${str}`
-        a.download = fileName
-        a.click()
+        const blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        // 释放创建的URL，以节省内存
+        URL.revokeObjectURL(url);
     }
+}
+
+export function saveBlob(blob, fileName) {
+    if (isTauri()) {
+        (async ()=> {
+            const path = await dialog.save({
+                filters: [getFilter(fileName)],
+                defaultPath: fileName
+            });
+            if (path !== null && path.length > 0) {
+                const arrayBuffer = await blob.arrayBuffer();
+                await fs.writeBinaryFile(path, arrayBuffer);
+            }
+        })()
+    } else {
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+}
+
+export function saveObj(data, fileName, selected) {
+    let _data = {version: 2, data: data, selected}
+    const str = JSON.stringify(_data)
+    saveText(str, fileName)
 }
 
 export function createObjUrl(file) {
@@ -51,4 +87,24 @@ export function createObjUrl(file) {
 
 export function isTauri() {
     return window !== undefined && window.__TAURI__ !== undefined
+}
+
+async function createZip(files) {
+    let zip = new JSZip();
+
+    files.forEach(file => {
+        zip.file(file.fileName, file.content);
+    });
+
+    return await zip.generateAsync({type: "blob"});
+}
+
+export async function code2zip(code) {
+    let files = []
+    for (let key in code) {
+        for (let suffix in code[key]) {
+            files.push({fileName: `${key}.${suffix}`, content: code[key][suffix]})
+        }
+    }
+    return await createZip(files)
 }
