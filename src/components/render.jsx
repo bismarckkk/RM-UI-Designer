@@ -9,7 +9,7 @@ import {fabric} from 'fabric'
 import {getColumnsFromData} from "@/utils/columns";
 import {createObjUrl, saveObj} from "@/utils/utils";
 import {createUiElement} from "@/utils/fabricObjects";
-import Generator from "@/components/generator";
+import Generator from "@/components/generator/index";
 import {readUiFile} from "@/utils/rmuiReader";
 
 class Render extends Component {

@@ -34,7 +34,14 @@ class GroupSplit {
     }
 
     check() {
-        return []
+        if (this.objs.length !== 1 && this.objs.length !== 2 && this.objs.length !== 5 && this.objs.length !== 7) {
+            return [{
+                level: 'warning',
+                info: `Length of Frame "${this.frame_name}" Group "${this.group_name}" Split "${this.split_id}" is not 1 or 2 or 5 or 7.`
+            }]
+        } else {
+            return []
+        }
     }
 }
 

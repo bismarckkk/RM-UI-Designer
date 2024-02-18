@@ -1,6 +1,8 @@
 {
   "extends": "./src/.umi/tsconfig.json",
   "path": {
-    "@tauri-apps/api/tauri": ["./node_modules/@tauri-apps/api/tauri"]
+    "@tauri-apps/api/tauri": ["./node_modules/@tauri-apps/api/tauri"],
+    "@uiw/react-codemirror": ["./node_modules/@uiw/react-codemirror"],
+    "@uiw/codemirror-theme-xcode": ["./node_modules/@uiw/codemirror-theme-xcode"]
   }
 }

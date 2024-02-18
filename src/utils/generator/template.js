@@ -45,7 +45,7 @@ const color2id = {
     white: 8,
 }
 
-export function ui_h_group(frame_name, group_name, split_num) {
+function ui_h_group(frame_name, group_name, split_num) {
     let res = ''
 
     for (let i = 0; i < split_num; i++) {
@@ -68,7 +68,7 @@ export function ui_h_group(frame_name, group_name, split_num) {
     return `${res}\n`
 }
 
-export function ui_h_frame(frame_name, groups) {
+function ui_h_frame(frame_name, groups) {
     let res = ''
     for (let group of groups) {
         res += ui_h_group(frame_name, group.name, group.splits.length)
@@ -120,7 +120,7 @@ export function ui_h_split(frame_name, group_name, split_id, objs) {
     return res
 }
 
-export function ui_c_obj(frame_name, group_name, _obj) {
+function ui_c_obj(frame_name, group_name, _obj) {
     let obj = {..._obj}
     const typeId = fabricType2id[obj.type]
     const name = obj.name
@@ -265,4 +265,45 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
         N}    ui_proc_string_frame(&ui_${split_name});${
         N}    SEND_MESSAGE((uint8_t *) &ui_${split_name}, sizeof(ui_${split_name}));${
         N}}`
+}
+
+const interfaceHUrl = require('@/assets/code_template/ui_interface.h')
+const interfaceCUrl = require('@/assets/code_template/ui_interface.c')
+const typesHUrl = require('@/assets/code_template/ui_types.h')
+
+let interfaceH = null
+let interfaceC = null
+let typesH = null
+
+export function getUiBase() {
+    if (interfaceH === null) {
+        fetch(interfaceHUrl).then(res => {
+            res.text().then(text => {
+                interfaceH = text
+            })
+        })
+    }
+    if (interfaceC === null) {
+        fetch(interfaceCUrl).then(res => {
+            res.text().then(text => {
+                interfaceC = text
+            })
+        })
+    }
+    if (typesH === null) {
+        fetch(typesHUrl).then(res => {
+            res.text().then(text => {
+                typesH = text
+            })
+        })
+    }
+    return {
+        ui_interface: {
+            h: interfaceH,
+            c: interfaceC
+        },
+        ui_types: {
+            h: typesH
+        }
+    }
 }

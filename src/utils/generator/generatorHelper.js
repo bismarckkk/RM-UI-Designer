@@ -13,6 +13,14 @@ toUiH() {
     return ui_h(this.frames)
 }
 
+check() {
+    let res = []
+    for (let frame of this.frames) {
+        res = res.concat(frame.check())
+    }
+    return res
+}
+
 }
 
 export default GeneratorHelper
