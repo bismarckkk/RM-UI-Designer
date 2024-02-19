@@ -64,67 +64,68 @@ class DownloadPanel extends Component {
         }
 
         return (
-            <div className="full" style={{paddingBottom: 50}}>
+            <div className="full" style={{overflow: 'hidden'}}>
                 <h3 style={{color: 'var(--ant-color-text)', marginBottom: 20}}>Download Data</h3>
-                <Table
-                    columns={[
-                        {title: 'File', dataIndex: 'file', key: 'file'},
-                        {
-                            title: 'Preview', dataIndex: 'key', key: 'preview',
-                            render: (key, item) => (
-                                <Space>
-                                    {item.h && <Button type="link" onClick={() => {
-                                        this.review(key, 'h')
-                                    }}>Preview .h</Button>}
-                                    {item.c && <Button type="link" onClick={() => {
-                                        this.review(key, 'c')
-                                    }}>Preview .c</Button>}
-                                </Space>
-                            )
-                        }, {
-                            title: 'Download', dataIndex: 'key', key: 'download',
-                            render: (key, item) => {
-                                if (key !== '_base') {
-                                    return (
-                                        <Space>
-                                            {item.h && <Button type="link" onClick={() => {
-                                                this.download(key, 'h')
-                                            }}>Download .h</Button>}
-                                            {item.c && <Button type="link" onClick={() => {
-                                                this.download(key, 'c')
-                                            }}>Download .c</Button>}
-                                        </Space>
-                                    )
-                                } else {
-                                    return <Button type="link" onClick={async () => {
-                                        const code = await getUiBase()
-                                        const zip = await code2zip(code)
-                                        saveBlob(zip, 'ui_base.zip')
-                                    }}>Download .zip</Button>
+                <div style={{height: '100%', paddingBottom: 36, overflow: 'auto'}}>
+                    <Table
+                        columns={[
+                            {title: 'File', dataIndex: 'file', key: 'file'},
+                            {
+                                title: 'Preview', dataIndex: 'key', key: 'preview',
+                                render: (key, item) => (
+                                    <Space>
+                                        {item.h && <Button type="link" onClick={() => {
+                                            this.review(key, 'h')
+                                        }}>Preview .h</Button>}
+                                        {item.c && <Button type="link" onClick={() => {
+                                            this.review(key, 'c')
+                                        }}>Preview .c</Button>}
+                                    </Space>
+                                )
+                            }, {
+                                title: 'Download', dataIndex: 'key', key: 'download',
+                                render: (key, item) => {
+                                    if (key !== '_base') {
+                                        return (
+                                            <Space>
+                                                {item.h && <Button type="link" onClick={() => {
+                                                    this.download(key, 'h')
+                                                }}>Download .h</Button>}
+                                                {item.c && <Button type="link" onClick={() => {
+                                                    this.download(key, 'c')
+                                                }}>Download .c</Button>}
+                                            </Space>
+                                        )
+                                    } else {
+                                        return <Button type="link" onClick={async () => {
+                                            const code = await getUiBase()
+                                            const zip = await code2zip(code)
+                                            saveBlob(zip, 'ui_base.zip')
+                                        }}>Download .zip</Button>
 
+                                    }
                                 }
                             }
-                        }
-                    ]}
-                    dataSource={data}
-                    rowSelection={{
-                        type: 'checkbox',
-                        onChange: (_selectedRowKeys) => {
-                            let selectedRowKeys = [..._selectedRowKeys]
-                            if (selectedRowKeys.includes('_base')) {
-                                selectedRowKeys = selectedRowKeys.filter(key => key !== '_base');
-                                selectedRowKeys.push('ui_types');
-                                selectedRowKeys.push('ui_interface');
-                            }
-                            this.checked = selectedRowKeys
-                        },
-                        getCheckboxProps: (record) => ({
-                            name: record.key,
-                        })
-                    }}
-                    pagination={false}
-                    style={{height: '100%', paddingBottom: 36}}
-                />
+                        ]}
+                        dataSource={data}
+                        rowSelection={{
+                            type: 'checkbox',
+                            onChange: (_selectedRowKeys) => {
+                                let selectedRowKeys = [..._selectedRowKeys]
+                                if (selectedRowKeys.includes('_base')) {
+                                    selectedRowKeys = selectedRowKeys.filter(key => key !== '_base');
+                                    selectedRowKeys.push('ui_types');
+                                    selectedRowKeys.push('ui_interface');
+                                }
+                                this.checked = selectedRowKeys
+                            },
+                            getCheckboxProps: (record) => ({
+                                name: record.key,
+                            })
+                        }}
+                        pagination={false}
+                    />
+                </div>
                 <Drawer
                     onClose={() => this.setState({preview: null})}
                     open={this.state.preview !== null}
