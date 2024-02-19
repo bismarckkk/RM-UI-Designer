@@ -71,7 +71,7 @@ function ui_h_group(frame_name, group_name, split_num) {
 function ui_h_frame(frame_name, groups) {
     let res = ''
     for (let group of groups) {
-        res += ui_h_group(frame_name, group.name, group.splits.length)
+        res += ui_h_group(frame_name, group.group_name, group.splits.length)
     }
     return res
 }
