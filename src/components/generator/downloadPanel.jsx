@@ -32,6 +32,7 @@ class DownloadPanel extends Component {
     state = {preview: null, fileName: ''}
     checked = []
 
+
     review(key, suffix) {
         this.setState({preview: this.props.code[key][suffix], fileName: `${key}.${suffix}`})
     }
@@ -132,13 +133,16 @@ class DownloadPanel extends Component {
                     title={this.state.fileName}
                     size="large"
                     getContainer={document.getElementById('content-in')}
-                    rootStyle={{indent: '25px'}}
+                    rootStyle={{inset: '25px 0 0 0'}}
                 >
                     <div style={{height: '100%', overflow: 'auto'}}>
                         <CodeMirror
                             value={this.state.preview || ''}
                             theme={isDarkMode() ? xcodeDark : xcodeLight}
                             extensions={[cpp()]}
+                            onContextMenu={(event) => {
+                                event.stopPropagation()
+                            }}
                         />
                     </div>
                 </Drawer>

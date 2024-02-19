@@ -56,14 +56,13 @@ class Generator extends Component {
                     open={this.state.show}
                     size="large"
                     getContainer={document.getElementById('content-in')}
-                    rootStyle={{position: 'absolute'}}
+                    rootStyle={{inset: '25px 0 0 0'}}
                     footer={
                         <div style={{
                             width: '100%',
-                            height: '50px',
                             display: 'flex',
                             justifyContent: 'flex-end',
-                            paddingTop: 5
+                            padding: 5
                         }}>
                             {this.state.step === 'check' ? generateButton : downloadButton}
                         </div>
