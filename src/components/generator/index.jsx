@@ -55,25 +55,24 @@ class Generator extends Component {
                     onClose={() => this.onClose()}
                     open={this.state.show}
                     size="large"
+                    getContainer={document.getElementById('content-in')}
+                    rootStyle={{inset: '25px 0 0 0'}}
+                    footer={
+                        <div style={{
+                            width: '100%',
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            padding: 5
+                        }}>
+                            {this.state.step === 'check' ? generateButton : downloadButton}
+                        </div>
+                    }
                 >
                     {
                         this.state.step === 'check' ?
-                            <CheckPanel errors={this.errors} /> :
-                            <DownloadPanel code={this.code} ref={this.downloadRef} />
+                            <CheckPanel errors={this.errors}/> :
+                            <DownloadPanel code={this.code} ref={this.downloadRef}/>
                     }
-                    <div style={{
-                        position: 'absolute',
-                        bottom: 0,
-                        height: '50px',
-                        width: '100%',
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                        padding: '5px 24px 5px 5px',
-                        borderTop: 'var(--ant-line-width) var(--ant-line-type) var(--ant-color-split)'
-                    }}>
-                        {this.state.step === 'check' ? generateButton : downloadButton}
-                    </div>
                 </Drawer>
             </div>
         );

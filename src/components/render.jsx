@@ -431,11 +431,13 @@ class Render extends Component {
                 return
             }
             const _frame = frame
-            frame = Object.keys(this.objects)[0]
-            if (frame === _frame) {
-                frame = Object.keys(this.objects)[1]
+            if (this.state.frame === frame) {
+                frame = Object.keys(this.objects)[0]
+                if (frame === _frame) {
+                    frame = Object.keys(this.objects)[1]
+                }
+                await this.setFrame(frame)
             }
-            await this.setFrame(frame)
             delete this.objects[_frame]
         } else if (type === 'change') {
             await this.setFrame(frame)
@@ -449,9 +451,9 @@ class Render extends Component {
             this.objectsToData()
             this.canvas.renderAll()
         } else if (type === 'rename') {
-            this.objects[frame] = this.objects[this.state.frame]
-            delete this.objects[this.state.frame]
-            this.setState({frame})
+            const old_frame = this.state.frame
+            await this.onFrameEvent('copy', frame)
+            await this.onFrameEvent('remove', old_frame)
         }
         this.props.onFrameChange({frames: Object.keys(this.objects), selected: frame})
         this.objectsToData()
@@ -460,7 +462,7 @@ class Render extends Component {
     render() {
         this.canvas?.renderAll()
         return (
-            <div className="full">
+            <div style={{width: '100vw', height: '100%'}}>
                 <Row warp={false} className="container" gutter={12}
                      style={{paddingTop: 12, paddingLeft: 12, paddingBottom: 12}}>
                     <Col flex="300px">
