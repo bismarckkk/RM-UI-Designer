@@ -139,6 +139,9 @@ class Menu extends Component {
         } else if (first === 'FrameOp-copy') {
             const name = await this.formRef.current.open('Copy Frame To', this.state.frames)
             this.props.setFrame('copy', name)
+        } else if (first === 'FrameOp-rename') {
+            const name = await this.formRef.current.open('Rename Frame To', this.state.frames)
+            this.props.setFrame('rename', name)
         } else if (first === 'FrameOp-change') {
             const name = key.key.slice(7)
             this.props.setFrame('change', name)
@@ -152,12 +155,16 @@ class Menu extends Component {
                 label: "New Frame"
             },
             {
-                key: 'FrameOp-remove',
-                label: "Remove This Frame"
-            },
-            {
                 key: 'FrameOp-copy',
                 label: "Copy This Frame"
+            },
+            {
+                key: 'FrameOp-rename',
+                label: "Rename This Frame"
+            },
+            {
+                key: 'FrameOp-remove',
+                label: "Remove This Frame"
             },
             {
                 key: 'FrameOp-change',
@@ -167,7 +174,7 @@ class Menu extends Component {
             },
         ]
         for (const frame of this.state.frames) {
-            menu[3].children.push({
+            menu[4].children.push({
                 key: `Frames-${frame}`,
                 label: frame
             })
