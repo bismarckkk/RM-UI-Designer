@@ -460,7 +460,7 @@ class Render extends Component {
     render() {
         this.canvas?.renderAll()
         return (
-            <div className="full">
+            <div style={{width: '100vw', height: '100%'}}>
                 <Row warp={false} className="container" gutter={12}
                      style={{paddingTop: 12, paddingLeft: 12, paddingBottom: 12}}>
                     <Col flex="300px">

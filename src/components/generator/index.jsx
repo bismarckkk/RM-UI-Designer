@@ -55,6 +55,8 @@ class Generator extends Component {
                     onClose={() => this.onClose()}
                     open={this.state.show}
                     size="large"
+                    getContainer={document.getElementById('content-in')}
+                    rootStyle={{position: 'absolute'}}
                 >
                     {
                         this.state.step === 'check' ?

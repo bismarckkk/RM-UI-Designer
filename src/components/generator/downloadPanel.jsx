@@ -130,6 +130,8 @@ class DownloadPanel extends Component {
                     open={this.state.preview !== null}
                     title={this.state.fileName}
                     size="large"
+                    getContainer={document.getElementById('content-in')}
+                    rootStyle={{indent: '25px'}}
                 >
                     <div style={{height: '100%', overflow: 'auto'}}>
                         <CodeMirror

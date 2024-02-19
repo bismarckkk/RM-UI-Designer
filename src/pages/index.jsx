@@ -28,7 +28,11 @@ class Index extends Component {
 
         window.addEventListener("drop", (e) => e.preventDefault(), false);
         window.addEventListener("dragover", (e) => e.preventDefault(), false);
-        window.addEventListener("contextmenu", (e) => e.preventDefault(), false);
+        window.addEventListener("contextmenu", (e) => {
+            if (e.target.tagName.toLowerCase() !== 'input') {
+                e.preventDefault();
+            }
+        }, false);
 
         function resizeHandle(width) {
             if (!that.modal && width < 792 && width !== lastWidth) {
@@ -85,12 +89,14 @@ class Index extends Component {
                                 setDarkMode={(e)=>this.setDarkMode(e)}
                                 darkMode={this.state.darkMode}
                             />
-                            <Render
-                                className="full"
-                                editable={true}
-                                ref={this.renderRef}
-                                onFrameChange={e=>this.menuRef.current.setFrames(e)}
-                            />
+                            <div id="content-in" style={{width: '100vw', height: '100%'}}>
+                                <Render
+                                    style={{width: '100vw', height: '100%'}}
+                                    editable={true}
+                                    ref={this.renderRef}
+                                    onFrameChange={e=>this.menuRef.current.setFrames(e)}
+                                />
+                            </div>
                         </div>
                     </div>
                     <AppHelper />
