@@ -390,7 +390,6 @@ class Render extends Component {
             }
         } else if (type === 'setAttr') {
             if (this.objects[this.state.frame][obj.id]) {
-                console.log('okk')
                 this.objects[this.state.frame][obj.id].set(obj.payload)
             }
         }
