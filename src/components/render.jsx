@@ -219,10 +219,15 @@ class Render extends Component {
                     try {
                         e.preventDefault()
                         let str = e.clipboardData.getData('text')
-                        let obj = JSON.parse(str)
-                        obj.id = that.getNewDataId()
-                        that.onObjectEvent('_update', obj)
-                        that.select(obj.id)
+                        let data = JSON.parse(str)
+                        if (!Array.isArray(data)) {
+                            data = [data]
+                        }
+                        for (const obj of data) {
+                            obj.id = that.getNewDataId()
+                            that.onObjectEvent('_update', obj)
+                            that.select(obj.id)
+                        }
                     } catch (e) {
 
                     }
@@ -382,6 +387,11 @@ class Render extends Component {
                 this.canvas.renderAll()
                 delete this.objects[this.state.frame][id]
                 this.objectsToData()
+            }
+        } else if (type === 'setAttr') {
+            if (this.objects[this.state.frame][obj.id]) {
+                console.log('okk')
+                this.objects[this.state.frame][obj.id].set(obj.payload)
             }
         }
 
