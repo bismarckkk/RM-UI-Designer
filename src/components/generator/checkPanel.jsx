@@ -17,7 +17,7 @@ class CheckPanel extends Component {
         if (errors.length + warnings.length > 0) {
             res = <div style={{color: 'var(--ant-color-text)', height: '100%'}}>
                 <p>Found {errors.length} errors, {warnings.length} warnings.</p>
-                <div style={{height: '100%', overflow: 'auto', paddingBottom: 10}}>
+                <div style={{paddingBottom: 10}} className="card-body">
                     <List
                         bordered
                         dataSource={this.props.errors}

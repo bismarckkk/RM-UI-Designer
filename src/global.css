@@ -29,8 +29,12 @@
 }
 
 .rmui .card-body {
-    height: calc((100vh - 172px) / 2);
+    height: 100%;
     overflow: auto;
+}
+
+.rmui .ant-card-small .ant-card-body {
+    height: calc(100% - 28px);
 }
 
 .rmui .background-color {
@@ -41,22 +45,18 @@
     background-color: var(--ant-color-bg-container);
 }
 
-.card-body::-webkit-scrollbar {
-    width: 0;
-}
-
-.card-body:hover::-webkit-scrollbar {
+.rmui .card-body::-webkit-scrollbar {
     width: 4px;
 }
 
-.rmui::-webkit-scrollbar-thumb {
+.rmui .card-body::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background: var(--scroll-main-color);
+    background: var(--ant-color-text-tertiary);
 }
 
 .rmui .card-body::-webkit-scrollbar-track {
     border-radius: 10px;
-    background: var(--scroll-accent-color);
+    background: var(--ant-color-text-quaternary);
 }
 
 .rmui #coordinateDisplay {

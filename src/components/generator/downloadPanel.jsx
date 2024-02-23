@@ -72,7 +72,7 @@ class DownloadPanel extends Component {
         return (
             <div className="full" style={{overflow: 'hidden'}}>
                 <h3 style={{color: 'var(--ant-color-text)', marginBottom: 20}}>Download Data</h3>
-                <div style={{height: '100%', paddingBottom: 36, overflow: 'auto'}}>
+                <div style={{paddingBottom: 36}} className="card-body">
                     <Table
                         columns={[
                             {title: 'File', dataIndex: 'file', key: 'file'},
