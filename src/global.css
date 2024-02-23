@@ -68,3 +68,13 @@
     pointer-events: none;
     position: absolute;
 }
+
+.rmui .panel-resize-handle {
+    background-color: transparent;
+    border-radius: 2px;
+    margin: 3px;
+}
+
+.rmui .panel-resize-handle[data-resize-handle-active] {
+    background-color: var(--ant-color-text-quaternary);
+}

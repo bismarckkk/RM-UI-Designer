@@ -8525,6 +8525,11 @@ react-refresh@0.14.0, react-refresh@^0.14.0:
   resolved "https://registry.npmmirror.com/react-refresh/-/react-refresh-0.14.0.tgz"
   integrity sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==
 
+react-resizable-panels@^2.0.9:
+  version "2.0.9"
+  resolved "https://registry.npmmirror.com/react-resizable-panels/-/react-resizable-panels-2.0.9.tgz#35acd8116475ebebb916c1559e75de3594004546"
+  integrity sha512-ZylBvs7oG7Y/INWw3oYGolqgpFvoPW8MPeg9l1fURDeKpxrmUuCHBUmPj47BdZ11MODImu3kZYXG85rbySab7w==
+
 react-router-dom@6.3.0:
   version "6.3.0"
   resolved "https://registry.npmmirror.com/react-router-dom/-/react-router-dom-6.3.0.tgz"
