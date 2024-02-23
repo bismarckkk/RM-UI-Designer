@@ -3,12 +3,11 @@ import {Button, Card, Empty, Space} from "antd";
 import { message, modal } from "@/utils/app";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import {ProDescriptions} from '@ant-design/pro-components';
-import UpdateModal from './modals/updateModal'
 import Elements from "./elements";
 
 import {fabric} from 'fabric'
 import {getColumnsFromData} from "@/utils/columns";
-import {createObjUrl, saveObj} from "@/utils/utils";
+import {createObjUrl, saveObj, uploadFile} from "@/utils/utils";
 import {createUiElement} from "@/utils/fabricObjects";
 import Generator from "@/components/generator/index";
 import {readUiFile} from "@/utils/rmuiReader";
@@ -32,7 +31,6 @@ class Render extends Component {
     }
     canvas = null
     canvasRef = createRef()
-    uploadRef = createRef()
     generatorRef = createRef()
     propertiesRef = createRef()
     background = null
@@ -268,7 +266,7 @@ class Render extends Component {
 
     upload() {
         const that = this
-        this.uploadRef.current.upload('Upload Your .rmui File', '.rmui').then(file => {
+        uploadFile('.rmui').then(file => {
             const reader = new FileReader()
             reader.onload = async e => {
                 await that.reset()
@@ -500,8 +498,7 @@ class Render extends Component {
                                             this.state.selectedId === -2 ?
                                                 <Space direction="vertical" size="middle" style={{display: 'flex'}}>
                                                     <Button onClick={() =>
-                                                        this.uploadRef.current.upload(
-                                                            'Upload Your Background Image',
+                                                        uploadFile(
                                                             'image/*'
                                                         ).then(file => {
                                                             console.log(file)
@@ -533,7 +530,6 @@ class Render extends Component {
                         </div>
                     </Panel>
                 </PanelGroup>
-                <UpdateModal ref={this.uploadRef}/>
                 <Generator ref={this.generatorRef}/>
             </div>
         );
