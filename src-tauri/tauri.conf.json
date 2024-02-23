@@ -81,7 +81,9 @@
         "resizable": true,
         "title": "RoboMaster UI Designer",
         "width": 1280,
-        "decorations": false
+        "decorations": false,
+        "minHeight": 420,
+        "minWidth": 842
       }
     ]
   }

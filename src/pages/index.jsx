@@ -35,7 +35,7 @@ class Index extends Component {
         }, false);
 
         function resizeHandle(width) {
-            if (!that.modal && width < 792 && width !== lastWidth) {
+            if (!that.modal && width < 842 && width !== lastWidth) {
                 lastWidth = width;
                 that.modal = modal.warning({
                     title: 'Display Aera too Small',
@@ -43,7 +43,7 @@ class Index extends Component {
                     footer: null
                 });
             }
-            if (that.modal && width >= 792) {
+            if (that.modal && width >= 842) {
                 that.modal.destroy()
                 that.modal = null
             }
