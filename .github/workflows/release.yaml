@@ -85,7 +85,7 @@ jobs:
           releaseId: ${{ needs.create-release.outputs.RELEASE_UPLOAD_ID }}
 
   deploy-github-pages:
-    needs: build-tauri
+    needs: [build-tauri, create-release]
     runs-on: ubuntu-latest
     steps:
       - name: checkout
