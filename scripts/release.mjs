@@ -1,4 +1,4 @@
-import { createRequire } from 'module';
+import { createRequire } from 'node:module';
 import { execSync } from 'child_process';
 import fs from 'fs';
 
