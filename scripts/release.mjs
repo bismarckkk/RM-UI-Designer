@@ -26,11 +26,11 @@ async function release() {
     const nextVersion = `${a}.${b}.${c}`;
     packageJson.package.version = nextVersion;
 
-    // 将新版本写入 package.json 文件
-    fs.writeFileSync('./src-tauri/tauri.conf.json', JSON.stringify(packageJson, null, 2));
-
     execSync('git checkout main');
     execSync('git pull');
+
+    fs.writeFileSync('./src-tauri/tauri.conf.json', JSON.stringify(packageJson, null, 2));
+
     execSync('git add ./src-tauri/tauri.conf.json');
     execSync(`git commit -m "release: v${nextVersion}"`);
     execSync(`git tag -a v${nextVersion} -m "v${nextVersion}"`);
