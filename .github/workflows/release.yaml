@@ -131,6 +131,8 @@ jobs:
         run: |
           yarn updateJson
           touch dist/.nojekyll
+        env:
+          GITHUB_TOKEN: ${{ secrets.API_TOKEN }}
 
       - name: deploy
         uses: JamesIves/github-pages-deploy-action@v4

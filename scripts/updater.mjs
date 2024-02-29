@@ -88,7 +88,7 @@ async function updater() {
 
     // 将数据写入文件
     fs.writeFileSync(
-        './dist/install.json',
+        './dist/update.json',
         JSON.stringify(updateData, null, 2)
     );
 }
