@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { ConfigProvider, App, theme } from "antd";
-import Render from "@/components/render";
+import Render from "@/components/render/render";
 import Menu from "@/components/menu";
 import AppHelper from "@/components/appHelper";
 import { modal } from "@/utils/app"

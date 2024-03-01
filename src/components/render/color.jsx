@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { ColorMap } from "../utils/utils";
+import { ColorMap } from "../../utils/utils";
 
 class Color extends Component {
     render() {
