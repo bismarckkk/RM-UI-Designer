@@ -10,7 +10,8 @@ async function _checkUpdate() {
     if (isTauri()) {
         return await checkUpdate()
     } else {
-        const rep = await fetch('https://ui.bismarck.xyz/update.json')
+        const timestamp = Date.now();
+        const rep = await fetch(`https://ui.bismarck.xyz/update.json?${timestamp}`)
         const data = await rep.json()
         const notes = data.notes
         const version = data.version.slice(1).split('.').map(Number)

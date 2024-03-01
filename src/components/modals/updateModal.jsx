@@ -19,7 +19,7 @@ class UpdateModal extends Component {
         }
     }
 
-    componentDidMount() {
+    check() {
         let regex_pr = /(https:\/\/github\.com\/bismarckkk\/RM-UI-Designer\/pull\/)(\d+)/g;
         let regex_cl = /(https:\/\/github\.com\/bismarckkk\/RM-UI-Designer\/compare\/)(v\d+\.\d+\.\d+\.\.\.v\d+\.\d+\.\d+)/g;
         (async () => {
@@ -35,6 +35,10 @@ class UpdateModal extends Component {
                 })
             }
         })()
+    }
+
+    componentDidMount() {
+        this.check()
     }
 
     render() {
