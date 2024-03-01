@@ -1,21 +1,28 @@
 # RoboMaster UI Designer
+## 如何使用
+1. 直接使用我们的[在线Demo](https://ui.bismarck.xyz/)
+2. 打开在线Demo后使用浏览器弹出的安装应用功能安装PWA应用以供离线使用
+3. 在Release中下载我们使用Tauri打包的本地应用，支持Windows、Linux、MacOS平台
 
-### Online Demo: [https://ui.bismarck.xyz/](https://ui.bismarck.xyz/)
+各客户端可自由选择，数据类型互通，均自备自动更新功能
 
 ## 自行部署
 本项目为纯前端项目，可直接部署在任何静态服务器上，如Nginx、Apache等，
-在线demo使用Github Pages托管，同时还提供了tauri的本地应用版本，
-本地应用程序和自动构建的代码可在release中下载，
-如需自行构建可以参考以下步骤：
+在线demo使用Github Pages托管，如需自行构建前端可以参考以下步骤：
 ```shell
 git clone https://github.com/bismarckkk/RM-UI-Designer.git
 cd RM-UI-Designer
 yarn
 yarn build
-yarn tauri build  # 构建tauri应用，需要配置tauri构建环境
+```
+如果需要自行构建Tauri应用，首先需要配置Tauri编译环境，
+然后自行生成签名密钥并配置`tauri.conf.json`中的`tauri.updater.pubKey`字段，
+将私钥和密码加入环境变量，然后执行以下命令进行构建  
+```shell
+yarn tauri build
 ```
 
-同时，本应用还提供了PWA应用，可以通过浏览器直接安装以供离线使用。
+也可以在Github上Fork我们的项目，利用Github Action进行跨平台构建
 
 ## 路线图
 - 基本组件
