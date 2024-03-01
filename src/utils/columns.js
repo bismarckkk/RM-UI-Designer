@@ -1,4 +1,4 @@
-import Color from "../components/color";
+import Color from "../components/render/color";
 
 export const columns = {
     id: {

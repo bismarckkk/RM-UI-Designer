@@ -1,15 +1,15 @@
-import React, {Component, createRef} from 'react';
-import {Button, Card, Empty, Space} from "antd";
+import React, { Component, createRef } from 'react';
+import { Button, Card, Empty, Space } from "antd";
 import { message, modal } from "@/utils/app";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import {ProDescriptions} from '@ant-design/pro-components';
+import { ProDescriptions } from '@ant-design/pro-components';
 import Elements from "./elements";
 
 import {fabric} from 'fabric'
 import {getColumnsFromData} from "@/utils/columns";
 import {createObjUrl, saveObj, uploadFile} from "@/utils/utils";
 import {createUiElement} from "@/utils/fabricObjects";
-import Generator from "@/components/generator/index";
+import Generator from "@/components/generator";
 import {readUiFile} from "@/utils/rmuiReader";
 
 class Render extends Component {
@@ -69,7 +69,7 @@ class Render extends Component {
     async reset() {
         this.canvas.clear()
         this.canvas.backgroundColor = '#fff'
-        this.setBackground(require("../assets/background.png"))
+        this.setBackground(require("../../assets/background.png"))
         if (!Object.keys(this.objects).includes('default')) {
             await this.onFrameEvent('add', 'default')
         }
@@ -169,7 +169,7 @@ class Render extends Component {
     componentDidMount() {
         const that = this
         this.canvas = new fabric.Canvas('ui')
-        this.setBackground(require("../assets/background.png"))
+        this.setBackground(require("../../assets/background.png"))
         this.canvas.backgroundColor = '#fff'
 
         window.addEventListener('resize', () => {
@@ -510,7 +510,7 @@ class Render extends Component {
                                                         Upload Background
                                                     </Button>
                                                     <Button onClick={() =>
-                                                        this.setBackground(require("../assets/background.png"))
+                                                        this.setBackground(require("../../assets/background.png"))
                                                     }>
                                                         Reset Background
                                                     </Button>

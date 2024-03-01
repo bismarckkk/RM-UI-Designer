@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {Card, Dropdown, Tree, Space, Flex} from "antd";
 import { DownOutlined, EyeOutlined, EyeInvisibleOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
-import SwitchButton from "@/components/switchButton";
+import SwitchButton from "./switchButton";
 
 function selectId2Key(id) {
     if (id === -1) {

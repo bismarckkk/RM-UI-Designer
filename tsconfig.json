@@ -1,7 +1,7 @@
 {
   "extends": "./src/.umi/tsconfig.json",
   "path": {
-    "@tauri-apps/api/tauri": ["./node_modules/@tauri-apps/api/tauri"],
+    "@tauri-apps/api": ["./node_modules/@tauri-apps/api"],
     "@uiw/react-codemirror": ["./node_modules/@uiw/react-codemirror"],
     "@uiw/codemirror-theme-xcode": ["./node_modules/@uiw/codemirror-theme-xcode"],
     "react-resizable-panels": ["./node_modules/react-resizable-panels"]
