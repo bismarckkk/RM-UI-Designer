@@ -49,7 +49,8 @@ jobs:
         shell: bash
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v3
+      - name: setup yarn cache
+        uses: actions/cache@v3
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -57,7 +58,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
             
-      - uses: actions/cache@v3
+      - name: setup rust cache
+        uses: actions/cache@v3
         id: rust-cache
         with:
           path: |
@@ -78,6 +80,7 @@ jobs:
         run: yarn
 
       - uses: tauri-apps/tauri-action@v0.5
+        name: build
         env:
           GITHUB_TOKEN: ${{ secrets.API_TOKEN }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
