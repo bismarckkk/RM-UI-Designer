@@ -216,7 +216,6 @@ class Menu extends Component {
                             paddingLeft: 6, paddingRight: 6, paddingTop: 3,
                             display: 'flex',
                             color: 'var(--ant-color-text)',
-                            userSelect: false,
                             cursor: 'default'
                         }}
                         data-tauri-drag-region
@@ -252,7 +251,7 @@ class Menu extends Component {
                         <div
                             style={{
                                 display: 'inline', marginRight: 15, fontSize: 10, cursor: 'default',
-                                color: 'var(--ant-color-text)', userSelect: false
+                                color: 'var(--ant-color-text)'
                             }}
                             data-tauri-drag-region
                         >

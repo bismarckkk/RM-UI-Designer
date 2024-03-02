@@ -28,6 +28,10 @@
     width: 100%;
 }
 
+body {
+    user-select: none;
+}
+
 .rmui .card-body {
     height: 100%;
     overflow: auto;
