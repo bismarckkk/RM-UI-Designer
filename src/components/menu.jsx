@@ -11,6 +11,7 @@ import { ReactComponent as SunSvg } from "@/assets/sun.svg"
 import { appWindow } from '@tauri-apps/api/window';
 import { exit } from '@tauri-apps/api/process';
 import { isTauri } from "@/utils/utils";
+import Generator from "@/components/generator";
 
 const fileItems = [
     {
@@ -59,6 +60,7 @@ class Menu extends Component {
     state = { fullscreen: false, frames: ['default'], selectedFrame: 'default', darkMode: false }
     formRef = createRef()
     aboutRef = createRef()
+    generatorRef = createRef()
     tauri = isTauri()
 
     async componentDidMount() {
@@ -130,7 +132,7 @@ class Menu extends Component {
         } else if (first === 'File-open') {
             this.props.upload()
         } else if (first === "File-generate") {
-            this.props.generate(this.data)
+            this.generatorRef.current?.gen(this.data)
         } else if (first === 'FrameOp-add') {
             const name = await this.formRef.current.open('New Frame', this.state.frames)
             this.props.setFrame('add', name)
@@ -296,6 +298,7 @@ class Menu extends Component {
                 </Flex>
                 <FormModal ref={this.formRef} />
                 <AboutModal ref={this.aboutRef} />
+                <Generator ref={this.generatorRef}/>
             </div>
         );
     }

@@ -9,7 +9,6 @@ import {fabric} from 'fabric'
 import {getColumnsFromData} from "@/utils/columns";
 import {createObjUrl, saveObj, uploadFile} from "@/utils/utils";
 import {createUiElement} from "@/utils/fabricObjects";
-import Generator from "@/components/generator";
 import {readUiFile} from "@/utils/rmuiReader";
 
 class Render extends Component {
@@ -31,7 +30,6 @@ class Render extends Component {
     }
     canvas = null
     canvasRef = createRef()
-    generatorRef = createRef()
     propertiesRef = createRef()
     background = null
 
@@ -44,10 +42,6 @@ class Render extends Component {
 
     save() {
         saveObj(this.data, 'ui.rmui', this.state.frame)
-    }
-
-    generate() {
-        this.generatorRef.current.gen(this.data)
     }
 
     select(id) {
@@ -530,7 +524,6 @@ class Render extends Component {
                         </div>
                     </Panel>
                 </PanelGroup>
-                <Generator ref={this.generatorRef}/>
             </div>
         );
     }
