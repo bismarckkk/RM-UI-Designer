@@ -105,8 +105,8 @@ class Render extends Component {
             const right = parentWidth - width;
             const bottom = parentHeight - height;
             const coordinateDisplay = document.getElementById('coordinateDisplay');
-            coordinateDisplay.style.right = `${right+10}px`;
-            coordinateDisplay.style.bottom = `${bottom+10}px`;
+            coordinateDisplay.style.right = `${right+12}px`;
+            coordinateDisplay.style.bottom = `${bottom+25}px`;
             for (const key of Object.keys(this.objects[this.state.frame])) {
                 this.objects[this.state.frame][key].setRatio(uiWindow.ratio)
             }
