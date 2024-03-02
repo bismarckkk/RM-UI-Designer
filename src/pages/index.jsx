@@ -83,7 +83,6 @@ class Index extends Component {
                             <Menu
                                 save={() => this.renderRef.current.save()}
                                 onObjectEvent={(t, e) => this.renderRef.current.onObjectEvent(t, e)}
-                                generate={() => this.renderRef.current.generate()}
                                 reset={() => this.renderRef.current.reset()}
                                 setFrame={(t, f) => this.renderRef.current.onFrameEvent(t, f)}
                                 upload={(e) => this.renderRef.current.upload(e)}

@@ -9,7 +9,6 @@ import {fabric} from 'fabric'
 import {getColumnsFromData} from "@/utils/columns";
 import {createObjUrl, saveObj, uploadFile} from "@/utils/utils";
 import {createUiElement} from "@/utils/fabricObjects";
-import Generator from "@/components/generator";
 import {readUiFile} from "@/utils/rmuiReader";
 
 class Render extends Component {
@@ -31,7 +30,6 @@ class Render extends Component {
     }
     canvas = null
     canvasRef = createRef()
-    generatorRef = createRef()
     propertiesRef = createRef()
     background = null
 
@@ -44,10 +42,6 @@ class Render extends Component {
 
     save() {
         saveObj(this.data, 'ui.rmui', this.state.frame)
-    }
-
-    generate() {
-        this.generatorRef.current.gen(this.data)
     }
 
     select(id) {
@@ -105,8 +99,8 @@ class Render extends Component {
             const right = parentWidth - width;
             const bottom = parentHeight - height;
             const coordinateDisplay = document.getElementById('coordinateDisplay');
-            coordinateDisplay.style.right = `${right+10}px`;
-            coordinateDisplay.style.bottom = `${bottom+10}px`;
+            coordinateDisplay.style.right = `${right+12}px`;
+            coordinateDisplay.style.bottom = `${bottom+25}px`;
             for (const key of Object.keys(this.objects[this.state.frame])) {
                 this.objects[this.state.frame][key].setRatio(uiWindow.ratio)
             }
@@ -530,7 +524,6 @@ class Render extends Component {
                         </div>
                     </Panel>
                 </PanelGroup>
-                <Generator ref={this.generatorRef}/>
             </div>
         );
     }

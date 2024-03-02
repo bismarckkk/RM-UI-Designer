@@ -4,7 +4,7 @@ This project provides an easy way to design
 This project could run on your bowser without backend.
 It based on React, Ant Design, and UmiJS.
 And open source on [GitHub](https://github.com/bismarckkk/RM-UI-Designer) 
-with GPL V3 license.
+with [GPL V3 license](https://github.com/bismarckkk/RM-UI-Designer/blob/main/LICENSE).
 
 This project also references 
 [RM-UI-Designer](https://github.com/RigoLigoRLC/RoboMasterUIDesigner).
