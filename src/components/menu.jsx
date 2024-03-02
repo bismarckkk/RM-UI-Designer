@@ -132,7 +132,7 @@ class Menu extends Component {
         } else if (first === 'File-open') {
             this.props.upload()
         } else if (first === "File-generate") {
-            this.generatorRef.current?.gen(this.data)
+            this.generatorRef.current?.gen(this.props.getData())
         } else if (first === 'FrameOp-add') {
             const name = await this.formRef.current.open('New Frame', this.state.frames)
             this.props.setFrame('add', name)

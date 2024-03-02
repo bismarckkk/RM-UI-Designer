@@ -44,6 +44,10 @@ class Render extends Component {
         saveObj(this.data, 'ui.rmui', this.state.frame)
     }
 
+    getData() {
+        return this.data
+    }
+
     select(id) {
         if (typeof id === 'undefined' || id === -1) {
             this.setState({properties: null, selectedId: -1})

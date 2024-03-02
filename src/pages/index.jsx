@@ -86,8 +86,9 @@ class Index extends Component {
                                 reset={() => this.renderRef.current.reset()}
                                 setFrame={(t, f) => this.renderRef.current.onFrameEvent(t, f)}
                                 upload={(e) => this.renderRef.current.upload(e)}
-                                ref={this.menuRef}
+                                getData={() => this.renderRef.current.getData()}
                                 setDarkMode={(e) => this.setDarkMode(e)}
+                                ref={this.menuRef}
                                 darkMode={this.state.darkMode}
                             />
                             <Watermark content={['RM Ui Designer', process.env.VERSION]} zIndex={0} style={{height: '100%'}} gap={[30, 30]}>
