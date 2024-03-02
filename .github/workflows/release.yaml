@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
@@ -31,8 +29,8 @@ jobs:
       fail-fast: false
       matrix:
         platform: [macos-latest, ubuntu-latest, windows-latest]
-
     runs-on: ${{ matrix.platform }}
+
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -53,7 +51,7 @@ jobs:
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: setup yarn cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -62,7 +60,7 @@ jobs:
             ${{ runner.os }}-yarn-
             
       - name: setup rust cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         id: rust-cache
         with:
           path: |
@@ -70,8 +68,10 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            target/
+            src-tauri/target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
