@@ -248,12 +248,20 @@ class Render extends Component {
                 }
             }
         })
-        window.addEventListener('keyup', e => {
+        window.addEventListener('keydown', e => {
             if (e.key === "Delete" && that.state.selectedId.length !== 0 && that.state.selectedId[0] !== -2) {
                 for (let id of that.state.selectedId) {
                     that.onObjectEvent('remove', { id })
                 }
                 this.updateHistory()
+            }
+            if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                this.onHistoryEvent('previous');
+            }
+            else if (e.ctrlKey && e.key === 'z' && e.shiftKey) {
+                e.preventDefault();
+                this.onHistoryEvent('next');
             }
         })
         this.canvas.on({

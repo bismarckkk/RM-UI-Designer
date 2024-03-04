@@ -48,11 +48,13 @@ let editItems = [
 const simulateItems = [
     {
         key: 'Simulate-start',
-        label: "Start"
+        label: "Start",
+        disable: true
     },
     {
         key: 'Simulate-settings',
-        label: "Settings"
+        label: "Settings",
+        disable: true
     }
 ]
 
