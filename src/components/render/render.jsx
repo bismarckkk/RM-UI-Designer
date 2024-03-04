@@ -10,6 +10,8 @@ import {getColumnsFromData} from "@/utils/columns";
 import {createObjUrl, saveObj, uploadFile} from "@/utils/utils";
 import {createUiElement} from "@/utils/fabricObjects";
 import {readUiFile} from "@/utils/rmuiReader";
+import History from "@/utils/history";
+import lodash from 'lodash'
 
 class Render extends Component {
     objects = {default: {}}
@@ -32,6 +34,7 @@ class Render extends Component {
     canvasRef = createRef()
     propertiesRef = createRef()
     background = null
+    his = new History()
 
     getNewDataId() {
         if (Object.keys(this.state.data).length === 0) {
@@ -44,12 +47,21 @@ class Render extends Component {
         saveObj(this.data, 'ui.rmui', this.state.frame)
     }
 
+    updateHistory() {
+        setTimeout(() => {
+            let _data = {version: 2, data: this.data, selected: this.state.frame}
+            if (!lodash.isEqual(_data, this.his.now)) {
+                this.his.update(_data)
+                this.props.setCouldDo({couldNext: false, couldPrevious: true})
+            }
+        }, 100)
+    }
+
     getData() {
         return this.data
     }
 
     select(ids, fromCanvas) {
-        console.log(2222, ids)
         if (ids.length === 0) {
             this.setState({properties: null, selectedId: []})
             this.canvas.discardActiveObject()
@@ -89,7 +101,6 @@ class Render extends Component {
         this.select([])
         this.resetCanvasSize()
         this.objectsToData()
-        localStorage.setItem('data', JSON.stringify({version: 2, data: {default: {}}, selected: 'default'}))
     }
 
     resetCanvasSize() {
@@ -159,6 +170,7 @@ class Render extends Component {
             this.objects[this.state.frame][this.state.selectedId[0]].fromObject(info)
             this.canvas.renderAll()
             this.objectsToData()
+            this.updateHistory()
         }
     }
 
@@ -221,13 +233,15 @@ class Render extends Component {
                         for (const obj of data) {
                             setTimeout(() => {
                                 obj.id = that.getNewDataId()
-                                console.log('new id', obj)
                                 ids.push(obj.id)
                                 that.onObjectEvent('_update', obj)
                             }, times)
                             times += 20
                         }
-                        setTimeout(() => that.select(ids), times)
+                        setTimeout(() => {
+                            that.select(ids)
+                            this.updateHistory()
+                        }, times)
                     } catch (e) {
                         message.warning('Invalid data')
                     }
@@ -239,6 +253,7 @@ class Render extends Component {
                 for (let id of that.state.selectedId) {
                     that.onObjectEvent('remove', { id })
                 }
+                this.updateHistory()
             }
         })
         this.canvas.on({
@@ -248,6 +263,7 @@ class Render extends Component {
                 }
                 that.canvas.renderAll()
                 that.objectsToData()
+                this.updateHistory()
                 const active = that.canvas.getActiveObject()
                 setTimeout(()=>{
                     if (active) {
@@ -277,12 +293,15 @@ class Render extends Component {
             }
         })
 
+        const state = this.his.get()
+        this.props.setCouldDo(state)
         readUiFile(
-            localStorage.getItem('data'),
+            state.now,
             (t, e) => this.onObjectEvent(t, e),
             frame => that.onFrameEvent('change', frame),
             () => this.canvas.renderAll()
         )
+        this.his.cancelUpdate()
         this.resetCanvasSize()
     }
 
@@ -293,11 +312,13 @@ class Render extends Component {
             reader.onload = async e => {
                 await that.reset()
                 await readUiFile(
-                    e.target.result,
+                    JSON.parse(e.target.result),
                     (t, e) => that.onObjectEvent(t, e),
                     frame => that.onFrameEvent('change', frame),
                     () => that.canvas.renderAll()
                 )
+                that.objectsToData()
+                that.his.reset({version: 2, data: this.data, selected: this.state.frame})
             }
             reader.readAsText(file)
         }).catch(_ => {
@@ -327,10 +348,6 @@ class Render extends Component {
             }, () => {
                 this.propertiesRef.current?.reload()
             })
-        }
-        if (Object.keys(data).length !== 0) {
-            let _data = {version: 2, data: data, selected: this.state.frame}
-            localStorage.setItem('data', JSON.stringify(_data))
         }
     }
 
@@ -438,6 +455,32 @@ class Render extends Component {
         })
     }
 
+    async onHistoryEvent(type) {
+        if (type === 'update') {
+            this.updateHistory()
+            return
+        } else if (type === 'reset') {
+            this.his.reset({version: 2, data: {default: {}}, selected: 'default'})
+            return
+        }
+        let state
+        if (type === 'previous') {
+            state = this.his.previous()
+        } else if (type === 'next') {
+            state = this.his.next()
+        }
+        console.log(state)
+        this.props.setCouldDo(state)
+        await this.reset()
+        await readUiFile(
+            state.now,
+            (t, e) => this.onObjectEvent(t, e),
+            frame => this.onFrameEvent('change', frame),
+            () => this.canvas.renderAll()
+        )
+        this.his.cancelUpdate()
+    }
+
     async onFrameEvent(type, frame) {
         if (type === 'add') {
             this.objects[frame] = {}
@@ -474,6 +517,7 @@ class Render extends Component {
         }
         this.props.onFrameChange({frames: Object.keys(this.objects), selected: frame})
         this.objectsToData()
+        this.updateHistory()
     }
 
     render() {
@@ -525,7 +569,6 @@ class Render extends Component {
                                                         uploadFile(
                                                             'image/*'
                                                         ).then(file => {
-                                                            console.log(file)
                                                             this.setState({imageUploadShow: false})
                                                             this.setBackground(createObjUrl(file))
                                                         }).catch(_ => {

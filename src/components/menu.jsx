@@ -30,18 +30,18 @@ const fileItems = [
     }
 ]
 
-const editItems = [
+let editItems = [
     {
         key: 'Edit-reset',
         label: "Reset Designer"
     },
     {
         key: 'Edit-undo',
-        label: "Undo 🚧"
+        label: "Undo"
     },
     {
         key: 'Edit-redo',
-        label: "Redo 🚧"
+        label: "Redo"
     },
 ]
 
@@ -57,7 +57,7 @@ const simulateItems = [
 ]
 
 class Menu extends Component {
-    state = { fullscreen: false, frames: ['default'], selectedFrame: 'default', darkMode: false }
+    state = { fullscreen: false, frames: ['default'], selectedFrame: 'default', darkMode: false, couldUndo: false, couldRedo: false }
     formRef = createRef()
     aboutRef = createRef()
     generatorRef = createRef()
@@ -68,6 +68,10 @@ class Menu extends Component {
             const maximized = await appWindow.isMaximized()
             this.setState({fullscreen: maximized})
         }
+    }
+
+    setCouldDo(e) {
+        this.setState({couldUndo: e.couldPrevious, couldRedo: e.couldNext})
     }
 
     fullScreen() {
@@ -127,6 +131,11 @@ class Menu extends Component {
             this.props.onObjectEvent('_add', options)
         } else if (first === 'Edit-reset') {
             this.props.reset()
+            this.props.onHistoryEvent('reset')
+        } else if (first === 'Edit-undo') {
+            this.props.onHistoryEvent('previous')
+        } else if (first === 'Edit-redo') {
+            this.props.onHistoryEvent('next')
         } else if (first === 'File-save') {
             this.props.save()
         } else if (first === 'File-open') {
@@ -205,6 +214,8 @@ class Menu extends Component {
                 <Icon component={SunSvg} />
             </Button>
         )
+        editItems[1]['disabled'] = !this.state.couldUndo
+        editItems[2]['disabled'] = !this.state.couldRedo
         return (
             <div style={{width: "100%", height: 32, marginTop: -5}} className="solid-color" data-tauri-drag-region>
                 <Flex

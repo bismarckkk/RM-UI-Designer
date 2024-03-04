@@ -1,5 +1,4 @@
-export async function readUiFile(str, onEvent, setFrame, render) {
-    const data = JSON.parse(str)
+export async function readUiFile(data, onEvent, setFrame, render) {
     if (!data) {
         return
     }
