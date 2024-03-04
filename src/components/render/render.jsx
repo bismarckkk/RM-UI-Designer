@@ -16,7 +16,7 @@ class Render extends Component {
     data = {}
     state = {
         properties: null,
-        selectedId: -1,
+        selectedId: [],
         frame: "default",
         uiWindow: {
             height: 1080,
@@ -48,19 +48,28 @@ class Render extends Component {
         return this.data
     }
 
-    select(id) {
-        if (typeof id === 'undefined' || id === -1) {
-            this.setState({properties: null, selectedId: -1})
+    select(ids) {
+        console.log(2222, ids)
+        if (ids.length === 0) {
+            this.setState({properties: null, selectedId: []})
             this.canvas.discardActiveObject()
             this.canvas.renderAll()
-        } else if (id === -2) {
-            this.setState({properties: this.state.uiWindow, selectedId: -2})
+        } else if (ids[0] === -2) {
+            this.setState({properties: this.state.uiWindow, selectedId: [-2]})
             this.canvas.discardActiveObject()
             this.canvas.renderAll()
         } else {
-            this.setState({properties: this.state.data[id], selectedId: id})
-            this.canvas.setActiveObject(this.objects[this.state.frame][id])
-            this.canvas.renderAll()
+            if (ids.length === 1) {
+                this.setState({properties: this.state.data[ids[0]], selectedId: [ids[0]]})
+                this.canvas.setActiveObject(this.objects[this.state.frame][ids[0]])
+                this.canvas.renderAll()
+            } else {
+                this.setState({properties: null, selectedId: ids})
+                let objectsToSelect = ids.map(id => this.objects[this.state.frame][id])
+                let activeSelection = new fabric.ActiveSelection(objectsToSelect, {canvas: this.canvas});
+                this.canvas.setActiveObject(activeSelection)
+                this.canvas.renderAll()
+            }
         }
     }
 
@@ -75,7 +84,7 @@ class Render extends Component {
         await this.onFrameEvent('change', 'default')
         this.objects = {default: {}}
         this.props.onFrameChange({frames: ['default'], selected: 'default'})
-        this.select(-1)
+        this.select([])
         this.resetCanvasSize()
         this.objectsToData()
         localStorage.setItem('data', JSON.stringify({version: 2, data: {default: {}}, selected: 'default'}))
@@ -116,7 +125,7 @@ class Render extends Component {
     }
 
     onPropertiesChange(key, info) {
-        if (this.state.selectedId === -2) {
+        if (this.state.selectedId[0] === -2) {
             if (info.team !== this.state.uiWindow.team) {
                 for (const key of Object.keys(this.objects[this.state.frame])) {
                     this.objects[this.state.frame][key].setTeam(info.team)
@@ -144,8 +153,8 @@ class Render extends Component {
                     content: 'Modify UI window width and height may cause unknown error.',
                 })
             }
-        } else if (this.state.selectedId !== -1) {
-            this.objects[this.state.frame][this.state.selectedId].fromObject(info)
+        } else if (this.state.selectedId.length === 1) {
+            this.objects[this.state.frame][this.state.selectedId[0]].fromObject(info)
             this.canvas.renderAll()
             this.objectsToData()
         }
@@ -175,9 +184,9 @@ class Render extends Component {
         }, false);
         window.addEventListener('copy', e => {
             let info = null
-            if (e.target.localName !== 'input' && that.state.selectedId >= 0) {
+            if (e.target.localName !== 'input' && that.state.selectedId.length !== 0 && that.state.selectedId[0] !== -2) {
                 e.preventDefault()
-                info = JSON.stringify(that.state.data[that.state.selectedId])
+                info = JSON.stringify(that.state.selectedId.map(id => that.state.data[id]))
                 e.clipboardData.setData('text', info)
             }
         })
@@ -205,20 +214,29 @@ class Render extends Component {
                         if (!Array.isArray(data)) {
                             data = [data]
                         }
+                        let ids = []
+                        let times = 20
                         for (const obj of data) {
-                            obj.id = that.getNewDataId()
-                            that.onObjectEvent('_update', obj)
-                            that.select(obj.id)
+                            setTimeout(() => {
+                                obj.id = that.getNewDataId()
+                                console.log('new id', obj)
+                                ids.push(obj.id)
+                                that.onObjectEvent('_update', obj)
+                            }, times)
+                            times += 20
                         }
+                        setTimeout(() => that.select(ids), times)
                     } catch (e) {
-
+                        message.warning('Invalid data')
                     }
                 }
             }
         })
         window.addEventListener('keyup', e => {
-            if (e.key === "Delete" && that.state.selectedId !== -1) {
-                that.onObjectEvent('remove', {id: this.state.selectedId})
+            if (e.key === "Delete" && that.state.selectedId.length !== 0 && that.state.selectedId[0] !== -2) {
+                for (let id of that.state.selectedId) {
+                    that.onObjectEvent('remove', { id })
+                }
             }
         })
         this.canvas.on({
@@ -231,9 +249,14 @@ class Render extends Component {
                 const active = that.canvas.getActiveObject()
                 setTimeout(()=>{
                     if (active) {
-                        that.select(active.id)
+                        if (active instanceof fabric.ActiveSelection) {
+                            let ids = active.getObjects().map(obj => obj.id);
+                            that.select(ids);
+                        } else {
+                            that.select([active.id]);
+                        }
                     } else {
-                        that.select(-1)
+                        that.select([])
                     }
                 }, 100)
             },
@@ -291,10 +314,12 @@ class Render extends Component {
         }
         this.data = data
         this.setState({data: data[this.state.frame]})
-        if (this.state.selectedId !== -1) {
-            let _d = data[this.state.frame][this.state.selectedId]
-            if (this.state.selectedId === -2) {
+        if (this.state.selectedId.length === 1) {
+            let _d
+            if (this.state.selectedId[0] === -2) {
                 _d = this.state.uiWindow
+            } else {
+                _d = data[this.state.frame][this.state.selectedId[0]]
             }
             this.setState({
                 properties: { ..._d }
@@ -364,7 +389,7 @@ class Render extends Component {
         } else if (type === 'remove') {
             const id = obj.id
             if (this.objects[this.state.frame][id]) {
-                this.select(-1)
+                this.select([])
                 this.canvas.remove(this.objects[this.state.frame][id])
                 this.canvas.renderAll()
                 delete this.objects[this.state.frame][id]
@@ -405,7 +430,7 @@ class Render extends Component {
                     }
                 }
                 that.objectsToData()
-                that.select(-1)
+                that.select([])
                 that.canvas.renderAll()
                 resolve()
             })
@@ -477,7 +502,7 @@ class Render extends Component {
                                                     dataSource={this.state.properties}
                                                     columns={getColumnsFromData(this.state.properties)}
                                                     ref={this.propertiesRef}
-                                                    key={this.state.selectedId}
+                                                    key={this.state.selectedId[0]}
                                                     editable={
                                                         this.props.editable ?
                                                             {
@@ -493,7 +518,7 @@ class Render extends Component {
                                                 <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>
                                         }
                                         {
-                                            this.state.selectedId === -2 ?
+                                            this.state.selectedId[0] === -2 ?
                                                 <Space direction="vertical" size="middle" style={{display: 'flex'}}>
                                                     <Button onClick={() =>
                                                         uploadFile(
