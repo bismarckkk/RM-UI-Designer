@@ -23,6 +23,7 @@ export const Text = fabric.util.createClass(fabric.Text, {
         options.lockRotation = true;
         options.lockScalingFlip = true;
         options.hasRotatingPoint = false;
+        options.flipY = true;
         options.fontSize || (options.fontSize = 20 / this.ratio);
         options.fontFamily || (options.fontFamily = 'Arial');
         options.width || (options.width = 50 / this.ratio);
