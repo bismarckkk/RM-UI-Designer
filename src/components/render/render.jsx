@@ -48,7 +48,7 @@ class Render extends Component {
         return this.data
     }
 
-    select(ids) {
+    select(ids, fromCanvas) {
         console.log(2222, ids)
         if (ids.length === 0) {
             this.setState({properties: null, selectedId: []})
@@ -65,10 +65,12 @@ class Render extends Component {
                 this.canvas.renderAll()
             } else {
                 this.setState({properties: null, selectedId: ids})
-                let objectsToSelect = ids.map(id => this.objects[this.state.frame][id])
-                let activeSelection = new fabric.ActiveSelection(objectsToSelect, {canvas: this.canvas});
-                this.canvas.setActiveObject(activeSelection)
-                this.canvas.renderAll()
+                if(!fromCanvas) {
+                    let objectsToSelect = ids.map(id => this.objects[this.state.frame][id])
+                    let activeSelection = new fabric.ActiveSelection(objectsToSelect, {canvas: this.canvas, hasControls: false});
+                    this.canvas.setActiveObject(activeSelection)
+                    this.canvas.renderAll()
+                }
             }
         }
     }
@@ -251,7 +253,7 @@ class Render extends Component {
                     if (active) {
                         if (active instanceof fabric.ActiveSelection) {
                             let ids = active.getObjects().map(obj => obj.id);
-                            that.select(ids);
+                            that.select(ids, true);
                         } else {
                             that.select([active.id]);
                         }
@@ -272,9 +274,8 @@ class Render extends Component {
             "mouse:out": () => {
                 const coordinateDisplay = document.getElementById('coordinateDisplay');
                 coordinateDisplay.style.display = 'none';
-            },
+            }
         })
-        this.canvas.selection = false
 
         readUiFile(
             localStorage.getItem('data'),
