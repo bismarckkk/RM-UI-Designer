@@ -51,7 +51,6 @@ export const Text = fabric.util.createClass(fabric.Text, {
             fontSize: this.fontSize * this.ratio,
             x: this.left * this.ratio,
             y: this.top * this.ratio,
-            width: this.width * this.fontSize * this.text.length * this.ratio,
             text: this.text,
             color: this._color,
             team: this.team,
