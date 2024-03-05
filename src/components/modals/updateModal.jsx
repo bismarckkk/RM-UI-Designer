@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { Modal, Button, Space, Spin, Result } from "antd";
 
 import updater from "@/utils/update"
+import {message} from "@/utils/app";
 import Markdown from "react-markdown";
 const { checkUpdate, installUpdate, relaunch } = updater
 
@@ -12,10 +13,14 @@ class UpdateModal extends Component {
     }
 
     async handleOk() {
-        this.setState({step: 2})
-        await installUpdate()
-        if (!await relaunch()) {
-            this.setState({step: 3})
+        try {
+            this.setState({step: 2})
+            await installUpdate()
+            if (!await relaunch()) {
+                this.setState({step: 3})
+            }
+        } catch (_) {
+            this.setState({step: -1})
         }
     }
 
@@ -23,16 +28,20 @@ class UpdateModal extends Component {
         let regex_pr = /(https:\/\/github\.com\/bismarckkk\/RM-UI-Designer\/pull\/)(\d+)/g;
         let regex_cl = /(https:\/\/github\.com\/bismarckkk\/RM-UI-Designer\/compare\/)(v\d+\.\d+\.\d+\.\.\.v\d+\.\d+\.\d+)/g;
         (async () => {
-            const { shouldUpdate, manifest: { body } } = await checkUpdate()
-            if (shouldUpdate) {
-                this.setState({
-                    step: 1,
-                    content: body.replace(regex_pr, (match, p1, p2) => {
-                        return `[#${p2}](${p1}${p2})`;
-                    }).replace(regex_cl, (match, p1, p2) => {
-                        return `[#${p2}](${p1}${p2})`;
+            try {
+                const { shouldUpdate, manifest: { body } } = await checkUpdate()
+                if (shouldUpdate) {
+                    this.setState({
+                        step: 1,
+                        content: body.replace(regex_pr, (match, p1, p2) => {
+                            return `[#${p2}](${p1}${p2})`;
+                        }).replace(regex_cl, (match, p1, p2) => {
+                            return `[#${p2}](${p1}${p2})`;
+                        })
                     })
-                })
+                }
+            } catch (e) {
+                message.warning('Failed to check update.')
             }
         })()
     }
@@ -43,7 +52,12 @@ class UpdateModal extends Component {
 
     render() {
         let content = <div />
-        if (this.state.step === 1) {
+        if (this.state.step === -1) {
+            content = <Result
+                status="error"
+                title="Update Failed"
+            />
+        } else if (this.state.step === 1) {
             content = <Markdown
                 components={{
                     a: ({node, ...props}) => <a {...props} target="_blank" />

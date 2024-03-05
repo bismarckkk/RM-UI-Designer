@@ -10,13 +10,16 @@ import {getColumnsFromData} from "@/utils/columns";
 import {createObjUrl, saveObj, uploadFile} from "@/utils/utils";
 import {createUiElement} from "@/utils/fabricObjects";
 import {readUiFile} from "@/utils/rmuiReader";
+import History from "@/utils/history";
+import lodash from 'lodash'
+import {toLower} from "loadsh/string";
 
 class Render extends Component {
     objects = {default: {}}
     data = {}
     state = {
         properties: null,
-        selectedId: -1,
+        selectedId: [],
         frame: "default",
         uiWindow: {
             height: 1080,
@@ -32,6 +35,7 @@ class Render extends Component {
     canvasRef = createRef()
     propertiesRef = createRef()
     background = null
+    his = new History()
 
     getNewDataId() {
         if (Object.keys(this.state.data).length === 0) {
@@ -44,30 +48,50 @@ class Render extends Component {
         saveObj(this.data, 'ui.rmui', this.state.frame)
     }
 
+    updateHistory() {
+        setTimeout(() => {
+            let _data = {version: 2, data: this.data, selected: this.state.frame}
+            if (!lodash.isEqual(_data, this.his.now)) {
+                this.his.update(_data)
+                this.props.setCouldDo({couldNext: false, couldPrevious: true})
+            }
+        }, 100)
+    }
+
     getData() {
         return this.data
     }
 
-    select(id) {
-        if (typeof id === 'undefined' || id === -1) {
-            this.setState({properties: null, selectedId: -1})
+    select(ids, fromCanvas) {
+        if (ids.length === 0) {
+            this.setState({properties: null, selectedId: []})
             this.canvas.discardActiveObject()
             this.canvas.renderAll()
-        } else if (id === -2) {
-            this.setState({properties: this.state.uiWindow, selectedId: -2})
+        } else if (ids[0] === -2) {
+            this.setState({properties: this.state.uiWindow, selectedId: [-2]})
             this.canvas.discardActiveObject()
             this.canvas.renderAll()
         } else {
-            this.setState({properties: this.state.data[id], selectedId: id})
-            this.canvas.setActiveObject(this.objects[this.state.frame][id])
-            this.canvas.renderAll()
+            if (ids.length === 1) {
+                this.setState({properties: this.state.data[ids[0]], selectedId: [ids[0]]})
+                this.canvas.setActiveObject(this.objects[this.state.frame][ids[0]])
+                this.canvas.renderAll()
+            } else {
+                this.setState({properties: null, selectedId: ids})
+                if(!fromCanvas) {
+                    let objectsToSelect = ids.map(id => this.objects[this.state.frame][id])
+                    let activeSelection = new fabric.ActiveSelection(objectsToSelect, {canvas: this.canvas, hasControls: false});
+                    this.canvas.setActiveObject(activeSelection)
+                    this.canvas.renderAll()
+                }
+            }
         }
     }
 
     async reset() {
         this.canvas.clear()
-        this.canvas.backgroundColor = '#fff'
         this.setBackground(require("../../assets/background.png"))
+        this.canvas.backgroundColor = '#fff'
         if (!Object.keys(this.objects).includes('default')) {
             await this.onFrameEvent('add', 'default')
         }
@@ -75,10 +99,9 @@ class Render extends Component {
         await this.onFrameEvent('change', 'default')
         this.objects = {default: {}}
         this.props.onFrameChange({frames: ['default'], selected: 'default'})
-        this.select(-1)
+        this.select([])
         this.resetCanvasSize()
         this.objectsToData()
-        localStorage.setItem('data', JSON.stringify({version: 2, data: {default: {}}, selected: 'default'}))
     }
 
     resetCanvasSize() {
@@ -116,7 +139,7 @@ class Render extends Component {
     }
 
     onPropertiesChange(key, info) {
-        if (this.state.selectedId === -2) {
+        if (this.state.selectedId[0] === -2) {
             if (info.team !== this.state.uiWindow.team) {
                 for (const key of Object.keys(this.objects[this.state.frame])) {
                     this.objects[this.state.frame][key].setTeam(info.team)
@@ -144,10 +167,11 @@ class Render extends Component {
                     content: 'Modify UI window width and height may cause unknown error.',
                 })
             }
-        } else if (this.state.selectedId !== -1) {
-            this.objects[this.state.frame][this.state.selectedId].fromObject(info)
+        } else if (this.state.selectedId.length === 1) {
+            this.objects[this.state.frame][this.state.selectedId[0]].fromObject(info)
             this.canvas.renderAll()
             this.objectsToData()
+            this.updateHistory()
         }
     }
 
@@ -175,9 +199,9 @@ class Render extends Component {
         }, false);
         window.addEventListener('copy', e => {
             let info = null
-            if (e.target.localName !== 'input' && that.state.selectedId >= 0) {
+            if (e.target.localName !== 'input' && that.state.selectedId.length !== 0 && that.state.selectedId[0] !== -2) {
                 e.preventDefault()
-                info = JSON.stringify(that.state.data[that.state.selectedId])
+                info = JSON.stringify(that.state.selectedId.map(id => that.state.data[id]))
                 e.clipboardData.setData('text', info)
             }
         })
@@ -205,20 +229,41 @@ class Render extends Component {
                         if (!Array.isArray(data)) {
                             data = [data]
                         }
+                        let ids = []
+                        let times = 20
                         for (const obj of data) {
-                            obj.id = that.getNewDataId()
-                            that.onObjectEvent('_update', obj)
-                            that.select(obj.id)
+                            setTimeout(() => {
+                                obj.id = that.getNewDataId()
+                                ids.push(obj.id)
+                                that.onObjectEvent('_update', obj)
+                            }, times)
+                            times += 20
                         }
+                        setTimeout(() => {
+                            that.select(ids)
+                            this.updateHistory()
+                        }, times)
                     } catch (e) {
-
+                        message.warning('Invalid data')
                     }
                 }
             }
         })
-        window.addEventListener('keyup', e => {
-            if (e.key === "Delete" && that.state.selectedId !== -1) {
-                that.onObjectEvent('remove', {id: this.state.selectedId})
+        window.addEventListener('keydown', e => {
+            if (e.key === "Delete" && that.state.selectedId.length !== 0 && that.state.selectedId[0] !== -2) {
+                for (let id of that.state.selectedId) {
+                    that.onObjectEvent('remove', { id })
+                }
+                this.updateHistory()
+            }
+            console.log(e.key, e.ctrlKey, e.shiftKey)
+            if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                this.onHistoryEvent('previous');
+            }
+            else if (e.ctrlKey && toLower(e.key) === 'z' && e.shiftKey) {
+                e.preventDefault();
+                this.onHistoryEvent('next');
             }
         })
         this.canvas.on({
@@ -228,12 +273,18 @@ class Render extends Component {
                 }
                 that.canvas.renderAll()
                 that.objectsToData()
+                this.updateHistory()
                 const active = that.canvas.getActiveObject()
                 setTimeout(()=>{
                     if (active) {
-                        that.select(active.id)
+                        if (active instanceof fabric.ActiveSelection) {
+                            let ids = active.getObjects().map(obj => obj.id);
+                            that.select(ids, true);
+                        } else {
+                            that.select([active.id]);
+                        }
                     } else {
-                        that.select(-1)
+                        that.select([])
                     }
                 }, 100)
             },
@@ -249,16 +300,18 @@ class Render extends Component {
             "mouse:out": () => {
                 const coordinateDisplay = document.getElementById('coordinateDisplay');
                 coordinateDisplay.style.display = 'none';
-            },
+            }
         })
-        this.canvas.selection = false
 
+        const state = this.his.get()
+        this.props.setCouldDo(state)
         readUiFile(
-            localStorage.getItem('data'),
+            state.now,
             (t, e) => this.onObjectEvent(t, e),
             frame => that.onFrameEvent('change', frame),
             () => this.canvas.renderAll()
         )
+        this.his.cancelUpdate()
         this.resetCanvasSize()
     }
 
@@ -269,11 +322,13 @@ class Render extends Component {
             reader.onload = async e => {
                 await that.reset()
                 await readUiFile(
-                    e.target.result,
+                    JSON.parse(e.target.result),
                     (t, e) => that.onObjectEvent(t, e),
                     frame => that.onFrameEvent('change', frame),
                     () => that.canvas.renderAll()
                 )
+                that.objectsToData()
+                that.his.reset({version: 2, data: this.data, selected: this.state.frame})
             }
             reader.readAsText(file)
         }).catch(_ => {
@@ -291,20 +346,18 @@ class Render extends Component {
         }
         this.data = data
         this.setState({data: data[this.state.frame]})
-        if (this.state.selectedId !== -1) {
-            let _d = data[this.state.frame][this.state.selectedId]
-            if (this.state.selectedId === -2) {
+        if (this.state.selectedId.length === 1) {
+            let _d
+            if (this.state.selectedId[0] === -2) {
                 _d = this.state.uiWindow
+            } else {
+                _d = data[this.state.frame][this.state.selectedId[0]]
             }
             this.setState({
                 properties: { ..._d }
             }, () => {
                 this.propertiesRef.current?.reload()
             })
-        }
-        if (Object.keys(data).length !== 0) {
-            let _data = {version: 2, data: data, selected: this.state.frame}
-            localStorage.setItem('data', JSON.stringify(_data))
         }
     }
 
@@ -364,7 +417,7 @@ class Render extends Component {
         } else if (type === 'remove') {
             const id = obj.id
             if (this.objects[this.state.frame][id]) {
-                this.select(-1)
+                this.select([])
                 this.canvas.remove(this.objects[this.state.frame][id])
                 this.canvas.renderAll()
                 delete this.objects[this.state.frame][id]
@@ -405,11 +458,41 @@ class Render extends Component {
                     }
                 }
                 that.objectsToData()
-                that.select(-1)
+                that.select([])
                 that.canvas.renderAll()
                 resolve()
             })
         })
+    }
+
+    async onHistoryEvent(type) {
+        let state
+        if (type === 'update') {
+            this.updateHistory()
+            return
+        } else if (type === 'reset') {
+            state = this.his.reset({version: 2, data: {default: {}}, selected: 'default'})
+            this.props.setCouldDo(state)
+            return
+        } else if (type === 'resetNow') {
+            state = this.his.reset(this.data)
+            this.props.setCouldDo(state)
+            return
+        }
+        if (type === 'previous') {
+            state = this.his.previous()
+        } else if (type === 'next') {
+            state = this.his.next()
+        }
+        this.props.setCouldDo(state)
+        await this.reset()
+        await readUiFile(
+            state.now,
+            (t, e) => this.onObjectEvent(t, e),
+            frame => this.onFrameEvent('change', frame),
+            () => this.canvas.renderAll()
+        )
+        this.his.cancelUpdate()
     }
 
     async onFrameEvent(type, frame) {
@@ -448,6 +531,7 @@ class Render extends Component {
         }
         this.props.onFrameChange({frames: Object.keys(this.objects), selected: frame})
         this.objectsToData()
+        this.updateHistory()
     }
 
     render() {
@@ -477,7 +561,7 @@ class Render extends Component {
                                                     dataSource={this.state.properties}
                                                     columns={getColumnsFromData(this.state.properties)}
                                                     ref={this.propertiesRef}
-                                                    key={this.state.selectedId}
+                                                    key={this.state.selectedId[0]}
                                                     editable={
                                                         this.props.editable ?
                                                             {
@@ -493,13 +577,12 @@ class Render extends Component {
                                                 <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>
                                         }
                                         {
-                                            this.state.selectedId === -2 ?
+                                            this.state.selectedId[0] === -2 ?
                                                 <Space direction="vertical" size="middle" style={{display: 'flex'}}>
                                                     <Button onClick={() =>
                                                         uploadFile(
                                                             'image/*'
                                                         ).then(file => {
-                                                            console.log(file)
                                                             this.setState({imageUploadShow: false})
                                                             this.setBackground(createObjUrl(file))
                                                         }).catch(_ => {

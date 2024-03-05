@@ -83,6 +83,7 @@ class Index extends Component {
                             <Menu
                                 save={() => this.renderRef.current.save()}
                                 onObjectEvent={(t, e) => this.renderRef.current.onObjectEvent(t, e)}
+                                onHistoryEvent={(t) => this.renderRef.current.onHistoryEvent(t)}
                                 reset={() => this.renderRef.current.reset()}
                                 setFrame={(t, f) => this.renderRef.current.onFrameEvent(t, f)}
                                 upload={(e) => this.renderRef.current.upload(e)}
@@ -97,7 +98,8 @@ class Index extends Component {
                                         style={{width: '100vw', height: '100%'}}
                                         editable={true}
                                         ref={this.renderRef}
-                                        onFrameChange={e => this.menuRef.current.setFrames(e)}
+                                        onFrameChange={e => this.menuRef.current?.setFrames(e)}
+                                        setCouldDo={e => {this.menuRef.current?.setCouldDo(e)}}
                                     />
                                 </div>
                             </Watermark>
