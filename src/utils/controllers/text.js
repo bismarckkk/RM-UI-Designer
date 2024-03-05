@@ -74,6 +74,7 @@ export const Text = fabric.util.createClass(fabric.Text, {
             this.set('fill', ColorMap[this._color])
         }
         this.moveTo(options.layer)
+        this.team = options.team
     },
     setRatio: function (ratio) {
         this.set('width', this.width * this.ratio / ratio)
@@ -92,7 +93,7 @@ export const Text = fabric.util.createClass(fabric.Text, {
     setTeam: function (team) {
         this.team = team
         if (this._color === 'main') {
-            this.set('stroke', ColorMap[this.team])
+            this.set('fill', ColorMap[this.team])
         }
     }
     // Add other methods and properties as needed
