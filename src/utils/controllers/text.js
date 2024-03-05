@@ -27,7 +27,7 @@ export const Text = fabric.util.createClass(fabric.Text, {
         options.fontSize || (options.fontSize = 20 / this.ratio);
         options.fontFamily || (options.fontFamily = 'YouSheBiaoTiHei');
         options.width || (options.width = 50 / this.ratio);
-        options.text || (options.text = 'Hello, World!');
+        options.text || (options.text = 'Text');
         options.left || (options.left = 50 / this.ratio);
         options.top || (options.top = 50 / this.ratio);
         if (this._color && this._color !== 'main') {
