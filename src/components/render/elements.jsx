@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import {Card, Dropdown, Tree, Space} from "antd";
-import {DownOutlined} from "@ant-design/icons";
+import {Card, Dropdown, Tree, Space, Flex} from "antd";
+import { DownOutlined, EyeOutlined, EyeInvisibleOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
+import SwitchButton from "./switchButton";
 
 function selectId2Key(id) {
     if (id === -1) {
@@ -104,7 +105,24 @@ class Elements extends Component {
             }
 
             treeData[pos].children.push({
-                title: node.name, key: `E-${keys[i]}`
+                title: <Flex justify="space-between" style={{width: '100%'}}>
+                    {node.name}
+                    <Space>
+                        <SwitchButton
+                            onChange={(e)=>this.props.onObjectEvent('setAttr', {id: node.id, payload: {visible: e}})}
+                            defaultStatus={true}
+                            onNode={<EyeInvisibleOutlined/>}
+                            offNode={<EyeOutlined/>}
+                        />
+                        <SwitchButton
+                            onChange={(e)=>this.props.onObjectEvent('setAttr', {id: node.id, payload: {selectable: e}})}
+                            defaultStatus={true}
+                            onNode={<LockOutlined/>}
+                            offNode={<UnlockOutlined style={{transform: 'scaleX(-1)'}}/>}
+                        />
+                    </Space>
+                </Flex>,
+                key: `E-${keys[i]}`
             })
         }
 
@@ -158,6 +176,8 @@ class Elements extends Component {
                             selectedKeys={selectId2Key(this.props.selectedId)}
                             onRightClick={(e)=>this.onElementRightClick(e)}
                             treeDefaultExpandAll={true}
+                            showLine={true}
+                            blockNode={true}
                         />
                     </Dropdown>
                 </div>

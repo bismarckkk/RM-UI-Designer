@@ -1,15 +1,14 @@
-import React, {Component, createRef} from 'react';
-import {Button, Card, Col, Empty, Row, Space} from "antd";
+import React, { Component, createRef } from 'react';
+import { Button, Card, Empty, Space } from "antd";
 import { message, modal } from "@/utils/app";
-import {ProDescriptions} from '@ant-design/pro-components';
-import UpdateModal from './modals/updateModal'
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { ProDescriptions } from '@ant-design/pro-components';
 import Elements from "./elements";
 
 import {fabric} from 'fabric'
 import {getColumnsFromData} from "@/utils/columns";
-import {createObjUrl, saveObj} from "@/utils/utils";
+import {createObjUrl, saveObj, uploadFile} from "@/utils/utils";
 import {createUiElement} from "@/utils/fabricObjects";
-import Generator from "@/components/generator/index";
 import {readUiFile} from "@/utils/rmuiReader";
 
 class Render extends Component {
@@ -31,8 +30,6 @@ class Render extends Component {
     }
     canvas = null
     canvasRef = createRef()
-    uploadRef = createRef()
-    generatorRef = createRef()
     propertiesRef = createRef()
     background = null
 
@@ -47,8 +44,8 @@ class Render extends Component {
         saveObj(this.data, 'ui.rmui', this.state.frame)
     }
 
-    generate() {
-        this.generatorRef.current.gen(this.data)
+    getData() {
+        return this.data
     }
 
     select(id) {
@@ -70,7 +67,7 @@ class Render extends Component {
     async reset() {
         this.canvas.clear()
         this.canvas.backgroundColor = '#fff'
-        this.setBackground(require("../assets/background.png"))
+        this.setBackground(require("../../assets/background.png"))
         if (!Object.keys(this.objects).includes('default')) {
             await this.onFrameEvent('add', 'default')
         }
@@ -85,51 +82,36 @@ class Render extends Component {
     }
 
     resetCanvasSize() {
-        let width = this.canvasRef.current.clientWidth - 14
-        let height = this.canvasRef.current.clientHeight
-        let uiWindow = {...this.state.uiWindow}
-        if (width / height < uiWindow.width / uiWindow.height) {
-            height = width * uiWindow.height / uiWindow.width
-            uiWindow.ratio = uiWindow.width / width
-        } else {
-            width = height * uiWindow.width / uiWindow.height
-            uiWindow.ratio = uiWindow.height / height
-        }
-        this.setState({uiWindow})
-        this.canvas.setHeight(height)
-        this.canvas.setWidth(width)
-        this.canvas.viewportTransform[5] = height;
-        this.canvas.viewportTransform[3] = -1;
-        const parentWidth = this.canvasRef.current.clientWidth;
-        const parentHeight = this.canvasRef.current.clientHeight;
-        const right = parentWidth - width;
-        const bottom = parentHeight - height;
-        const coordinateDisplay = document.getElementById('coordinateDisplay');
-        coordinateDisplay.style.right = `${right}px`;
-        coordinateDisplay.style.bottom = `${bottom}px`;
-        for (const key of Object.keys(this.objects[this.state.frame])) {
-            this.objects[this.state.frame][key].setRatio(uiWindow.ratio)
-        }
-        this.background?.set({scaleX: 1 / uiWindow.ratio, scaleY: 1 / uiWindow.ratio})
-        this.canvas.renderAll()
-        this.objectsToData()
-        this.setState({infoModalShow: false})
-    }
-
-    onReSize() {
-        if (!this.state.infoModalShow) {
-            this.canvas.setHeight(10)
-            this.canvas.setWidth(10)
+        if (this.canvas) {
+            let width = this.canvasRef.current.clientWidth
+            let height = this.canvasRef.current.clientHeight
+            let uiWindow = {...this.state.uiWindow}
+            if (width / height < uiWindow.width / uiWindow.height) {
+                height = width * uiWindow.height / uiWindow.width
+                uiWindow.ratio = uiWindow.width / width
+            } else {
+                width = height * uiWindow.width / uiWindow.height
+                uiWindow.ratio = uiWindow.height / height
+            }
+            this.setState({uiWindow})
+            this.canvas.setHeight(height)
+            this.canvas.setWidth(width)
+            this.canvas.viewportTransform[5] = height;
+            this.canvas.viewportTransform[3] = -1;
+            const parentWidth = this.canvasRef.current.clientWidth;
+            const parentHeight = this.canvasRef.current.clientHeight;
+            const right = parentWidth - width;
+            const bottom = parentHeight - height;
+            const coordinateDisplay = document.getElementById('coordinateDisplay');
+            coordinateDisplay.style.right = `${right+12}px`;
+            coordinateDisplay.style.bottom = `${bottom+25}px`;
+            for (const key of Object.keys(this.objects[this.state.frame])) {
+                this.objects[this.state.frame][key].setRatio(uiWindow.ratio)
+            }
+            this.background?.set({scaleX: 1 / uiWindow.ratio, scaleY: 1 / uiWindow.ratio})
             this.canvas.renderAll()
-            this.setState({infoModalShow: true}, () => {
-                modal.info({
-                    title: "Reset UI Window Size",
-                    content: "Must reset UI window size after resize browser window.",
-                    onOk: () => this.resetCanvasSize(),
-                    okText: 'Reset',
-                    zIndex: 10
-                })
-            })
+            this.objectsToData()
+            this.setState({infoModalShow: false})
         }
     }
 
@@ -185,11 +167,11 @@ class Render extends Component {
     componentDidMount() {
         const that = this
         this.canvas = new fabric.Canvas('ui')
-        this.setBackground(require("../assets/background.png"))
+        this.setBackground(require("../../assets/background.png"))
         this.canvas.backgroundColor = '#fff'
 
         window.addEventListener('resize', () => {
-            this.onReSize();
+            this.resetCanvasSize();
         }, false);
         window.addEventListener('copy', e => {
             let info = null
@@ -219,10 +201,15 @@ class Render extends Component {
                     try {
                         e.preventDefault()
                         let str = e.clipboardData.getData('text')
-                        let obj = JSON.parse(str)
-                        obj.id = that.getNewDataId()
-                        that.onObjectEvent('_update', obj)
-                        that.select(obj.id)
+                        let data = JSON.parse(str)
+                        if (!Array.isArray(data)) {
+                            data = [data]
+                        }
+                        for (const obj of data) {
+                            obj.id = that.getNewDataId()
+                            that.onObjectEvent('_update', obj)
+                            that.select(obj.id)
+                        }
                     } catch (e) {
 
                     }
@@ -277,7 +264,7 @@ class Render extends Component {
 
     upload() {
         const that = this
-        this.uploadRef.current.upload('Upload Your .rmui File', '.rmui').then(file => {
+        uploadFile('.rmui').then(file => {
             const reader = new FileReader()
             reader.onload = async e => {
                 await that.reset()
@@ -383,6 +370,10 @@ class Render extends Component {
                 delete this.objects[this.state.frame][id]
                 this.objectsToData()
             }
+        } else if (type === 'setAttr') {
+            if (this.objects[this.state.frame][obj.id]) {
+                this.objects[this.state.frame][obj.id].set(obj.payload)
+            }
         }
 
         this.objectsToData()
@@ -462,77 +453,81 @@ class Render extends Component {
     render() {
         this.canvas?.renderAll()
         return (
-            <div style={{width: '100vw', height: '100%'}}>
-                <Row warp={false} className="container" gutter={12}
-                     style={{paddingTop: 12, paddingLeft: 12, paddingBottom: 12}}>
-                    <Col flex="300px">
-                        <div style={{height: "50%", paddingBottom: 12}}>
-                            <Elements
-                                onSelect={e => this.select(e)}
-                                onObjectEvent={(t, e) => this.onObjectEvent(t, e)}
-                                onReset={() => this.reset()}
-                                data={this.state.data}
-                                editable={this.props.editable}
-                                selectedId={this.state.selectedId}
-                            />
-                        </div>
-                        <Card size="small" title="Properties" style={{height: "50%"}}>
-                            <div className="card-body">
-                                {
-                                    this.state.properties ?
-                                        <ProDescriptions
-                                            dataSource={this.state.properties}
-                                            columns={getColumnsFromData(this.state.properties)}
-                                            ref={this.propertiesRef}
-                                            key={this.state.selectedId}
-                                            editable={
-                                                this.props.editable ?
-                                                    {
-                                                        onSave: (key, info) =>
-                                                            this.onPropertiesChange(key, info)
+            <div style={{width: '100vw', height: 'calc(100% - 20px)', padding: 10}}>
+                <PanelGroup autoSaveId="container_h" className="container" direction="horizontal">
+                    <Panel defaultSize={25} minSize={15} maxSize={45} order={1}>
+                        <PanelGroup autoSaveId="card_v" className="full" direction="vertical">
+                            <Panel defaultSize={50} minSize={25} maxSize={75}>
+                                <Elements
+                                    onSelect={e => this.select(e)}
+                                    onObjectEvent={(t, e) => this.onObjectEvent(t, e)}
+                                    onReset={() => this.reset()}
+                                    data={this.state.data}
+                                    editable={this.props.editable}
+                                    selectedId={this.state.selectedId}
+                                />
+                            </Panel>
+                            <PanelResizeHandle className="panel-resize-handle" style={{height: 6}} />
+                            <Panel defaultSize={50}>
+                                <Card size="small" title="Properties" style={{height: "100%"}}>
+                                    <div className="card-body">
+                                        {
+                                            this.state.properties ?
+                                                <ProDescriptions
+                                                    dataSource={this.state.properties}
+                                                    columns={getColumnsFromData(this.state.properties)}
+                                                    ref={this.propertiesRef}
+                                                    key={this.state.selectedId}
+                                                    editable={
+                                                        this.props.editable ?
+                                                            {
+                                                                onSave: (key, info) =>
+                                                                    this.onPropertiesChange(key, info)
+                                                            }
+                                                            :
+                                                            null
                                                     }
-                                                    :
-                                                    null
-                                            }
-                                            column={1}
-                                            style={{marginTop: 4}}
-                                        /> :
-                                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>
-                                }
-                                {
-                                    this.state.selectedId === -2 ?
-                                        <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-                                            <Button onClick={() =>
-                                                this.uploadRef.current.upload(
-                                                    'Upload Your Background Image',
-                                                    'image/*'
-                                                ).then(file => {
-                                                    console.log(file)
-                                                    this.setState({imageUploadShow: false})
-                                                    this.setBackground(createObjUrl(file))
-                                                }).catch(_ => {
-                                                })
-                                            }>
-                                                Upload Background
-                                            </Button>
-                                            <Button onClick={() =>
-                                                this.setBackground(require("../assets/background.png"))
-                                            }>
-                                                Reset Background
-                                            </Button>
-                                        </Space> :
-                                        <div/>
-                                }
-                            </div>
-                        </Card>
-                    </Col>
-                    <Col flex="auto" ref={this.canvasRef}>
-                        <canvas className="full" id="ui"/>
-                        <div id="coordinateDisplay" style={{bottom: 0, right: 0, display: 'none'}}/>
-                    </Col>
-                </Row>
-                <UpdateModal ref={this.uploadRef}/>
-                <Generator ref={this.generatorRef}/>
+                                                    column={1}
+                                                    style={{marginTop: 4}}
+                                                /> :
+                                                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>
+                                        }
+                                        {
+                                            this.state.selectedId === -2 ?
+                                                <Space direction="vertical" size="middle" style={{display: 'flex'}}>
+                                                    <Button onClick={() =>
+                                                        uploadFile(
+                                                            'image/*'
+                                                        ).then(file => {
+                                                            console.log(file)
+                                                            this.setState({imageUploadShow: false})
+                                                            this.setBackground(createObjUrl(file))
+                                                        }).catch(_ => {
+                                                        })
+                                                    }>
+                                                        Upload Background
+                                                    </Button>
+                                                    <Button onClick={() =>
+                                                        this.setBackground(require("../../assets/background.png"))
+                                                    }>
+                                                        Reset Background
+                                                    </Button>
+                                                </Space> :
+                                                <div/>
+                                        }
+                                    </div>
+                                </Card>
+                            </Panel>
+                        </PanelGroup>
+                    </Panel>
+                    <PanelResizeHandle className="panel-resize-handle" style={{width: 6}} />
+                    <Panel defaultSize={75} order={2} onResize={(_)=>setTimeout(()=>this.resetCanvasSize(), 100)}>
+                        <div className="full" ref={this.canvasRef}>
+                            <canvas className="full" id="ui"/>
+                            <div id="coordinateDisplay" style={{bottom: 0, right: 0, display: 'none', padding: "1px 6px 1px 6px"}}/>
+                        </div>
+                    </Panel>
+                </PanelGroup>
             </div>
         );
     }

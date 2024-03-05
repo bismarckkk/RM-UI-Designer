@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 jobs:
   create-release:
@@ -13,7 +14,7 @@ jobs:
       RELEASE_UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: ncipollo/release-action@v1
         id: create_release
@@ -28,8 +29,8 @@ jobs:
       fail-fast: false
       matrix:
         platform: [macos-latest, ubuntu-latest, windows-latest]
-
     runs-on: ${{ matrix.platform }}
+
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -46,9 +47,11 @@ jobs:
 
       - name: get yarn cache directory path
         id: yarn-cache-dir-path
+        shell: bash
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v3
+      - name: setup yarn cache
+        uses: actions/cache/restore@v3
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -56,7 +59,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
             
-      - uses: actions/cache@v3
+      - name: setup rust cache
+        uses: actions/cache/restore@v3
         id: rust-cache
         with:
           path: |
@@ -64,8 +68,10 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            target/
+            src-tauri/target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
@@ -77,17 +83,49 @@ jobs:
         run: yarn
 
       - uses: tauri-apps/tauri-action@v0.5
+        name: build
         env:
           GITHUB_TOKEN: ${{ secrets.API_TOKEN }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_PRIVATE_PASSWORD: ""
         with:
           releaseId: ${{ needs.create-release.outputs.RELEASE_UPLOAD_ID }}
 
+  deploy-github-pages:
+    needs: [build-tauri, create-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+
+      - name: setup yarn cache
+        uses: actions/cache/restore@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: setup yarn dependencies
+        run: yarn
+
+      - name: build
+        run: yarn build
+
       - name: pack
-        if: matrix.platform == 'ubuntu-latest'
         run: tar -czvf gh_pages.tar.gz dist
 
       - name: upload
-        if: matrix.platform == 'ubuntu-latest'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.API_TOKEN }}
@@ -96,3 +134,17 @@ jobs:
           asset_path: ./gh_pages.tar.gz
           asset_name: gh_pages.tar.gz
           asset_content_type: application/gzip
+
+      - name: before deploy
+        run: |
+          yarn updateJson
+          touch dist/.nojekyll
+        env:
+          GITHUB_TOKEN: ${{ secrets.API_TOKEN }}
+
+      - name: deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: dist
+          clean: true

@@ -1,8 +1,9 @@
-import React, {Component} from 'react';
-import {Table, Drawer, Button, Space} from "antd";
+import React, { Component } from 'react';
+import { Table, Drawer, Button, Space } from "antd";
 import CodeMirror from '@uiw/react-codemirror';
-import {xcodeLight, xcodeDark} from "@uiw/codemirror-theme-xcode";
-import {cpp} from '@codemirror/lang-cpp';
+import { message } from "@/utils/app";
+import { xcodeLight, xcodeDark } from "@uiw/codemirror-theme-xcode";
+import { cpp } from '@codemirror/lang-cpp';
 
 import { saveText, saveBlob, code2zip } from "@/utils/utils";
 import { getUiBase } from "@/utils/generator/template";
@@ -43,6 +44,10 @@ class DownloadPanel extends Component {
     }
 
     downloadChecked() {
+        if (this.checked.length === 0) {
+            message.error('Please select at least one file.')
+            return
+        }
         let files = {}
         let code = {...this.props.code, ...getUiBase()}
         for (let key of this.checked) {
@@ -67,7 +72,7 @@ class DownloadPanel extends Component {
         return (
             <div className="full" style={{overflow: 'hidden'}}>
                 <h3 style={{color: 'var(--ant-color-text)', marginBottom: 20}}>Download Data</h3>
-                <div style={{height: '100%', paddingBottom: 36, overflow: 'auto'}}>
+                <div style={{paddingBottom: 36}} className="card-body">
                     <Table
                         columns={[
                             {title: 'File', dataIndex: 'file', key: 'file'},

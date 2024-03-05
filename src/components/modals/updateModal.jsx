@@ -1,83 +1,85 @@
 import React, {Component} from 'react';
-import {Divider, Modal, Upload} from "antd";
-import {InboxOutlined} from "@ant-design/icons";
-import { dialog, fs } from '@tauri-apps/api';
-import { isTauri } from "@/utils/utils";
+import { Modal, Button, Space, Spin, Result } from "antd";
 
-const { Dragger } = Upload;
+import updater from "@/utils/update"
+import Markdown from "react-markdown";
+const { checkUpdate, installUpdate, relaunch } = updater
 
 class UpdateModal extends Component {
-    state = {show: false, promise: null, title: '', accept: ''}
-
-    onCancel() {
-        this.setState({show: false})
-        this.state.promise.reject()
+    state = { step: 0, content: '' }
+    handleClose() {
+        this.setState({step: 0})
     }
 
-    onUpload(e) {
-        const {promise} = this.state
-        promise.resolve(e)
-        this.setState({show: false})
-    }
-
-    upload(title, accept) {
-        if (isTauri()) {
-            let _accept = [accept.slice(1)]
-            let _acceptType = `${_accept} file`
-            if (accept === 'image/*') {
-                _accept = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'ico', 'svg']
-                _acceptType = 'image'
-            }
-            return new Promise((resolve, reject) => {
-                (async ()=> {
-                    const path = await dialog.open({
-                        multiple: false,
-                        directory: false,
-                        filters: [{ name: _acceptType, extensions: _accept }]
-                    })
-                    if (path !== null && path.length > 0) {
-                        const _path = path.replace(/\\/g, '/')
-                        const fileName = _path.split('/').pop()
-                        const blob = new Blob([await fs.readBinaryFile(path)]);
-                        const file = new File([blob], fileName);
-                        resolve(file)
-                    } else {
-                        reject();
-                    }
-                })()
-            })
-        } else {
-            return new Promise((resolve, reject) => {
-                this.setState({show: true, promise: {resolve, reject}, title, accept})
-            })
+    async handleOk() {
+        this.setState({step: 2})
+        await installUpdate()
+        if (!await relaunch()) {
+            this.setState({step: 3})
         }
     }
 
+    check() {
+        let regex_pr = /(https:\/\/github\.com\/bismarckkk\/RM-UI-Designer\/pull\/)(\d+)/g;
+        let regex_cl = /(https:\/\/github\.com\/bismarckkk\/RM-UI-Designer\/compare\/)(v\d+\.\d+\.\d+\.\.\.v\d+\.\d+\.\d+)/g;
+        (async () => {
+            const { shouldUpdate, manifest: { body } } = await checkUpdate()
+            if (shouldUpdate) {
+                this.setState({
+                    step: 1,
+                    content: body.replace(regex_pr, (match, p1, p2) => {
+                        return `[#${p2}](${p1}${p2})`;
+                    }).replace(regex_cl, (match, p1, p2) => {
+                        return `[#${p2}](${p1}${p2})`;
+                    })
+                })
+            }
+        })()
+    }
+
+    componentDidMount() {
+        this.check()
+    }
+
     render() {
-        return (
-            <div>
-                <Modal
-                    title={this.state.title}
-                    open={this.state.show}
-                    onCancel={()=>this.onCancel()}
-                    footer={null}
-                    destroyOnClose={true}
-                >
-                    <Divider />
-                    <Dragger
-                        showUploadList={false}
-                        beforeUpload={e=>this.onUpload(e)}
-                        accept={this.state.accept}
-                    >
-                        <p className="ant-upload-drag-icon">
-                            <InboxOutlined />
-                        </p>
-                        <p className="ant-upload-text">
-                            Click or drag file to this area to upload
-                        </p>
-                    </Dragger>
-                </Modal>
+        let content = <div />
+        if (this.state.step === 1) {
+            content = <Markdown
+                components={{
+                    a: ({node, ...props}) => <a {...props} target="_blank" />
+                }}
+            >
+                {this.state.content}
+            </Markdown>
+        } else if (this.state.step === 2) {
+            content = <div style={{padding: 40, textAlign: 'center', color: 'var(--ant-color-text)'}}>
+                <Space direction="vertical">
+                    <Spin size="large"/>
+                    <h3>Updating...</h3>
+                </Space>
             </div>
+        } else if (this.state.step === 3) {
+            content = <Result
+                status="success"
+                title="Update Success"
+                subTitle="Please restart the app to apply the update."
+            />
+        }
+        return (
+            <Modal
+                title="Auto Update"
+                open={this.state.step}
+                closable={this.state.step > 1}
+                maskClosable={this.state.step > 1}
+                footer={
+                    this.state.step > 1 ? null : <Space>
+                    <Button onClick={this.handleClose.bind(this)}>Cancel</Button>
+                        <Button type="primary" onClick={this.handleOk.bind(this)}>Update</Button>
+                    </Space>
+                }
+            >
+                { content }
+            </Modal>
         );
     }
 }

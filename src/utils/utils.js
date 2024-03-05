@@ -2,6 +2,9 @@ import {dialog, fs} from '@tauri-apps/api';
 import JSZip from 'jszip';
 
 const a = document.createElement('a')
+const input = document.createElement('input')
+
+input.type = 'file'
 
 export const ColorMap = {
     'yellow': 'rgb(255, 238, 70)',
@@ -107,4 +110,45 @@ export async function code2zip(code) {
         }
     }
     return await createZip(files)
+}
+
+export function uploadFile(accept) {
+    return new Promise((resolve, reject) => {
+        if (isTauri()) {
+            let _accept = [accept.slice(1)]
+            let _acceptType = `${_accept} file`
+            if (accept === 'image/*') {
+                _accept = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'ico', 'svg']
+                _acceptType = 'image'
+            }
+            (async ()=> {
+                const path = await dialog.open({
+                    multiple: false,
+                    directory: false,
+                    filters: [{ name: _acceptType, extensions: _accept }]
+                })
+                if (path !== null && path.length > 0) {
+                    const _path = path.replace(/\\/g, '/')
+                    const fileName = _path.split('/').pop()
+                    const blob = new Blob([await fs.readBinaryFile(path)]);
+                    const file = new File([blob], fileName);
+                    resolve(file)
+                } else {
+                    reject();
+                }
+            })()
+        } else {
+            input.accept = accept;
+            input.value = '';
+            input.onchange = () => {
+                if (input.files.length > 0) {
+                    const file = input.files[0];
+                    resolve(file);
+                } else {
+                    reject(new Error('No file selected'));
+                }
+            };
+            input.click();
+        }
+    })
 }
