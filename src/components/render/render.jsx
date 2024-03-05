@@ -12,6 +12,7 @@ import {createUiElement} from "@/utils/fabricObjects";
 import {readUiFile} from "@/utils/rmuiReader";
 import History from "@/utils/history";
 import lodash from 'lodash'
+import {toLower} from "loadsh/string";
 
 class Render extends Component {
     objects = {default: {}}
@@ -89,8 +90,8 @@ class Render extends Component {
 
     async reset() {
         this.canvas.clear()
-        this.canvas.backgroundColor = '#fff'
         this.setBackground(require("../../assets/background.png"))
+        this.canvas.backgroundColor = '#fff'
         if (!Object.keys(this.objects).includes('default')) {
             await this.onFrameEvent('add', 'default')
         }
@@ -255,11 +256,12 @@ class Render extends Component {
                 }
                 this.updateHistory()
             }
+            console.log(e.key, e.ctrlKey, e.shiftKey)
             if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
                 e.preventDefault();
                 this.onHistoryEvent('previous');
             }
-            else if (e.ctrlKey && e.key === 'z' && e.shiftKey) {
+            else if (e.ctrlKey && toLower(e.key) === 'z' && e.shiftKey) {
                 e.preventDefault();
                 this.onHistoryEvent('next');
             }
@@ -464,20 +466,24 @@ class Render extends Component {
     }
 
     async onHistoryEvent(type) {
+        let state
         if (type === 'update') {
             this.updateHistory()
             return
         } else if (type === 'reset') {
-            this.his.reset({version: 2, data: {default: {}}, selected: 'default'})
+            state = this.his.reset({version: 2, data: {default: {}}, selected: 'default'})
+            this.props.setCouldDo(state)
+            return
+        } else if (type === 'resetNow') {
+            state = this.his.reset(this.data)
+            this.props.setCouldDo(state)
             return
         }
-        let state
         if (type === 'previous') {
             state = this.his.previous()
         } else if (type === 'next') {
             state = this.his.next()
         }
-        console.log(state)
         this.props.setCouldDo(state)
         await this.reset()
         await readUiFile(

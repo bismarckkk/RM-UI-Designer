@@ -98,8 +98,8 @@ class Index extends Component {
                                         style={{width: '100vw', height: '100%'}}
                                         editable={true}
                                         ref={this.renderRef}
-                                        onFrameChange={e => this.menuRef.current.setFrames(e)}
-                                        setCouldDo={e => {this.menuRef.current.setCouldDo(e)}}
+                                        onFrameChange={e => this.menuRef.current?.setFrames(e)}
+                                        setCouldDo={e => {this.menuRef.current?.setCouldDo(e)}}
                                     />
                                 </div>
                             </Watermark>
