@@ -16,6 +16,7 @@
 
 .ds-font {
     font-family: ds-digitalnormal;
+
 }
 
 .container {
@@ -51,6 +52,7 @@ body {
 
 .rmui .card-body::-webkit-scrollbar {
     width: 4px;
+    height: 4px;
 }
 
 .rmui .card-body::-webkit-scrollbar-thumb {

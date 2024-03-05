@@ -131,14 +131,14 @@ class Elements extends Component {
                         <SwitchButton
                             onChange={(e)=>this.props.onObjectEvent('setAttr', {id: node.id, payload: {visible: e}})}
                             defaultStatus={true}
-                            onNode={<EyeInvisibleOutlined/>}
-                            offNode={<EyeOutlined/>}
+                            offNode={<EyeInvisibleOutlined/>}
+                            onNode={<EyeOutlined/>}
                         />
                         <SwitchButton
                             onChange={(e)=>this.props.onObjectEvent('setAttr', {id: node.id, payload: {selectable: e}})}
                             defaultStatus={true}
-                            onNode={<LockOutlined/>}
-                            offNode={<UnlockOutlined style={{transform: 'scaleX(-1)'}}/>}
+                            offNode={<LockOutlined/>}
+                            onNode={<UnlockOutlined style={{transform: 'scaleX(-1)'}}/>}
                         />
                     </Space>
                 </Flex>,
