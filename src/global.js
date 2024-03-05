@@ -1,6 +1,7 @@
 import { fabric } from "fabric";
 
 fabric.Object.prototype.isOnScreen = () => true
+fabric.ActiveSelection.prototype.hasControls = false
 
 function findCornerQuadrant(fabricObject, control) {
     const cornerAngle = fabricObject.angle + fabric.util.radiansToDegrees(Math.atan2(control.y, control.x)) + 360;

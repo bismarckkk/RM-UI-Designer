@@ -3,24 +3,8 @@ import {Card, Dropdown, Tree, Space, Flex} from "antd";
 import { DownOutlined, EyeOutlined, EyeInvisibleOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import SwitchButton from "./switchButton";
 
-function selectId2Key(id) {
-    if (id === -1) {
-        return []
-    } if (id === -2) {
-        return ['window']
-    } else {
-        return [`E-${id}`]
-    }
-}
-
-function selectKey2id(key) {
-    if (key[0] === 'E') {
-        return key.slice(2)
-    } if (key === 'window') {
-        return -2
-    } else {
-        return -1
-    }
+function selectId2Key(ids) {
+    return ids.map(id => id === -2 ? 'window' : `E-${id}`)
 }
 
 const items = [
@@ -34,41 +18,77 @@ class Elements extends Component {
         rightClickMenuOpen: false,
         groupKey: 'layer',
     }
+    treeData = []
+
+     selectKey2id(keys) {
+        let res = []
+        for (let key of keys) {
+            if (key === 'window') {
+                res.push(-2)
+            } else {
+                if (key.startsWith('E-')) {
+                    res.push(parseInt(key.slice(2)))
+                } else {
+                    const ids = this.treeData.find(e => e.key === key).children.map(e => parseInt(e.key.slice(2)))
+                    for (let id of ids) {
+                        if (!res.includes(id)) {
+                            res.push(id)
+                        }
+                    }
+                }
+            }
+        }
+        return res
+    }
 
     onElementMenuContainerClick(e) {
         if (e.target.localName === 'div') {
             this.setState({rightClickMenuOpen: false})
-            this.props.onSelect(-1)
+            if (e.target.classList.contains('ant-tree') || (!e.ctrlKey && !e.shiftKey)) {
+                this.props.onSelect([])
+            }
         }
     }
 
     onElementMenuClick(e) {
         this.setState({rightClickMenuOpen: false})
         if (e.key === 'D2-copy') {
-            const obj = {...this.props.data[this.props.selectedId]}
-            obj.id = -1
-            this.props.onObjectEvent('_update', obj)
+            let info = null
+            if (e.target.localName !== 'input' && this.props.selectedId.length !== 0 &&this.props.selectedId[0] !== -2) {
+                e.preventDefault()
+                info = JSON.stringify(this.props.selectedId.map(id => this.props.data[id]))
+                e.clipboardData.setData('text', info)
+            }
         } else if (e.key === 'D2-delete') {
-            this.props.onObjectEvent('remove', {id: this.props.selectedId})
+            for (let id of this.props.selectedId) {
+                this.props.onObjectEvent('remove', {id})
+            }
         }
     }
 
     onElementRightClick(e) {
-        this.props.onSelect(selectKey2id(e.node.key))
+        let id = this.selectKey2id([e.node.key])
+        if (!(id[0] in this.props.selectedId)) {
+            this.props.onSelect(id)
+        }
     }
 
     onSelect(nodes) {
         if (nodes.length === 0) {
             return
         }
-        this.props.onSelect(selectKey2id(nodes[0]))
+        let ids = this.selectKey2id(nodes)
+        if (ids.includes(-2)) {
+            ids = [ids[ids.length - 1]]
+        }
+        this.props.onSelect(ids)
     }
 
     onMenuOpenChange(e) {
         if (e) {
             const that = this
             setTimeout(()=>{
-                if (that.props.selectedId !== -1) {
+                if (that.props.selectedId.length !== 0 && that.props.selectedId[0] !== -2) {
                     that.setState({rightClickMenuOpen: true})
                 } else {
                     that.setState({rightClickMenuOpen: false})
@@ -111,14 +131,14 @@ class Elements extends Component {
                         <SwitchButton
                             onChange={(e)=>this.props.onObjectEvent('setAttr', {id: node.id, payload: {visible: e}})}
                             defaultStatus={true}
-                            onNode={<EyeInvisibleOutlined/>}
-                            offNode={<EyeOutlined/>}
+                            offNode={<EyeInvisibleOutlined/>}
+                            onNode={<EyeOutlined/>}
                         />
                         <SwitchButton
                             onChange={(e)=>this.props.onObjectEvent('setAttr', {id: node.id, payload: {selectable: e}})}
                             defaultStatus={true}
-                            onNode={<LockOutlined/>}
-                            offNode={<UnlockOutlined style={{transform: 'scaleX(-1)'}}/>}
+                            offNode={<LockOutlined/>}
+                            onNode={<UnlockOutlined style={{transform: 'scaleX(-1)'}}/>}
                         />
                     </Space>
                 </Flex>,
@@ -128,6 +148,8 @@ class Elements extends Component {
 
         treeData = treeData.sort((a, b) => a.key.toString().localeCompare(b.key.toString()))
         treeData.unshift({title: "UI Window", key: 'window'})
+
+        this.treeData = treeData
         return treeData
     }
 
@@ -178,6 +200,7 @@ class Elements extends Component {
                             treeDefaultExpandAll={true}
                             showLine={true}
                             blockNode={true}
+                            multiple={true}
                         />
                     </Dropdown>
                 </div>
