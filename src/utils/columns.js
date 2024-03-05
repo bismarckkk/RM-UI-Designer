@@ -124,6 +124,9 @@ export const columns = {
         title: 'Text',
         key: 'text',
         dataIndex: 'text',
+        formItemProps: {
+            rules: [{max: 30}]
+        }
     },
     color: {
         title: 'Color',

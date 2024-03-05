@@ -31,7 +31,7 @@ class Group {
             if (obj.type === "UiText") {
                 this.splits.push(new GroupSplit(
                     this.frame_name, this.frame_id, this.group_name, this.group_id,
-                    this.splits.length, start_id, obj
+                    this.splits.length, start_id, [obj]
                 ))
                 start_id += 1
             }
