@@ -36,6 +36,8 @@ class Render extends Component {
     propertiesRef = createRef()
     background = null
     his = new History()
+    moveTimer = null
+    moveTimeout = null
 
     getNewDataId() {
         if (Object.keys(this.state.data).length === 0) {
@@ -256,7 +258,6 @@ class Render extends Component {
                 }
                 this.updateHistory()
             }
-            console.log(e.key, e.ctrlKey, e.shiftKey)
             if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
                 e.preventDefault();
                 this.onHistoryEvent('previous');
@@ -265,7 +266,57 @@ class Render extends Component {
                 e.preventDefault();
                 this.onHistoryEvent('next');
             }
+
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+                const active = that.canvas.getActiveObject()
+                if (!active) return;
+                e.preventDefault();
+                function move(key, shiftAmount) {
+                    shiftAmount *= that.state.uiWindow.ratio
+                    switch (key) {
+                        case "ArrowUp":
+                            active.top += shiftAmount;
+                            break;
+                        case "ArrowDown":
+                            active.top -= shiftAmount;
+                            break;
+                        case "ArrowLeft":
+                            active.left -= shiftAmount;
+                            break;
+                        case "ArrowRight":
+                            active.left += shiftAmount;
+                            break;
+                    }
+                    if (active instanceof fabric.ActiveSelection) {
+                        active.getObjects().forEach(obj => {
+                            obj.setCoords();
+                            obj.resizeScale()
+                        });
+                    } else {
+                        active.setCoords();
+                        active.resizeScale()
+                    }
+                    that.canvas.renderAll();
+                    that.objectsToData()
+                    that.updateHistory()
+                }
+                move(e.key, 2)
+                if (this.moveTimeout) clearTimeout(this.moveTimeout);
+                if (this.moveTimer) clearInterval(this.moveTimer);
+                this.moveTimeout = setTimeout(() => {
+                    this.moveTimer = setInterval(() => {
+                        move(e.key, 1)
+                    }, 500)
+                }, 1500)
+            }
         })
+        window.addEventListener('keyup', e => {
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+                clearTimeout(this.moveTimeout);
+                clearInterval(this.moveTimer);
+            }
+        });
+
         this.canvas.on({
             "mouse:up": () => {
                 for (const key of Object.keys(that.objects[that.state.frame])) {
@@ -273,7 +324,7 @@ class Render extends Component {
                 }
                 that.canvas.renderAll()
                 that.objectsToData()
-                this.updateHistory()
+                that.updateHistory()
                 const active = that.canvas.getActiveObject()
                 setTimeout(()=>{
                     if (active) {
