@@ -39,7 +39,6 @@ export const Text = fabric.util.createClass(fabric.Text, {
         this.callSuper('initialize', options.text, options);
         this.moveTo(options.layer);
         this.setControlVisible('mtr', false);
-        this.transparentCorners = false;
     },
     toObject: function() {
         return {
@@ -53,7 +52,6 @@ export const Text = fabric.util.createClass(fabric.Text, {
             y: this.top * this.ratio,
             text: this.text,
             color: this._color,
-            team: this.team,
         };
     },
     fromObject: function(options) {
