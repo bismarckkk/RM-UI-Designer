@@ -20,9 +20,6 @@ export const Text = fabric.util.createClass(fabric.Text, {
         this.ratio = options.ratio;
         this._color = options.color;
         this.team = options.team;
-        options.lockRotation = true;
-        options.lockScalingFlip = true;
-        options.hasRotatingPoint = false;
         options.flipY = true;
         options.fontSize || (options.fontSize = 20 / this.ratio);
         options.fontFamily || (options.fontFamily = 'ds-digitalnormal');
@@ -38,7 +35,17 @@ export const Text = fabric.util.createClass(fabric.Text, {
         }
         this.callSuper('initialize', options.text, options);
         this.moveTo(options.layer);
-        this.setControlVisible('mtr', false);
+        this.setControlsVisibility({
+            tl: false, // top left
+            tr: false, // top right
+            bl: false, // bottom left
+            br: false, // bottom right
+            ml: false, // middle left
+            mt: false, // middle top
+            mr: false, // middle right
+            mb: false, // middle bottom
+            mtr: false, // rotate point
+        });
     },
     toObject: function() {
         return {
