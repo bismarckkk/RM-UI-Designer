@@ -152,3 +152,11 @@ export function uploadFile(accept) {
         }
     })
 }
+
+export function isEditable(element) {
+    if (element.getAttribute('contentEditable') === "true") {
+        return true;
+    }
+
+    return element.tagName === "INPUT" || element.tagName === "TEXTAREA";
+}

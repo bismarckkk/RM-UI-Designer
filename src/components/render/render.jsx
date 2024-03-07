@@ -7,7 +7,7 @@ import Elements from "./elements";
 
 import {fabric} from 'fabric'
 import {getColumnsFromData} from "@/utils/columns";
-import {createObjUrl, saveObj, uploadFile} from "@/utils/utils";
+import {createObjUrl, saveObj, uploadFile, isEditable} from "@/utils/utils";
 import {createUiElement} from "@/utils/fabricObjects";
 import {readUiFile} from "@/utils/rmuiReader";
 import History from "@/utils/history";
@@ -201,7 +201,7 @@ class Render extends Component {
         }, false);
         window.addEventListener('copy', e => {
             let info = null
-            if (e.target.localName !== 'input' && that.state.selectedId.length !== 0 && that.state.selectedId[0] !== -2) {
+            if (!isEditable(e.target) && that.state.selectedId.length !== 0 && that.state.selectedId[0] !== -2) {
                 e.preventDefault()
                 info = JSON.stringify(that.state.selectedId.map(id => that.state.data[id]))
                 e.clipboardData.setData('text', info)
@@ -223,7 +223,7 @@ class Render extends Component {
                 }
             }
             if (!findImage) {
-                if (e.target.localName !== 'input') {
+                if (!isEditable(e.target)) {
                     try {
                         e.preventDefault()
                         let str = e.clipboardData.getData('text')
@@ -267,7 +267,8 @@ class Render extends Component {
                 this.onHistoryEvent('next');
             }
 
-            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key) && !isEditable(e.target)) {
+                console.log(e)
                 const active = that.canvas.getActiveObject()
                 if (!active) return;
                 e.preventDefault();
