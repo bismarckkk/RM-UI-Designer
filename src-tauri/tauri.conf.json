@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "RoboMaster UI Designer",
-    "version": "0.2.9"
+    "version": "0.4.0"
   },
   "tauri": {
     "allowlist": {

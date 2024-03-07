@@ -29,11 +29,11 @@ class UpdateModal extends Component {
         let regex_cl = /(https:\/\/github\.com\/bismarckkk\/RM-UI-Designer\/compare\/)(v\d+\.\d+\.\d+\.\.\.v\d+\.\d+\.\d+)/g;
         (async () => {
             try {
-                const { shouldUpdate, manifest: { body } } = await checkUpdate()
+                const { shouldUpdate, manifest } = await checkUpdate()
                 if (shouldUpdate) {
                     this.setState({
                         step: 1,
-                        content: body.replace(regex_pr, (match, p1, p2) => {
+                        content: manifest.body.replace(regex_pr, (match, p1, p2) => {
                             return `[#${p2}](${p1}${p2})`;
                         }).replace(regex_cl, (match, p1, p2) => {
                             return `[#${p2}](${p1}${p2})`;
