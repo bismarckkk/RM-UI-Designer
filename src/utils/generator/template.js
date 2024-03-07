@@ -246,7 +246,7 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
         N}    ui_${split_name}.option.figure_name[2] = START_ID;${
         N}    ui_${split_name}.option.operate_tpyel = 1;${
         N}${
-        N}    strcpy(ui_${frame_name}_${group_name}_${name}, "Hello, World!");${
+        N}    strcpy(ui_${frame_name}_${group_name}_${name}, "${objs[0].text}");${
         N}${
         N}    ui_proc_string_frame(&ui_${split_name});${
         N}    SEND_MESSAGE((uint8_t *) &ui_${split_name}, sizeof(ui_${split_name}));${
@@ -260,7 +260,7 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
         N}}${
         N}${
         N}void _ui_remove_${split_name}() {${
-        N}    ui_${split_name}.option.operate_tpyel = 2;${
+        N}    ui_${split_name}.option.operate_tpyel = 3;${
         N}${
         N}    ui_proc_string_frame(&ui_${split_name});${
         N}    SEND_MESSAGE((uint8_t *) &ui_${split_name}, sizeof(ui_${split_name}));${
