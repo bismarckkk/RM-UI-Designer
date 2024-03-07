@@ -4,6 +4,8 @@ import { Round } from "@/utils/controllers/round";
 import { Ellipse } from "@/utils/controllers/ellipse";
 import { Arc } from "@/utils/controllers/arc";
 
+import { message } from "@/utils/app";
+
 const Controller = {
     Rect,
     Line,
@@ -21,7 +23,11 @@ export function createUiElement(options) {
         ratio: options.ratio,
         team: options.team
     }
-    return new Controller[options.type.slice(2)](obj)
+    const type = options.type.slice(2)
+    if (type === 'Text') {
+        message.warning('Text object is beta now, maybe not same with client!')
+    }
+    return new Controller[type](obj)
 }
 
 export function getMenuProps() {
