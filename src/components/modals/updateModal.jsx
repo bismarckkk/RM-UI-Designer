@@ -7,7 +7,7 @@ import Markdown from "react-markdown";
 const { checkUpdate, installUpdate, relaunch } = updater
 
 class UpdateModal extends Component {
-    state = { step: 0, content: '' }
+    state = { step: 0, content: '', version: '' }
     handleClose() {
         this.setState({step: 0})
     }
@@ -37,13 +37,19 @@ class UpdateModal extends Component {
                             return `[#${p2}](${p1}${p2})`;
                         }).replace(regex_cl, (match, p1, p2) => {
                             return `[#${p2}](${p1}${p2})`;
-                        })
+                        }),
+                        version: manifest.version
                     })
                 }
             } catch (e) {
                 message.warning('Failed to check update.')
             }
         })()
+    }
+
+    ignore() {
+        localStorage.setItem('version_ignored', this.state.version)
+        this.handleClose()
     }
 
     componentDidMount() {
@@ -87,7 +93,8 @@ class UpdateModal extends Component {
                 maskClosable={this.state.step > 1}
                 footer={
                     this.state.step > 1 ? null : <Space>
-                    <Button onClick={this.handleClose.bind(this)}>Cancel</Button>
+                        <Button onClick={this.ignore.bind(this)}>Ignore</Button>
+                        <Button onClick={this.handleClose.bind(this)}>Cancel</Button>
                         <Button type="primary" onClick={this.handleOk.bind(this)}>Update</Button>
                     </Space>
                 }
