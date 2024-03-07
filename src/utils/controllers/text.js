@@ -26,7 +26,7 @@ export const Text = fabric.util.createClass(fabric.Text, {
         options.text || (options.text = 'Text');
         options.left || (options.left = 50 / this.ratio);
         options.top || (options.top = 50 / this.ratio);
-        options.width || (options.width = options.fontSize * options.text.length / this.ratio);
+        options.width || (options.width = options.fontSize * options.text.length / 1.8);
         if (this._color && this._color !== 'main') {
             options.fill = ColorMap[this._color];
         } else {
@@ -71,14 +71,13 @@ export const Text = fabric.util.createClass(fabric.Text, {
         this.set('top', options.y / this.ratio)
         this.set('fontSize', options.fontSize / this.ratio)
         this.text = options.text
-        this.set('width', this.fontSize * this.text.length / this.ratio)
+        this.set('width', this.text.length * this.fontSize / 1.8)
         if (this._color === 'main') {
             this.set('fill', ColorMap[this.team])
         } else {
             this.set('fill', ColorMap[this._color])
         }
         this.moveTo(options.layer)
-        this.team = options.team
     },
     setRatio: function (ratio) {
         this.set('width', this.width * this.ratio / ratio)
@@ -88,11 +87,6 @@ export const Text = fabric.util.createClass(fabric.Text, {
         this.ratio = ratio
     },
     resizeScale: function() {
-        this.set('width', Math.round(this.width * this.scaleX * this.ratio) / this.ratio)
-        this.set('left', Math.round(this.left * this.ratio) / this.ratio)
-        this.set('top', Math.round(this.top * this.ratio) / this.ratio)
-        this.set('scaleX', 1)
-        this.set('scaleY', 1)
     },
     setTeam: function (team) {
         this.team = team
