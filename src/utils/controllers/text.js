@@ -23,10 +23,10 @@ export const Text = fabric.util.createClass(fabric.Text, {
         options.flipY = true;
         options.fontSize || (options.fontSize = 20 / this.ratio);
         options.fontFamily || (options.fontFamily = 'ds-digitalnormal');
-        options.width || (options.width = 50 / this.ratio);
         options.text || (options.text = 'Text');
         options.left || (options.left = 50 / this.ratio);
         options.top || (options.top = 50 / this.ratio);
+        options.width || (options.width = options.fontSize * options.text.length / this.ratio);
         if (this._color && this._color !== 'main') {
             options.fill = ColorMap[this._color];
         } else {
@@ -67,11 +67,11 @@ export const Text = fabric.util.createClass(fabric.Text, {
         this.name = options.name
         this.layer = options.layer
         this.groupName = options.group
-        this.set('width', options.width / this.ratio)
         this.set('left', options.x / this.ratio)
         this.set('top', options.y / this.ratio)
         this.set('fontSize', options.fontSize / this.ratio)
         this.text = options.text
+        this.set('width', this.fontSize * this.text.length / this.ratio)
         if (this._color === 'main') {
             this.set('fill', ColorMap[this.team])
         } else {
@@ -100,5 +100,4 @@ export const Text = fabric.util.createClass(fabric.Text, {
             this.set('fill', ColorMap[this.team])
         }
     }
-    // Add other methods and properties as needed
-});
+})
