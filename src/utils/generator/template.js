@@ -232,6 +232,7 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
     const text = obj.text
     obj.color = color2id[obj.color]
     obj.strLength = text.length
+    obj.lineWidth = Math.round(obj.fontSize / 10)
     delete obj.text
     delete obj.type
     delete obj.id
