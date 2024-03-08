@@ -1,6 +1,16 @@
 import { fabric } from "fabric";
 import { ColorMap } from "../utils";
 
+
+function getTextWidth(text, font) {
+    const canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+    const context = canvas.getContext("2d");
+    context.font = font;
+    const metrics = context.measureText(text);
+    return metrics.width;
+}
+
+
 export const Text = fabric.util.createClass(fabric.Text, {
     type: 'UiText',
     id: 0,
@@ -26,7 +36,7 @@ export const Text = fabric.util.createClass(fabric.Text, {
         options.text || (options.text = 'Text');
         options.left || (options.left = 50 / this.ratio);
         options.top || (options.top = 50 / this.ratio);
-        options.width || (options.width = options.fontSize * options.text.length / 1.8);
+        options.width || (options.width = getTextWidth(options.text, options.fontSize + 'px ' + options.fontFamily) / this.ratio);
         if (this._color && this._color !== 'main') {
             options.fill = ColorMap[this._color];
         } else {
@@ -71,7 +81,7 @@ export const Text = fabric.util.createClass(fabric.Text, {
         this.set('top', options.y / this.ratio)
         this.set('fontSize', options.fontSize / this.ratio)
         this.text = options.text
-        this.set('width', this.text.length * this.fontSize / 1.8)
+        this.set('width', getTextWidth(options.text, options.fontSize + 'px ' + this.fontFamily) / this.ratio)
         if (this._color === 'main') {
             this.set('fill', ColorMap[this.team])
         } else {
