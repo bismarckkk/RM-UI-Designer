@@ -14,7 +14,6 @@ export const Float = fabric.util.createClass(Text, {
         let obj = this.callSuper('toObject');
         obj.float = this.float;
         delete obj.text
-        console.log(obj)
         return obj;
     },
     fromObject: function(options) {
