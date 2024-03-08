@@ -268,7 +268,6 @@ class Render extends Component {
             }
 
             if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key) && !isEditable(e.target)) {
-                console.log(e)
                 const active = that.canvas.getActiveObject()
                 if (!active) return;
                 e.preventDefault();
