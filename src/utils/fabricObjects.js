@@ -3,6 +3,7 @@ import { Line } from "@/utils/controllers/line";
 import { Round } from "@/utils/controllers/round";
 import { Ellipse } from "@/utils/controllers/ellipse";
 import { Arc } from "@/utils/controllers/arc";
+import { Text } from "@/utils/controllers/text";
 
 import { message } from "@/utils/app";
 
@@ -12,6 +13,7 @@ const Controller = {
     Round,
     Ellipse,
     Arc,
+    Text,
 }
 
 export function createUiElement(options) {
