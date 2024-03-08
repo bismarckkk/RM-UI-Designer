@@ -136,6 +136,9 @@ function ui_c_obj(frame_name, group_name, _obj) {
         delete obj.width
         delete obj.height
     }
+    if (obj.type === 'UiFloat' || obj.type === 'UiNumber') {
+        obj.lineWidth = Math.round(obj.fontSize / 10)
+    }
     obj.color = color2id[obj.color]
     delete obj.type
     delete obj.id
