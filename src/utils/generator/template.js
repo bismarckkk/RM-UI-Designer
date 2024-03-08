@@ -31,7 +31,9 @@ const fabricKey2key = {
     'startAngle': 'start_angle',
     'endAngle': 'end_angle',
     'number': 'number',
-    'color': 'color'
+    'color': 'color',
+    'fontSize': 'font_size',
+    'strLength': 'str_length',
 }
 const color2id = {
     main: 0,
@@ -224,8 +226,17 @@ export function ui_c_split(frame_name, frame_id, group_name, group_id,
 export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
                                     split_id, start_id, objs) {
     const split_name = `${frame_name}_${group_name}_${split_id}`
-    const name = objs[0].name
-    return `//${
+    const obj = {...objs[0]}
+    const name = obj.name
+    const text = obj.text
+    obj.color = color2id[obj.color]
+    delete obj.text
+    delete obj.type
+    delete obj.id
+    delete obj.name
+    delete obj.group
+
+    let res =  `//${
         N}// Created by RM UI Designer${
         N}//${
         N}${
@@ -245,8 +256,18 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
         N}    ui_${split_name}.option.figure_name[1] = GROUP_ID;${
         N}    ui_${split_name}.option.figure_name[2] = START_ID;${
         N}    ui_${split_name}.option.operate_tpyel = 1;${
-        N}${
-        N}    strcpy(ui_${frame_name}_${group_name}_${name}, "${objs[0].text}");${
+        N}`
+
+    res += `    ui_${split_name}.option.figure_tpye = ${fabricType2id['UiText']};\n`
+    for (let key in obj) {
+        let value = obj[key]
+        if (typeof value === "number") {
+            value = Math.round(value)
+        }
+        res += `    ui_${split_name}.option.${fabricKey2key[key]} = ${value};\n`
+    }
+
+    res += `    strcpy(ui_${frame_name}_${group_name}_${name}, "${text}");${
         N}${
         N}    ui_proc_string_frame(&ui_${split_name});${
         N}    SEND_MESSAGE((uint8_t *) &ui_${split_name}, sizeof(ui_${split_name}));${
@@ -265,6 +286,8 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
         N}    ui_proc_string_frame(&ui_${split_name});${
         N}    SEND_MESSAGE((uint8_t *) &ui_${split_name}, sizeof(ui_${split_name}));${
         N}}`
+
+    return res
 }
 
 const interfaceHUrl = require('@/assets/code_template/ui_interface.h')
