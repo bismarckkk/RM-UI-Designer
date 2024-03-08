@@ -10,7 +10,7 @@ function findCornerQuadrant(fabricObject, control) {
 
 fabric.controlsUtils.skewCursorStyleHandler = (eventData, control, fabricObject) => {
     const notAllowed = 'not-allowed';
-    const skewMap = ['ns', 'nesw', 'ew', 'nwse']
+    const skewMap = ['ew', 'nesw', 'ns', 'nwse']
     if (control.x !== 0 && fabricObject.lockSkewingY) {
         return notAllowed;
     }
