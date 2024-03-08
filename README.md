@@ -54,3 +54,17 @@ yarn tauri build
   - [x] PWA应用
   - [x] Tauri应用
 
+## 贡献代码
+
+欢迎修复任何bug或添加上述路线图中的功能，请fork本项目主分支，然后提交PR，PR需要任何一个管理员审核通过即可合并  
+
+### 项目结构
+
+详见[代码目录结构](./doc/directory.md)
+
+### 组件结构
+![组件结构](./doc/components.png)
+
+### 联系作者
+* Email: [zuoqingyu@nuaa.edu.cn](mailto:zuoqingyu@nuaa.edu.cn)
+* QQ: 3040585972
