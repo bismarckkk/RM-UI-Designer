@@ -4,6 +4,8 @@ import { Round } from "@/utils/controllers/round";
 import { Ellipse } from "@/utils/controllers/ellipse";
 import { Arc } from "@/utils/controllers/arc";
 import { Text } from "@/utils/controllers/text";
+import { Number } from "@/utils/controllers/number";
+import { Float } from "@/utils/controllers/float";
 
 import { message } from "@/utils/app";
 
@@ -14,6 +16,8 @@ const Controller = {
     Ellipse,
     Arc,
     Text,
+    Number,
+    Float,
 }
 
 export function createUiElement(options) {

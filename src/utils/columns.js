@@ -108,10 +108,10 @@ export const columns = {
         dataIndex: 'fontSize',
         valueType: 'digit',
     },
-    decimalPlaces: {
-        title: 'Decimal Places',
-        key: 'decimalPlaces',
-        dataIndex: 'decimalPlaces',
+    float: {
+        title: 'Number',
+        key: 'float',
+        dataIndex: 'float',
         valueType: 'digit',
     },
     number: {
@@ -125,7 +125,7 @@ export const columns = {
         key: 'text',
         dataIndex: 'text',
         formItemProps: {
-            rules: [{max: 30}]
+            rules: [{max: 30}, {type: 'string'}]
         }
     },
     color: {

@@ -127,7 +127,8 @@ function ui_c_obj(frame_name, group_name, _obj) {
     const typeId = fabricType2id[obj.type]
     const name = obj.name
     if (obj.type === "UiFloat") {
-        obj.number = Math.round(obj.number * 1000)
+        obj.number = Math.round(obj.float * 1000)
+        delete obj.float
     }
     if (obj.type === "UiRect") {
         obj.x2 = obj.x + obj.width
