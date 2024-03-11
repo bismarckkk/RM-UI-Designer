@@ -12,6 +12,7 @@ import { appWindow } from '@tauri-apps/api/window';
 import { exit } from '@tauri-apps/api/process';
 import { isTauri } from "@/utils/utils";
 import Generator from "@/components/generator";
+import Serial from "@/utils/serial/webSerialDriver";
 
 const fileItems = [
     {
@@ -68,6 +69,7 @@ class Menu extends Component {
     aboutRef = createRef()
     generatorRef = createRef()
     tauri = isTauri()
+    serial = new Serial((e)=>{console.log(e)})
 
     async componentDidMount() {
         if (this.tauri) {
@@ -164,6 +166,8 @@ class Menu extends Component {
         } else if (first === 'FrameOp-change') {
             const name = key.key.slice(7)
             this.props.setFrame('change', name)
+        } else if (first === 'Simulate-start') {
+            await this.serial.connect()
         }
     }
 

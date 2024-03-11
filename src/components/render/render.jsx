@@ -90,10 +90,18 @@ class Render extends Component {
         }
     }
 
-    async reset() {
-        this.canvas.clear()
-        this.setBackground(require("../../assets/background.png"))
-        this.canvas.backgroundColor = '#fff'
+    async reset(noBackgroundUpdate = false) {
+        if (noBackgroundUpdate) {
+            let objects = this.canvas.getObjects();
+            for (let i in objects) {
+                this.canvas.remove(objects[i]);
+            }
+            this.canvas.renderAll();
+        } else {
+            this.canvas.clear()
+            this.setBackground(require("../../assets/background.png"))
+            this.canvas.backgroundColor = '#fff'
+        }
         if (!Object.keys(this.objects).includes('default')) {
             await this.onFrameEvent('add', 'default')
         }
@@ -446,8 +454,7 @@ class Render extends Component {
         }
 
         if (type === 'add') {
-            if (!obj.id || this.objects[this.state.frame][obj.id]) {
-                obj.id = this.getNewDataId()
+            if (obj.id && !this.objects[this.state.frame][obj.id]) {
                 addObject(obj)
             }
         } else if (type === '_add') {
@@ -478,6 +485,14 @@ class Render extends Component {
             if (this.objects[this.state.frame][obj.id]) {
                 this.objects[this.state.frame][obj.id].set(obj.payload)
             }
+        } else if (type === 'removeLayer') {
+            for (const key of Object.keys(this.objects[this.state.frame])) {
+                if (this.objects[this.state.frame][key].layer === obj.layer) {
+                    this.onObjectEvent('remove', {id: key})
+                }
+            }
+        } else if (type === 'removeAll') {
+            this.reset(true)
         }
 
         this.objectsToData()
@@ -536,7 +551,7 @@ class Render extends Component {
             state = this.his.next()
         }
         this.props.setCouldDo(state)
-        await this.reset()
+        await this.reset(true)
         await readUiFile(
             state.now,
             (t, e) => this.onObjectEvent(t, e),
