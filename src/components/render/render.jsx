@@ -248,6 +248,7 @@ class Render extends Component {
         }, false);
         window.addEventListener('copy', e => {
             let info = null
+            console.log(e.target,isEditable(e.target))
             if (!isEditable(e.target) && that.state.selectedId.length !== 0 && that.state.selectedId[0] !== -2) {
                 e.preventDefault()
                 info = JSON.stringify(that.state.selectedId.map(id => that.state.data[id]))

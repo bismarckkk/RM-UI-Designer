@@ -263,9 +263,9 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
         N}#define GROUP_ID ${group_id}${
         N}#define START_ID ${start_id}${
         N}${
-        N}CAT(ui_, CAT(FRAME_OBJ_NUM, _frame_t)) ui_${split_name};${
+        N}ui_string_frame_t ui_${split_name};${
         N}${
-        N}ui_interface_string_t* ui_${frame_name}_${group_name}_${name} = ui_${split_name}.string;${
+        N}ui_interface_string_t* ui_${frame_name}_${group_name}_${name} = &ui_${split_name}.option;${
         N}${
         N}void _ui_init_${split_name}() {${
         N}    ui_${split_name}.option.figure_name[0] = FRAME_ID;${
