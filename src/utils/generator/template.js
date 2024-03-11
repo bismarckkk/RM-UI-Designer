@@ -310,20 +310,12 @@ const interfaceHUrl = require('@/assets/code_template/ui_interface.h')
 const interfaceCUrl = require('@/assets/code_template/ui_interface.c')
 const typesHUrl = require('@/assets/code_template/ui_types.h')
 
-let interfaceH = null
-let interfaceC = null
-let typesH = null
+let interfaceH = await (await fetch(interfaceHUrl)).text()
+let interfaceC = await (await fetch(interfaceCUrl)).text()
+let typesH = await (await fetch(typesHUrl)).text()
 
 export async function getUiBase() {
-    if (interfaceH === null) {
-        interfaceH = await (await fetch(interfaceHUrl)).text()
-    }
-    if (interfaceC === null) {
-        interfaceC = await (await fetch(interfaceCUrl)).text()
-    }
-    if (typesH === null) {
-        typesH = await (await fetch(typesHUrl)).text()
-    }
+
     return {
         ui_interface: {
             h: interfaceH,
