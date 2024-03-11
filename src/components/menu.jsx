@@ -1,5 +1,5 @@
 import React, { Component, createRef } from 'react';
-import { Flex, Button, Dropdown } from "antd";
+import { Flex, Button, Dropdown, Badge } from "antd";
 import { FullscreenExitOutlined, FullscreenOutlined, ThunderboltOutlined,
     GithubOutlined, CloseOutlined, MinusOutlined } from "@ant-design/icons";
 import Icon from '@ant-design/icons';
@@ -8,6 +8,9 @@ import { getMenuProps } from "@/utils/fabricObjects";
 import AboutModal from "@/components/modals/aboutModal";
 import { ReactComponent as MoonSvg } from "@/assets/moon.svg"
 import { ReactComponent as SunSvg } from "@/assets/sun.svg"
+import SerialModal from "@/components/modals/serialModal";
+import LogDrawer from "@/components/modals/logDrawer";
+import { message } from "@/utils/app";
 import { appWindow } from '@tauri-apps/api/window';
 import { exit } from '@tauri-apps/api/process';
 import { isTauri } from "@/utils/utils";
@@ -53,28 +56,41 @@ let editItems = [
 const simulateItems = [
     {
         key: 'Simulate-start',
-        label: "Start",
-        disable: true
+        label: "Start"
+    },
+    {
+        key: 'Simulate-stop',
+        label: "Stop"
     },
     {
         key: 'Simulate-settings',
-        label: "Settings",
-        disable: true
+        label: "Settings"
+    },
+    {
+        key: 'Simulate-log',
+        label: "Debug Log"
     }
 ]
 
 class Menu extends Component {
-    state = { fullscreen: false, frames: ['default'], selectedFrame: 'default', darkMode: false, couldUndo: false, couldRedo: false }
+    state = { fullscreen: false, frames: ['default'], selectedFrame: 'default', darkMode: false, couldUndo: false, couldRedo: false, serialStart: false }
     formRef = createRef()
     aboutRef = createRef()
     generatorRef = createRef()
+    logDrawerRef = createRef()
+    serialModalRef = createRef()
     tauri = isTauri()
-    serial = new Serial(e => this.onSerialEvent(e))
+    serial = new Serial(e => this.onSerialEvent(e), e => this.onSerialError(e))
 
     onSerialEvent(e) {
         for (let event of e.events) {
             this.props.onObjectEvent(event.type, event.obj)
         }
+    }
+
+    onSerialError(e) {
+        this.props.setEditable(true)
+        this.setState({serialStart: false})
     }
 
     async componentDidMount() {
@@ -177,7 +193,28 @@ class Menu extends Component {
             const name = key.key.slice(7)
             this.props.setFrame('change', name)
         } else if (first === 'Simulate-start') {
-            await this.serial.connect()
+            try {
+                this.props.setEditable(false)
+                await this.serial.connect()
+                this.setState({serialStart: true})
+            } catch (e) {
+                message.error(e.text)
+            }
+        } else if (first === 'Simulate-stop') {
+            try {
+                await this.serial.stop()
+                this.props.setEditable(true)
+                this.setState({serialStart: false})
+            } catch (e) {
+                message.error(e.text)
+            }
+        } else if (first === 'Simulate-settings') {
+            const options = await this.serialModalRef.current?.getOptions(this.serial.options)
+            if (options) {
+                this.serial.options = options
+            }
+        } else if (first === 'Simulate-log') {
+            this.logDrawerRef.current?.show(this.serial.getLog())
         }
     }
 
@@ -238,6 +275,8 @@ class Menu extends Component {
         )
         editItems[0]['disabled'] = !this.state.couldUndo
         editItems[1]['disabled'] = !this.state.couldRedo
+        simulateItems[0]['disabled'] = this.state.serialStart
+        simulateItems[1]['disabled'] = !this.state.serialStart
         return (
             <div style={{width: "100%", height: 32, marginTop: -5}} className="solid-color" data-tauri-drag-region>
                 <Flex
@@ -273,8 +312,8 @@ class Menu extends Component {
                     }}>
                         <Button type="text" size="small">Frames</Button>
                     </Dropdown>
-                    <Dropdown menu={{ items: simulateItems, onClick: e=>this.onMenuClick(e) }}>
-                        <Button type="text" size="small">Simulate🚧</Button>
+                    <Dropdown menu={{ items: [...simulateItems], onClick: e=>this.onMenuClick(e) }}>
+                        <Button type="text" size="small">Simulate&nbsp;<Badge color={this.state.serialStart?"green":"red"} /></Button>
                     </Dropdown>
                     <Button type="text" size="small" onClick={()=> {
                         this.aboutRef.current?.show()
@@ -331,7 +370,9 @@ class Menu extends Component {
                 </Flex>
                 <FormModal ref={this.formRef} />
                 <AboutModal ref={this.aboutRef} />
-                <Generator ref={this.generatorRef}/>
+                <Generator ref={this.generatorRef} />
+                <LogDrawer ref={this.logDrawerRef} />
+                <SerialModal ref={this.serialModalRef} />
             </div>
         );
     }

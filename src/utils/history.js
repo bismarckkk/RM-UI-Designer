@@ -23,6 +23,7 @@ class History {
     _previous = null
     _next = null
     his = null
+    catchUpdate = true
 
     constructor() {
         let his = localStorage.getItem('history')
@@ -67,7 +68,11 @@ class History {
     }
 
     get() {
-        return {now: this.now, couldNext: this._next !== null, couldPrevious: this._previous !== null}
+        if (this.catchUpdate) {
+            return {now: this.now, couldNext: this._next !== null, couldPrevious: this._previous !== null}
+        } else {
+            return {now: this.now, couldNext: false, couldPrevious: false}
+        }
     }
 
     reset(data) {
@@ -109,6 +114,9 @@ class History {
     }
 
     update(data) {
+        if (!this.catchUpdate) {
+            return
+        }
         if (this.updateTimer) {
             clearTimeout(this.updateTimer)
         }

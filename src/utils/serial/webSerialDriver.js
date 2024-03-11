@@ -1,10 +1,20 @@
 import SerialTransformer from './serialTransformer';
 import { getEvent } from './msgView';
+import logger from "./logger";
 import { message } from "../app";
 
 class Serial {
-    constructor(onEvent) {
+    options = {
+        baudRate: 115200,
+        dataBits: 8,
+        stopBits: 1,
+        flowControl: 'none',
+        parity: 'none'
+    }
+
+    constructor(onEvent, onError) {
         this.onEvent = onEvent;
+        this.onError = onError;
         this.reader = null;
         this.transformer = new TransformStream(new SerialTransformer());
         this.self = 1;
@@ -16,34 +26,72 @@ class Serial {
             return;
         }
 
-        const port = await navigator.serial.requestPort();
-        await port.open({ baudRate: 115200 });
+        this.port = await navigator.serial.requestPort();
+        await this.port.open(this.options);
 
-        await port.readable.pipeThrough(this.transformer);
+        this.readableStreamClosed = this.port.readable.pipeTo(this.transformer.writable);
+        this.reader = this.transformer.readable.getReader();
 
-        this.readLoop();
+        logger.enabled = true;
+        logger.clear()
+
+        this.readLoop()
+    }
+
+    async stop() {
+        const textEncoder = new TextEncoderStream();
+        const writer = textEncoder.writable.getWriter();
+        const writableStreamClosed = textEncoder.readable.pipeTo(this.port.writable);
+
+        this.reader.cancel();
+        await this.readableStreamClosed.catch(() => { /* Ignore the error */ });
+
+        writer.close();
+        await writableStreamClosed;
+
+        await this.port.close();
+
+        this.reader = null;
+        this.transformer = new TransformStream(new SerialTransformer());
+        this.self = 1;
+        logger.enabled = false;
     }
 
     async readLoop() {
-        this.reader = this.transformer.readable.getReader();
-        while (true) {
-            const { value, done } = await this.reader.read();
-            if (done) {
-                this.reader.releaseLock();
-                break;
-            }
+        try {
+            while (true) {
+                const { value, done } = await this.reader.read();
+                if (done) {
+                    this.reader.releaseLock();
+                    break;
+                }
 
-            const event = getEvent(value);
-            if (event.sender !== this.self) {
-                console.log('Sender', event.sender, "not match self", this.self);
-                continue
+                const event = getEvent(value);
+                if (event.sender !== this.self) {
+                    logger.error(`Sender ${event.sender} not match self ${this.self}`);
+                    continue
+                }
+                if (event.receiver !== this.self + 256) {
+                    logger.error(`Receiver ${event.receiver} not match self ${this.self}`);
+                    continue
+                }
+                this?.onEvent(event);
             }
-            if (event.receiver !== this.self + 256) {
-                console.log('Receiver', event.receiver, "not match self", this.self);
-                continue
-            }
-            this?.onEvent(event);
+        } catch (error) {
+            try {
+                await this.stop()
+            } catch (_) { }
+            this.reader = null;
+            this.transformer = new TransformStream(new SerialTransformer());
+            this.self = 1;
+            logger.enabled = false;
+            logger.clear()
+            this.onError(error);
         }
+    }
+
+    getLog() {
+        return logger.get()
     }
 }
 

@@ -1,4 +1,5 @@
 import { calc_crc8, calc_crc16 } from './crc';
+import logger from "./logger";
 
 const possibleLength = [
     8, 21, 36, 81, 111, 51
@@ -31,18 +32,18 @@ class SerialTransformer {
 
             if (calc_crc8(header) !== crc8) {
                 this.buffer = this.buffer.subarray(1);
-                console.log('crc8 error', calc_crc8(header), crc8);
+                logger.warn(`crc8 error, calc: 0x${calc_crc8(header).toString(16)}, msg: 0x${crc8.toString(16)}`);
                 continue;
             }
 
             if (cmd_id !== 0x0301) {
                 this.buffer = this.buffer.subarray(1);
-                console.log('cmd_id error', cmd_id);
+                logger.warn(`cmd_id 0x${cmd_id.toString(16)} not match`);
                 continue;
             }
             if (!(possibleLength.includes(length))) {
                 this.buffer = this.buffer.subarray(1);
-                console.log('length error', length);
+                logger.warn(`length error, length: ${length}`);
                 continue;
             }
 
@@ -53,7 +54,7 @@ class SerialTransformer {
 
             if (calc_crc16(this.buffer.subarray(0, 7 + length)) !== crc16) {
                 this.buffer = this.buffer.subarray(1);
-                console.log('crc16 error', calc_crc16(this.buffer.subarray(0, 7 + length)), crc16);
+                logger.error(`crc16 error, calc: 0x${calc_crc16(this.buffer.subarray(0, 7 + length)).toString(16)}, msg: 0x${crc16.toString(16)}`)
                 continue;
             }
 

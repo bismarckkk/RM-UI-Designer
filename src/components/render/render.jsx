@@ -30,7 +30,8 @@ class Render extends Component {
             backgroundImage: true
         },
         infoModalShow: false,
-        data: {}
+        data: {},
+        editable: true
     }
     canvas = null
     canvasRef = createRef()
@@ -45,6 +46,26 @@ class Render extends Component {
             return 0
         }
         return Math.max(...Object.keys(this.state.data)) + 1
+    }
+
+    setEditable(editable) {
+        this.setState({editable})
+        this.his.catchUpdate = editable
+        this.canvas.selection = editable
+        fabric.Object.prototype.selectable = editable
+
+        const objs = this.canvas.getObjects()
+        if (editable) {
+            for (const obj of objs) {
+                obj.set('selectable', true)
+            }
+        } else {
+            for (const obj of objs) {
+                obj.set('selectable', false)
+            }
+        }
+
+        this.select([])
     }
 
     setRobotId() {
@@ -631,7 +652,7 @@ class Render extends Component {
                                     onObjectEvent={(t, e) => this.onObjectEvent(t, e)}
                                     onReset={() => this.reset()}
                                     data={this.state.data}
-                                    editable={this.props.editable}
+                                    editable={this.state.editable}
                                     selectedId={this.state.selectedId}
                                 />
                             </Panel>
