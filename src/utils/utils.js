@@ -154,6 +154,9 @@ export function uploadFile(accept) {
 }
 
 export function isEditable(element) {
+    if (document.getElementById('content-in').contains(element)) {
+        return true;
+    }
     if (element.getAttribute('contentEditable') === "true") {
         return true;
     }

@@ -9,9 +9,9 @@
 #define GROUP_ID 0
 #define START_ID 0
 
-CAT(ui_, CAT(FRAME_OBJ_NUM, _frame_t)) ui_default_Ungroup_0;
+ui_string_frame_t ui_default_Ungroup_0;
 
-ui_interface_string_t* ui_default_Ungroup_NewText = ui_default_Ungroup_0.string;
+ui_interface_string_t* ui_default_Ungroup_NewText = &ui_default_Ungroup_0.option;
 
 void _ui_init_default_Ungroup_0() {
     ui_default_Ungroup_0.option.figure_name[0] = FRAME_ID;
