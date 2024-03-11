@@ -69,6 +69,7 @@ class History {
 
     get() {
         if (this.catchUpdate) {
+            console.log(this.his)
             return {now: this.now, couldNext: this._next !== null, couldPrevious: this._previous !== null}
         } else {
             return {now: this.now, couldNext: false, couldPrevious: false}
@@ -79,6 +80,7 @@ class History {
         this._previous = null
         this._next = null
         this.his = {data: [data], head: 0, version: 1}
+        console.log(this.his)
         this.save()
         return this.get()
     }

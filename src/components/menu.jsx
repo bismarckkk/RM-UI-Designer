@@ -91,6 +91,7 @@ class Menu extends Component {
     onSerialError(e) {
         this.props.setEditable(true)
         this.setState({serialStart: false})
+        message.error(e.text)
     }
 
     async componentDidMount() {
@@ -101,6 +102,7 @@ class Menu extends Component {
     }
 
     setCouldDo(e) {
+        console.log(e)
         this.setState({couldUndo: e.couldPrevious, couldRedo: e.couldNext})
     }
 

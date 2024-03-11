@@ -76,6 +76,14 @@ class Render extends Component {
         this.props.setRobotId(id)
     }
 
+    cancelHistoryUpdate() {
+        this.his.cancelUpdate()
+        setTimeout(() => {
+            this.his.cancelUpdate()
+            this.props.setCouldDo(this.his.get())
+        }, 200)
+    }
+
     save() {
         saveObj(this.data, 'ui.rmui', this.state.frame)
     }
@@ -402,9 +410,9 @@ class Render extends Component {
             () => this.canvas.renderAll()
         ).then(() => {
             this.setRobotId()
-            this.his.cancelUpdate()
             this.resetCanvasSize()
         })
+        this.cancelHistoryUpdate()
     }
 
     upload() {
@@ -578,7 +586,7 @@ class Render extends Component {
             this.props.setCouldDo(state)
             return
         } else if (type === 'resetNow') {
-            state = this.his.reset(this.data)
+            state = this.his.reset({version: 2, data: this.data, selected: this.state.frame})
             this.props.setCouldDo(state)
             return
         }
@@ -596,8 +604,9 @@ class Render extends Component {
             () => this.canvas.renderAll()
         ).then(() => {
             this.setRobotId()
-            this.his.cancelUpdate()
         })
+        this.cancelHistoryUpdate()
+        this.props.setCouldDo(state)
     }
 
     async onFrameEvent(type, frame) {
