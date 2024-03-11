@@ -28,6 +28,7 @@ const fabricKey2key = {
     'y2': 'end_y',
     'rx': 'rx',
     'ry': 'ry',
+    'r': 'r',
     'startAngle': 'start_angle',
     'endAngle': 'end_angle',
     'number': 'number',
