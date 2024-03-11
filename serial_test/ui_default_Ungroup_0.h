@@ -7,7 +7,7 @@
 
 #include "ui_interface.h"
 
-extern char *ui_default_Ungroup_NewText;
+extern ui_interface_string_t *ui_default_Ungroup_NewText;
 
 void _ui_init_default_Ungroup_0();
 void _ui_update_default_Ungroup_0();

@@ -121,6 +121,6 @@ void ui_proc_string_frame(ui_string_frame_t *msg) {
     msg->header.sub_id = 0x0110;
     msg->header.send_id = UI_SELF_ID;
     msg->header.recv_id = UI_SELF_ID + 256;
-    msg->option.str_length = strlen(msg->string);
+    msg->option.str_length = strlen(msg->option.string);
     msg->crc16 = calc_crc16((uint8_t *) msg, 58);
 }

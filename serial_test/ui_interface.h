@@ -7,12 +7,13 @@
 
 #include <stdio.h>
 #include "ui_types.h"
+#include "serial.h"
 
 #define UI_SELF_ID 1
 
 void print_message(const uint8_t* message, int length);
 
-#define SEND_MESSAGE(message, length) print_message(message, length)
+#define SEND_MESSAGE(message, length) write(message, length)
 
 void ui_proc_1_frame(ui_1_frame_t *msg);
 void ui_proc_2_frame(ui_2_frame_t *msg);

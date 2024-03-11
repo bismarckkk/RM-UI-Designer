@@ -4,6 +4,9 @@
 
 #ifndef UI_H
 #define UI_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "ui_interface.h"
 
@@ -22,5 +25,10 @@ _ui_update_default_Ungroup_1()
 _ui_remove_default_Ungroup_0(); \
 _ui_remove_default_Ungroup_1()
     
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //UI_H
