@@ -43,17 +43,8 @@ export const Line = fabric.util.createClass(fabric.Line, {
     resizeScale: function() {
         let l = this.left
         let t = this.top
-        let w = Math.round((this.x2 - this.x1) * this.scaleX)
-        let h = Math.round((this.y2 - this.y1) * this.scaleY)
-
-        if (h < 0) {
-            t = t + h
-            h = Math.abs(h)
-        }
-        if (w < 0) {
-            l = l + w
-            w = Math.abs(w)
-        }
+        let w = Math.abs(Math.round((this.x2 - this.x1) * this.scaleX))
+        let h = Math.abs(Math.round((this.y2 - this.y1) * this.scaleY))
 
         this.set('x1', Math.round(l * this.ratio) / this.ratio)
         this.set('y1', Math.round(t * this.ratio) / this.ratio)
