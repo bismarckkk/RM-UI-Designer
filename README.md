@@ -30,7 +30,7 @@ yarn tauri build
   - [x] 矩形
   - [x] 正圆
   - [x] 椭圆
-  - [ ] 文本
+  - [x] 文本
   - [x] 圆弧
   - [x] 自定义背景图
 - 高级组件
@@ -50,7 +50,7 @@ yarn tauri build
   - [x] 在同一工程中切换frame
 - 高级功能
   - [x] 生成代码
-  - [ ] UI模拟器
+  - [x] UI模拟器
   - [x] PWA应用
   - [x] Tauri应用
 
