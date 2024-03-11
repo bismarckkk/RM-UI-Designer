@@ -53,7 +53,22 @@ typedef struct {
     int32_t number;
 } MESSAGE_PACKED ui_interface_number_t;
 
-typedef char ui_interface_string_t;
+typedef struct {
+    uint8_t figure_name[3];
+    uint32_t operate_tpyel: 3;
+    uint32_t figure_tpye: 3;
+    uint32_t layer: 4;
+    uint32_t color: 4;
+    uint32_t font_size: 9;
+    uint32_t str_length: 9;
+    uint32_t width: 10;
+    uint32_t start_x: 11;
+    uint32_t start_y: 11;
+    uint32_t _c: 10;
+    uint32_t _d: 11;
+    uint32_t _e: 11;
+    char string[30];
+} MESSAGE_PACKED ui_interface_string_t;
 
 typedef struct {
     uint8_t SOF;
@@ -77,8 +92,7 @@ DEFINE_FIGURE_MESSAGE(7);
 
 typedef struct {
     ui_frame_header_t header;
-    ui_interface_figure_t option;
-    char string[30];
+    ui_interface_string_t option;
     uint16_t crc16;
 } MESSAGE_PACKED ui_string_frame_t;
 

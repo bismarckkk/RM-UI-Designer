@@ -155,6 +155,20 @@ export const columns = {
             blue: <Color color="Blue" />,
         },
     },
+    role: {
+        title: 'Role',
+        key: 'role',
+        dataIndex: 'role',
+        valueType: 'select',
+        valueEnum: {
+            1: "Hero",
+            2: "Engineer",
+            3: "No3. Infantry",
+            4: "No4. Infantry",
+            5: "No5. Infantry",
+            6: "Drone",
+        },
+    },
     backgroundImage: {
         title: 'Background Image',
         key: 'backgroundImage',

@@ -8,6 +8,9 @@ class FormModal extends Component {
     open(title, frames) {
         return new Promise((resolve, reject) => {
             this.setState({title, open: true, frames})
+            if (this.promise) {
+                this.promise.reject()
+            }
             this.promise = {resolve, reject}
         })
     }

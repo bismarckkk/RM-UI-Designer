@@ -88,6 +88,7 @@ class Index extends Component {
                                 setFrame={(t, f) => this.renderRef.current.onFrameEvent(t, f)}
                                 upload={(e) => this.renderRef.current.upload(e)}
                                 getData={() => this.renderRef.current.getData()}
+                                setEditable={(e) => this.renderRef.current.setEditable(e)}
                                 setDarkMode={(e) => this.setDarkMode(e)}
                                 ref={this.menuRef}
                                 darkMode={this.state.darkMode}
@@ -100,6 +101,7 @@ class Index extends Component {
                                         ref={this.renderRef}
                                         onFrameChange={e => this.menuRef.current?.setFrames(e)}
                                         setCouldDo={e => {this.menuRef.current?.setCouldDo(e)}}
+                                        setRobotId={e => {this.menuRef.current?.setRobotId(e)}}
                                     />
                                 </div>
                             </Watermark>

@@ -1,20 +1,4 @@
-//
-// Created by bismarckkk on 2024/2/17.
-//
-
-#include "ui_interface.h"
-#include <string.h>
-
-uint8_t seq = 0;
-
-void print_message(const uint8_t *message, const int length) {
-    for (int i = 0; i < length; i++) {
-        printf("%02x ", message[i]);
-    }
-    printf("\n\n");
-}
-
-const unsigned char CRC8_TAB[256] = {
+const CRC8_TAB = [
     0x00, 0x5e, 0xbc, 0xe2, 0x61, 0x3f, 0xdd, 0x83, 0xc2, 0x9c, 0x7e, 0x20, 0xa3, 0xfd, 0x1f, 0x41,
     0x9d, 0xc3, 0x21, 0x7f, 0xfc, 0xa2, 0x40, 0x1e, 0x5f, 0x01, 0xe3, 0xbd, 0x3e, 0x60, 0x82, 0xdc, 0x23,
     0x7d, 0x9f, 0xc1, 0x42, 0x1c, 0xfe, 0xa0, 0xe1, 0xbf, 0x5d, 0x03, 0x80, 0xde, 0x3c, 0x62, 0xbe, 0xe0,
@@ -31,19 +15,22 @@ const unsigned char CRC8_TAB[256] = {
     0x36, 0x68, 0x8a, 0xd4, 0x95, 0xcb, 0x29, 0x77, 0xf4, 0xaa, 0x48, 0x16, 0xe9, 0xb7, 0x55, 0x0b, 0x88,
     0xd6, 0x34, 0x6a, 0x2b, 0x75, 0x97, 0xc9, 0x4a, 0x14, 0xf6, 0xa8,
     0x74, 0x2a, 0xc8, 0x96, 0x15, 0x4b, 0xa9, 0xf7, 0xb6, 0xe8, 0x0a, 0x54, 0xd7, 0x89, 0x6b, 0x35,
-};
+]
 
-unsigned char calc_crc8(unsigned char *pchMessage, unsigned int dwLength) {
-    unsigned char ucCRC8 = 0xff;
-    unsigned char ucIndex;
-    while (dwLength--) {
-        ucIndex = ucCRC8 ^ (*pchMessage++);
+export function calc_crc8(msg: Uint8Array) {
+    let ucCRC8 = 0xff;
+    let index = 0
+    let ucIndex;
+    let len = msg.byteLength;
+    while (len--) {
+        ucIndex = ucCRC8 ^ (msg[index]);
         ucCRC8 = CRC8_TAB[ucIndex];
+        index++
     }
-    return (ucCRC8);
+    return ucCRC8;
 }
 
-const uint16_t wCRC_Table[256] = {
+const wCRC_Table = [
     0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
     0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5, 0xe97e, 0xf8f7,
     0x1081, 0x0108, 0x3393, 0x221a, 0x56a5, 0x472c, 0x75b7, 0x643e,
@@ -76,51 +63,18 @@ const uint16_t wCRC_Table[256] = {
     0x6b46, 0x7acf, 0x4854, 0x59dd, 0x2d62, 0x3ceb, 0x0e70, 0x1ff9,
     0xf78f, 0xe606, 0xd49d, 0xc514, 0xb1ab, 0xa022, 0x92b9, 0x8330,
     0x7bc7, 0x6a4e, 0x58d5, 0x495c, 0x3de3, 0x2c6a, 0x1ef1, 0x0f78
-};
+]
 
-uint16_t calc_crc16(uint8_t *pchMessage, uint32_t dwLength)
-{
-    uint16_t wCRC = 0xffff;
-    uint8_t chData;
-    if (pchMessage == NULL)
-    {
-        return 0xFFFF;
-    }
+export function calc_crc16(msg: Uint8Array) {
+    let wCRC = 0xffff;
+    let chData;
+    let index = 0
+    let dwLength = msg.byteLength;
     while(dwLength--)
     {
-        chData = *pchMessage++;
-        (wCRC) = ((uint16_t)(wCRC) >> 8) ^ wCRC_Table[((uint16_t)(wCRC) ^ (uint16_t)(chData)) & 0x00ff];
+        chData = msg[index];
+        (wCRC) = (wCRC >> 8) ^ wCRC_Table[(wCRC ^ chData) & 0x00ff];
+        index++
     }
     return wCRC;
-}
-
-#define DEFINE_FRAME_PROC(num, id)                          \
-void ui_proc_ ## num##_frame(ui_ ## num##_frame_t *msg) {   \
-    msg->header.SOF = 0xA5;                                 \
-    msg->header.length = 6 + 15 * num;                      \
-    msg->header.seq = seq++;                                \
-    msg->header.crc8 = calc_crc8((uint8_t*)msg, 4);        \
-    msg->header.cmd_id = 0x0301;                            \
-    msg->header.sub_id = id;                                \
-    msg->header.send_id = UI_SELF_ID;                       \
-    msg->header.recv_id = UI_SELF_ID + 256;                 \
-    msg->crc16 = calc_crc16((uint8_t*)msg, 13 + 15 * num); \
-}
-
-DEFINE_FRAME_PROC(1, 0x0101)
-DEFINE_FRAME_PROC(2, 0x0102)
-DEFINE_FRAME_PROC(5, 0x0103)
-DEFINE_FRAME_PROC(7, 0x0104)
-
-void ui_proc_string_frame(ui_string_frame_t *msg) {
-    msg->header.SOF = 0xA5;
-    msg->header.length = 51;
-    msg->header.seq = seq++;
-    msg->header.crc8 = calc_crc8((uint8_t *) msg, 4);
-    msg->header.cmd_id = 0x0301;
-    msg->header.sub_id = 0x0110;
-    msg->header.send_id = UI_SELF_ID;
-    msg->header.recv_id = UI_SELF_ID + 256;
-    msg->option.str_length = strlen(msg->option.string);
-    msg->crc16 = calc_crc16((uint8_t *) msg, 58);
 }

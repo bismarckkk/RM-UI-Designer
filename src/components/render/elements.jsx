@@ -201,6 +201,7 @@ class Elements extends Component {
                             showLine={true}
                             blockNode={true}
                             multiple={true}
+                            selectable={this.props.editable}
                         />
                     </Dropdown>
                 </div>

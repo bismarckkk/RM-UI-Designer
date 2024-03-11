@@ -88,6 +88,7 @@ export const Text = fabric.util.createClass(fabric.Text, {
             this.set('fill', ColorMap[this._color])
         }
         this.moveTo(options.layer)
+        this.set('fontFamily', 'ds-digitalnormal')
     },
     setRatio: function (ratio) {
         this.set('width', this.width * this.ratio / ratio)

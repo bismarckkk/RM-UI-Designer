@@ -85,6 +85,9 @@ export function ui_h(frames) {
         N}${
         N}#ifndef UI_H${
         N}#define UI_H${
+        N}#ifdef __cplusplus${
+        N}extern "C" {${
+        N}#endif${
         N}${
         N}#include "ui_interface.h"${
         N}`
@@ -93,7 +96,13 @@ export function ui_h(frames) {
         res += ui_h_frame(frame.name, frame.groups)
     }
 
-    return `${res}\n#endif //UI_H\n`
+    return `${res}${
+        N}${
+        N}#ifdef __cplusplus${
+        N}}${
+        N}#endif${
+        N}${
+        N}#endif //UI_H\n`
 }
 
 export function ui_h_split(frame_name, group_name, split_id, objs) {
@@ -247,15 +256,15 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
         N}//${
         N}${
         N}#include "ui_${split_name}.h"${
+        N}#include "string.h"${
         N}${
         N}#define FRAME_ID ${frame_id}${
         N}#define GROUP_ID ${group_id}${
         N}#define START_ID ${start_id}${
-        N}#define OBJ_NUM ${objs.length}${
         N}${
         N}CAT(ui_, CAT(FRAME_OBJ_NUM, _frame_t)) ui_${split_name};${
         N}${
-        N}char* ui_${frame_name}_${group_name}_${name} = ui_${split_name}.string;${
+        N}ui_interface_string_t* ui_${frame_name}_${group_name}_${name} = ui_${split_name}.string;${
         N}${
         N}void _ui_init_${split_name}() {${
         N}    ui_${split_name}.option.figure_name[0] = FRAME_ID;${
@@ -273,7 +282,7 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
         res += `    ui_${split_name}.option.${fabricKey2key[key]} = ${value};\n`
     }
 
-    res += `    strcpy(ui_${frame_name}_${group_name}_${name}, "${text}");${
+    res += `    strcpy(ui_${frame_name}_${group_name}_${name}->string, "${text}");${
         N}${
         N}    ui_proc_string_frame(&ui_${split_name});${
         N}    SEND_MESSAGE((uint8_t *) &ui_${split_name}, sizeof(ui_${split_name}));${
@@ -304,27 +313,15 @@ let interfaceH = null
 let interfaceC = null
 let typesH = null
 
-export function getUiBase() {
+export async function getUiBase() {
     if (interfaceH === null) {
-        fetch(interfaceHUrl).then(res => {
-            res.text().then(text => {
-                interfaceH = text
-            })
-        })
+        interfaceH = await (await fetch(interfaceHUrl)).text()
     }
     if (interfaceC === null) {
-        fetch(interfaceCUrl).then(res => {
-            res.text().then(text => {
-                interfaceC = text
-            })
-        })
+        interfaceC = await (await fetch(interfaceCUrl)).text()
     }
     if (typesH === null) {
-        fetch(typesHUrl).then(res => {
-            res.text().then(text => {
-                typesH = text
-            })
-        })
+        typesH = await (await fetch(typesHUrl)).text()
     }
     return {
         ui_interface: {
