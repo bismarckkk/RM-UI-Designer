@@ -53,7 +53,7 @@ typedef struct {
     int32_t number;
 } MESSAGE_PACKED ui_interface_number_t;
 
-typedef char ui_interface_string_t
+typedef char ui_interface_string_t;
 
 typedef struct {
     uint8_t SOF;
