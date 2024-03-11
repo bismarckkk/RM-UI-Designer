@@ -38,6 +38,7 @@ DEFINE_MESSAGE(rect, _a, _b, _c, end_x, end_y);
 DEFINE_MESSAGE(round, _a, _b, r, _d, _e);
 DEFINE_MESSAGE(ellipse, _a, _b, _c, rx, ry);
 DEFINE_MESSAGE(arc, start_angle, end_angle, _c, rx, ry);
+DEFINE_MESSAGE(string, font_size, str_length, _c, _d, _e);
 
 typedef struct {
     uint8_t figure_name[3];
@@ -52,8 +53,6 @@ typedef struct {
     uint32_t start_y: 11;
     int32_t number;
 } MESSAGE_PACKED ui_interface_number_t;
-
-typedef char ui_interface_string_t;
 
 typedef struct {
     uint8_t SOF;
@@ -77,7 +76,7 @@ DEFINE_FIGURE_MESSAGE(7);
 
 typedef struct {
     ui_frame_header_t header;
-    ui_interface_figure_t option;
+    ui_interface_string_t option;
     char string[30];
     uint16_t crc16;
 } MESSAGE_PACKED ui_string_frame_t;

@@ -100,6 +100,7 @@ class Index extends Component {
                                         ref={this.renderRef}
                                         onFrameChange={e => this.menuRef.current?.setFrames(e)}
                                         setCouldDo={e => {this.menuRef.current?.setCouldDo(e)}}
+                                        setRobotId={e => {this.menuRef.current?.setRobotId(e)}}
                                     />
                                 </div>
                             </Watermark>

@@ -43,13 +43,13 @@ class DownloadPanel extends Component {
         console.log(this.props.code[key][suffix])
     }
 
-    downloadChecked() {
+    async downloadChecked() {
         if (this.checked.length === 0) {
             message.error('Please select at least one file.')
             return
         }
         let files = {}
-        let code = {...this.props.code, ...getUiBase()}
+        let code = {...this.props.code, ...(await getUiBase())}
         for (let key of this.checked) {
             files[key] = code[key]
         }

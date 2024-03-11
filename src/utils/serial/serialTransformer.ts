@@ -31,15 +31,18 @@ class SerialTransformer {
 
             if (calc_crc8(header) !== crc8) {
                 this.buffer = this.buffer.subarray(1);
+                console.log('crc8 error', calc_crc8(header), crc8);
                 continue;
             }
 
             if (cmd_id !== 0x0301) {
                 this.buffer = this.buffer.subarray(1);
+                console.log('cmd_id error', cmd_id);
                 continue;
             }
             if (!(possibleLength.includes(length))) {
                 this.buffer = this.buffer.subarray(1);
+                console.log('length error', length);
                 continue;
             }
 
@@ -49,8 +52,8 @@ class SerialTransformer {
             const crc16 = this.buffer[7 + length] | (this.buffer[8 + length] << 8);
 
             if (calc_crc16(this.buffer.subarray(0, 7 + length)) !== crc16) {
-
                 this.buffer = this.buffer.subarray(1);
+                console.log('crc16 error', calc_crc16(this.buffer.subarray(0, 7 + length)), crc16);
                 continue;
             }
 

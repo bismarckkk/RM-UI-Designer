@@ -7,6 +7,7 @@ class Serial {
         this.onEvent = onEvent;
         this.reader = null;
         this.transformer = new TransformStream(new SerialTransformer());
+        this.self = 1;
     }
 
     async connect() {
@@ -33,6 +34,14 @@ class Serial {
             }
 
             const event = getEvent(value);
+            if (event.sender !== this.self) {
+                console.log('Sender', event.sender, "not match self", this.self);
+                continue
+            }
+            if (event.receiver !== this.self + 256) {
+                console.log('Receiver', event.receiver, "not match self", this.self);
+                continue
+            }
             this?.onEvent(event);
         }
     }

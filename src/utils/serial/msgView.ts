@@ -1,12 +1,12 @@
 const objectType = [
-    'Line',
-    'Rect',
-    'Round',
-    'Ellipse',
-    'Arc',
-    'Float',
-    'Number',
-    'Text'
+    'UiLine',
+    'UiRect',
+    'UiRound',
+    'UiEllipse',
+    'UiArc',
+    'UiFloat',
+    'UiNumber',
+    'UiText'
 ]
 
 const colorType = [
@@ -169,9 +169,9 @@ export function getEvent(msg: Uint8Array) {
                 layer: msg[7]
             }
         })
-    } else if (cmd_id === 0x0120) {
+    } else if (cmd_id === 0x0110) {
         const prop = unpackObject(msg.subarray(6, 21))
-        const text = String.fromCharCode(...msg.subarray(21, 21 + prop._a))
+        const text = String.fromCharCode(...msg.subarray(21, 21 + prop._b))
         events.push(<event>{
             type: objectEventType[prop.operate_tpyel],
             obj: <objectType>{
@@ -203,7 +203,7 @@ export function getEvent(msg: Uint8Array) {
                 x: obj.start_x,
                 y: obj.start_y,
             }
-            switch (objectType[obj.figure_tpye]) {
+            switch (objectType[obj.figure_tpye].slice(2)) {
                 case 'Line':
                     _obj.x2 = obj._d
                     _obj.y2 = obj._e
@@ -239,6 +239,8 @@ export function getEvent(msg: Uint8Array) {
                 obj: _obj
             })
         }
+    } else {
+        console.log('unknown sub_id', cmd_id)
     }
     return <msg>{
         sender,

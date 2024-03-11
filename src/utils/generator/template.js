@@ -109,7 +109,11 @@ export function ui_h_split(frame_name, group_name, split_id, objs) {
         N}`
 
     for (let obj of objs) {
-        res += `extern ui_interface_${fabricType2type[obj.type]}_t *ui_${frame_name}_${group_name}_${obj.name};\n`
+        if (obj.type !== "UiText") {
+            res += `extern ui_interface_${fabricType2type[obj.type]}_t *ui_${frame_name}_${group_name}_${obj.name};\n`
+        } else {
+            res += `extern char *ui_${frame_name}_${group_name}_${obj.name};\n`
+        }
     }
 
     res += `${
@@ -247,11 +251,11 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
         N}//${
         N}${
         N}#include "ui_${split_name}.h"${
+        N}#include "string.h"${
         N}${
         N}#define FRAME_ID ${frame_id}${
         N}#define GROUP_ID ${group_id}${
         N}#define START_ID ${start_id}${
-        N}#define OBJ_NUM ${objs.length}${
         N}${
         N}CAT(ui_, CAT(FRAME_OBJ_NUM, _frame_t)) ui_${split_name};${
         N}${
@@ -304,27 +308,15 @@ let interfaceH = null
 let interfaceC = null
 let typesH = null
 
-export function getUiBase() {
+export async function getUiBase() {
     if (interfaceH === null) {
-        fetch(interfaceHUrl).then(res => {
-            res.text().then(text => {
-                interfaceH = text
-            })
-        })
+        interfaceH = await (await fetch(interfaceHUrl)).text()
     }
     if (interfaceC === null) {
-        fetch(interfaceCUrl).then(res => {
-            res.text().then(text => {
-                interfaceC = text
-            })
-        })
+        interfaceC = await (await fetch(interfaceCUrl)).text()
     }
     if (typesH === null) {
-        fetch(typesHUrl).then(res => {
-            res.text().then(text => {
-                typesH = text
-            })
-        })
+        typesH = await (await fetch(typesHUrl)).text()
     }
     return {
         ui_interface: {

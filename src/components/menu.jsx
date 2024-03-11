@@ -69,7 +69,13 @@ class Menu extends Component {
     aboutRef = createRef()
     generatorRef = createRef()
     tauri = isTauri()
-    serial = new Serial((e)=>{console.log(e)})
+    serial = new Serial(e => this.onSerialEvent(e))
+
+    onSerialEvent(e) {
+        for (let event of e.events) {
+            this.props.onObjectEvent(event.type, event.obj)
+        }
+    }
 
     async componentDidMount() {
         if (this.tauri) {
@@ -123,6 +129,10 @@ class Menu extends Component {
 
     setFrames(info) {
         this.setState({frames: info.frames, selectedFrame: info.selected})
+    }
+
+    setRobotId(id) {
+        this.serial.self = id
     }
 
     async onMenuClick(key) {

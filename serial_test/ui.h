@@ -1,25 +1,26 @@
 //
-// Created by bismarckkk on 2024/2/17.
+// Created by RM UI Designer
 //
 
-#ifndef SERIAL_TEST_UI_H
-#define SERIAL_TEST_UI_H
+#ifndef UI_H
+#define UI_H
 
 #include "ui_interface.h"
 
-#include "ui_default_ungroup1.h"
-#include "ui_default_ungroup2.h"
+#include "ui_default_Ungroup_0.h"
+#include "ui_default_Ungroup_1.h"
 
-#define ui_init_default_ungroup()  \
-_ui_init_default_ungroup_1();      \
-_ui_init_default_ungroup_2()
+#define ui_init_default_Ungroup() \
+_ui_init_default_Ungroup_0(); \
+_ui_init_default_Ungroup_1()
 
-#define ui_update_default_ungroup()  \
-_ui_update_default_ungroup_1();      \
-_ui_update_default_ungroup_2()
+#define ui_update_default_Ungroup() \
+_ui_update_default_Ungroup_0(); \
+_ui_update_default_Ungroup_1()
 
-#define ui_remove_default_ungroup()  \
-_ui_remove_default_ungroup_1();      \
-_ui_remove_default_ungroup_2()
+#define ui_remove_default_Ungroup() \
+_ui_remove_default_Ungroup_0(); \
+_ui_remove_default_Ungroup_1()
+    
 
-#endif //SERIAL_TEST_UI_H
+#endif //UI_H

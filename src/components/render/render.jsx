@@ -26,6 +26,7 @@ class Render extends Component {
             width: 1920,
             ratio: 1,
             team: 'red',
+            role: 1,
             backgroundImage: true
         },
         infoModalShow: false,
@@ -44,6 +45,14 @@ class Render extends Component {
             return 0
         }
         return Math.max(...Object.keys(this.state.data)) + 1
+    }
+
+    setRobotId() {
+        let id = this.state.uiWindow.role
+        if (this.state.uiWindow.team === 'blue') {
+            id += 100
+        }
+        this.props.setRobotId(id)
     }
 
     save() {
@@ -159,6 +168,7 @@ class Render extends Component {
             }
             this.setState({uiWindow: info, properties: info}, () => {
                 this.resetCanvasSize()
+                this.setRobotId()
             })
             if (info.backgroundImage !== this.state.uiWindow.backgroundImage) {
                 if (info.backgroundImage) {
@@ -369,9 +379,11 @@ class Render extends Component {
             (t, e) => this.onObjectEvent(t, e),
             frame => that.onFrameEvent('change', frame),
             () => this.canvas.renderAll()
-        )
-        this.his.cancelUpdate()
-        this.resetCanvasSize()
+        ).then(() => {
+            this.setRobotId()
+            this.his.cancelUpdate()
+            this.resetCanvasSize()
+        })
     }
 
     upload() {
@@ -385,7 +397,9 @@ class Render extends Component {
                     (t, e) => that.onObjectEvent(t, e),
                     frame => that.onFrameEvent('change', frame),
                     () => that.canvas.renderAll()
-                )
+                ).then(() => {
+                    this.setRobotId()
+                })
                 that.objectsToData()
                 that.his.reset({version: 2, data: this.data, selected: this.state.frame})
             }
@@ -454,8 +468,10 @@ class Render extends Component {
         }
 
         if (type === 'add') {
-            if (obj.id && !this.objects[this.state.frame][obj.id]) {
-                addObject(obj)
+            if (typeof obj.id === 'number' && obj.id >= 0 && !this.objects[this.state.frame][obj.id]) {
+                addObject(obj, true)
+            } else {
+                console.log('id exists', obj.id, this.objects[this.state.frame][obj.id])
             }
         } else if (type === '_add') {
             obj.id = this.getNewDataId()
@@ -557,8 +573,10 @@ class Render extends Component {
             (t, e) => this.onObjectEvent(t, e),
             frame => this.onFrameEvent('change', frame),
             () => this.canvas.renderAll()
-        )
-        this.his.cancelUpdate()
+        ).then(() => {
+            this.setRobotId()
+            this.his.cancelUpdate()
+        })
     }
 
     async onFrameEvent(type, frame) {

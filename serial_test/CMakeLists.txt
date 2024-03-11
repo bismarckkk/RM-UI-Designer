@@ -7,6 +7,6 @@ add_executable(serial_test main.c
         ui_interface.c
         ui_interface.h
         ui_types.h
-        ui_default_ungroup1.c
-        ui_default_ungroup2.c
+        ui_default_ungroup_0.c
+        ui_default_ungroup_1.c
 )
