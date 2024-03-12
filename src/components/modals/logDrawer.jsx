@@ -55,6 +55,7 @@ class LogDrawer extends Component {
                 size="large"
                 getContainer={document.getElementById('content-in')}
                 rootStyle={{inset: '25px 0 0 0'}}
+                style={{borderTop: '3px var(--ant-line-type) var(--ant-color-split)'}}
             >
                 <div style={{
                     width: '100%',
