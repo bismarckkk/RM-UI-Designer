@@ -48,6 +48,14 @@ class Group {
         }
     }
 
+    toSerialMsg() {
+        let res = []
+        for (let split of this.splits) {
+            res.push(split.toSerialMsg())
+        }
+        return res
+    }
+
     check() {
         let res = this.errors
         for (let split of this.splits) {

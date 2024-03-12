@@ -1,6 +1,6 @@
 import React, { Component, createRef } from 'react';
 import { Button, Card, Empty, Space } from "antd";
-import { message, modal } from "@/utils/app";
+import { message, modal, setRid } from "@/utils/app";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ProDescriptions } from '@ant-design/pro-components';
 import Elements from "./elements";
@@ -73,7 +73,7 @@ class Render extends Component {
         if (this.state.uiWindow.team === 'blue') {
             id += 100
         }
-        this.props.setRobotId(id)
+        setRid(id)
     }
 
     cancelHistoryUpdate() {

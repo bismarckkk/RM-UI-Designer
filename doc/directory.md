@@ -44,7 +44,7 @@ src
 ├─pages                     // 页面目录
 │      index.jsx                // 主页面
 └─utils                     // 工具目录
-  │    app.js                   // 与appHelper.jsx结合，用于获取带上下文的meassage、Modal方法
+  │    app.ts                   // 与appHelper.jsx结合，用于获取带上下文的meassage、Modal方法
   │    columns.js               // 属性面板中各属性的渲染配置
   │    fabricObjects.js         // 自定义的fabricjs控件（见控件目录）
   │    history.js               // 操作历史记录

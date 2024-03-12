@@ -3,6 +3,7 @@ import { App } from 'antd';
 let message;
 let notification;
 let modal;
+let rid = 1;
 
 export default () => {
     const staticFunction = App.useApp();
@@ -12,4 +13,8 @@ export default () => {
     return null;
 };
 
-export { message, notification, modal };
+export function setRid(newRid: number) {
+    rid = newRid;
+}
+
+export { message, notification, modal, rid };
