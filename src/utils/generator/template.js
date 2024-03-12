@@ -6,7 +6,7 @@ const fabricType2type = {
     "UiLine": "line",
     "UiEllipse": "ellipse",
     "UiText": "string",
-    "UiInt": "number",
+    "UiNumber": "number",
     "UiFloat": "number",
 }
 const fabricType2id = {
@@ -16,7 +16,7 @@ const fabricType2id = {
     "UiEllipse": 3,
     "UiArc": 4,
     "UiFloat": 5,
-    "UiInt": 6,
+    "UiNumber": 6,
     "UiText": 7,
 }
 const fabricKey2key = {
