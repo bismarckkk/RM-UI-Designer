@@ -280,7 +280,7 @@ class Menu extends Component {
         simulateItems[0]['disabled'] = this.state.serialStart
         simulateItems[1]['disabled'] = !this.state.serialStart
         return (
-            <div style={{width: "100%", height: 32, marginTop: -5}} className="solid-color" data-tauri-drag-region>
+            <div style={{width: "100%", height: 32, marginTop: -5, zIndex: 2000, position: 'relative'}} className="solid-color" data-tauri-drag-region>
                 <Flex
                     style={{width: "100vw", display: 'flex', paddingTop: -5}}
                     justify="flex-start" align="center" data-tauri-drag-region
