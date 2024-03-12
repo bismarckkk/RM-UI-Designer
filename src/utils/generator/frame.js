@@ -21,6 +21,15 @@ class Frame {
         }
     }
 
+    toSerialMsg() {
+        let res = []
+        for (let group of this.groups) {
+            res = res.concat(group.toSerialMsg())
+        }
+        console.log(res)
+        return res
+    }
+
     check() {
         let res = []
         for (let group of this.groups) {

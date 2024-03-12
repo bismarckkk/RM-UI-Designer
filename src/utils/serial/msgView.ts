@@ -1,4 +1,4 @@
-const objectType = [
+export const objectTypeMap = [
     'UiLine',
     'UiRect',
     'UiRound',
@@ -9,7 +9,7 @@ const objectType = [
     'UiText'
 ]
 
-const colorType = [
+export const colorType = [
     'main',
     'yellow',
     'green',
@@ -21,7 +21,7 @@ const colorType = [
     'white',
 ]
 
-const objectEventType = [
+export const objectEventType = [
     'null',
     'add',
     'update',
@@ -41,7 +41,7 @@ const layerType = [
     'removeAll',
 ]
 
-interface objectType {
+export interface objectType {
     layer: number,
     group: string,
     type: string,
@@ -81,7 +81,7 @@ interface msg {
     events: event[]
 }
 
-interface msgObj {
+export interface msgObj {
     group: string,
     id: number,
     operate_tpyel: number,
@@ -96,7 +96,7 @@ interface msgObj {
     _c: number,
     _d: number,
     _e: number,
-    number: number
+    number?: number
 }
 
 function getUint16(msg: Uint8Array, index: number) {
@@ -177,9 +177,9 @@ export function getEvent(msg: Uint8Array) {
             obj: <objectType>{
                 layer: prop.layer,
                 group: prop.group,
-                type: objectType[prop.figure_tpye],
+                type: objectTypeMap[prop.figure_tpye],
                 id: prop.id,
-                name: `${objectType[prop.figure_tpye]}_${prop.id}`,
+                name: `${objectTypeMap[prop.figure_tpye]}_${prop.id}`,
                 color: colorType[prop.color],
                 lineWidth: prop.width,
                 x: prop.start_x,
@@ -195,15 +195,15 @@ export function getEvent(msg: Uint8Array) {
             let _obj: objectType = {
                 layer: obj.layer,
                 group: obj.group,
-                type: objectType[obj.figure_tpye],
+                type: objectTypeMap[obj.figure_tpye],
                 id: obj.id,
-                name: `${objectType[obj.figure_tpye]}_${obj.id}`,
+                name: `${objectTypeMap[obj.figure_tpye]}_${obj.id}`,
                 color: colorType[obj.color],
                 lineWidth: obj.width,
                 x: obj.start_x,
                 y: obj.start_y,
             }
-            switch (objectType[obj.figure_tpye].slice(2)) {
+            switch (objectTypeMap[obj.figure_tpye].slice(2)) {
                 case 'Line':
                     _obj.x2 = obj._d
                     _obj.y2 = obj._e
@@ -227,6 +227,7 @@ export function getEvent(msg: Uint8Array) {
                     break
                 case 'Float':
                     _obj.fontSize = obj._a
+                    // @ts-ignore
                     _obj.float = obj.number / 1000
                     break
                 case 'Number':

@@ -2,6 +2,7 @@ import SerialTransformer from './serialTransformer';
 import { getEvent } from './msgView';
 import logger from "./logger";
 import { message } from "../app";
+import { rid } from "../app";
 
 class Serial {
     options = {
@@ -17,7 +18,6 @@ class Serial {
         this.onError = onError;
         this.reader = null;
         this.transformer = new TransformStream(new SerialTransformer());
-        this.self = 1;
     }
 
     async connect() {
@@ -53,7 +53,6 @@ class Serial {
 
         this.reader = null;
         this.transformer = new TransformStream(new SerialTransformer());
-        this.self = 1;
         logger.enabled = false;
     }
 
@@ -67,12 +66,12 @@ class Serial {
                 }
 
                 const event = getEvent(value);
-                if (event.sender !== this.self) {
-                    logger.error(`Sender ${event.sender} not match self ${this.self}`);
+                if (event.sender !== rid) {
+                    logger.error(`Sender ${event.sender} not match self ${rid}`);
                     continue
                 }
-                if (event.receiver !== this.self + 256) {
-                    logger.error(`Receiver ${event.receiver} not match self ${this.self}`);
+                if (event.receiver !== rid + 256) {
+                    logger.error(`Receiver ${event.receiver} not match self ${rid}`);
                     continue
                 }
                 this?.onEvent(event);
@@ -83,7 +82,6 @@ class Serial {
             } catch (_) { }
             this.reader = null;
             this.transformer = new TransformStream(new SerialTransformer());
-            this.self = 1;
             logger.enabled = false;
             logger.clear()
             this.onError(error);

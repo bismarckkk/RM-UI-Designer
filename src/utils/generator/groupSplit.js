@@ -1,4 +1,5 @@
 import { ui_c_split, ui_c_string_split, ui_h_split } from "./template";
+import { splitToSerialMsg } from "./toSerialMsg";
 
 class GroupSplit {
     constructor(frame_name, frame_id, group_name, group_id, split_id, start_id, objs) {
@@ -31,6 +32,16 @@ class GroupSplit {
         }
 
         this.toSplitH = () => ui_h_split(this.frame_name, this.group_name, this.split_id, this.objs)
+    }
+
+    toSerialMsg() {
+        let objs = []
+        for (let obj of this.objs) {
+            const _obj = {...obj}
+            _obj.group = `${this.frame_name}-${this.split_id}`
+            objs.push(_obj)
+        }
+        return splitToSerialMsg(objs)
     }
 
     check() {

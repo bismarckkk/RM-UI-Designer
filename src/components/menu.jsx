@@ -15,7 +15,9 @@ import { appWindow } from '@tauri-apps/api/window';
 import { exit } from '@tauri-apps/api/process';
 import { isTauri } from "@/utils/utils";
 import Generator from "@/components/generator";
-import Serial from "@/utils/serial/webSerialDriver";
+import SerialFrom from "@/utils/serial/webSerialFromDriver";
+import SerialTo from "@/utils/serial/webSerialToDriver";
+
 
 const fileItems = [
     {
@@ -55,32 +57,67 @@ let editItems = [
 
 const simulateItems = [
     {
-        key: 'Simulate-start',
-        label: "Start"
+        key: 'Simulate-from',
+        label: 'From Robot',
+        children: [
+            {
+                key: 'Simulate-from-start',
+                label: "Start"
+            },
+            {
+                key: 'Simulate-from-stop',
+                label: "Stop"
+            },
+            {
+                key: 'Simulate-from-log',
+                label: "Debug Log"
+            },
+        ]
     },
     {
-        key: 'Simulate-stop',
-        label: "Stop"
+        key: 'Simulate-to',
+        label: 'To Referee',
+        children: [
+            {
+                key: 'Simulate-to-start',
+                label: "Start"
+            },
+            {
+                key: 'Simulate-to-stop',
+                label: "Stop"
+            },
+            {
+                key: 'Simulate-to-update',
+                label: "Update"
+            },
+        ]
     },
     {
         key: 'Simulate-settings',
         label: "Settings"
-    },
-    {
-        key: 'Simulate-log',
-        label: "Debug Log"
     }
 ]
 
 class Menu extends Component {
-    state = { fullscreen: false, frames: ['default'], selectedFrame: 'default', darkMode: false, couldUndo: false, couldRedo: false, serialStart: false }
+    state = {
+        fullscreen: false,
+        frames: ['default'],
+        selectedFrame: 'default',
+        darkMode: false,
+        couldUndo: false,
+        couldRedo: false,
+        serialStart: false,
+        serialToStart: false
+    }
     formRef = createRef()
     aboutRef = createRef()
     generatorRef = createRef()
     logDrawerRef = createRef()
     serialModalRef = createRef()
     tauri = isTauri()
-    serial = new Serial(e => this.onSerialEvent(e), e => this.onSerialError(e))
+    serial = new SerialFrom(e => this.onSerialEvent(e), e => this.onSerialError(e))
+    serialTo = new SerialTo()
+
 
     onSerialEvent(e) {
         for (let event of e.events) {
@@ -149,10 +186,6 @@ class Menu extends Component {
         this.setState({frames: info.frames, selectedFrame: info.selected})
     }
 
-    setRobotId(id) {
-        this.serial.self = id
-    }
-
     async onMenuClick(key) {
         const first = key.keyPath[key.keyPath.length - 1]
         if (first.slice(0, 6) === 'Insert') {
@@ -194,7 +227,7 @@ class Menu extends Component {
         } else if (first === 'FrameOp-change') {
             const name = key.key.slice(7)
             this.props.setFrame('change', name)
-        } else if (first === 'Simulate-start') {
+        } else if (key.key === 'Simulate-from-start') {
             try {
                 this.props.setEditable(false)
                 await this.serial.connect()
@@ -202,7 +235,7 @@ class Menu extends Component {
             } catch (e) {
                 message.error(e.text)
             }
-        } else if (first === 'Simulate-stop') {
+        } else if (key.key === 'Simulate-from-stop') {
             try {
                 await this.serial.stop()
                 this.props.setEditable(true)
@@ -210,13 +243,34 @@ class Menu extends Component {
             } catch (e) {
                 message.error(e.text)
             }
-        } else if (first === 'Simulate-settings') {
+        } else if (key.key === 'Simulate-from-log') {
+            this.logDrawerRef.current?.show(this.serial.getLog())
+        } else if (key.key === 'Simulate-to-start') {
+            try {
+                await this.serialTo.connect()
+                message.warning('This Module is beta now, maybe not work!')
+                this.setState({serialToStart: true})
+            } catch (e) {
+                message.error(e.text)
+            }
+        } else if (key.key === 'Simulate-to-stop') {
+            try {
+                await this.serialTo.stop()
+                this.setState({serialToStart: false})
+            } catch (e) {
+                message.error(e.text)
+            }
+        } else if (key.key === 'Simulate-to-update') {
+            try {
+                await this.serialTo.write({data: this.props.getData(), selected: this.state.selectedFrame})
+            } catch (e) {
+                message.error(e.text)
+            }
+        }  else if (first === 'Simulate-settings') {
             const options = await this.serialModalRef.current?.getOptions(this.serial.options)
             if (options) {
                 this.serial.options = options
             }
-        } else if (first === 'Simulate-log') {
-            this.logDrawerRef.current?.show(this.serial.getLog())
         }
     }
 
@@ -277,8 +331,13 @@ class Menu extends Component {
         )
         editItems[0]['disabled'] = !this.state.couldUndo
         editItems[1]['disabled'] = !this.state.couldRedo
-        simulateItems[0]['disabled'] = this.state.serialStart
-        simulateItems[1]['disabled'] = !this.state.serialStart
+        simulateItems[0]['disabled'] = this.state.serialToStart
+        simulateItems[1]['disabled'] = this.state.serialStart
+        simulateItems[2]['disabled'] = this.state.serialStart || this.state.serialToStart
+        simulateItems[0].children[0]['disabled'] = this.state.serialStart
+        simulateItems[0].children[1]['disabled'] = !this.state.serialStart
+        simulateItems[1].children[0]['disabled'] = this.state.serialToStart
+        simulateItems[1].children[1]['disabled'] = !this.state.serialToStart
         return (
             <div style={{width: "100%", height: 32, marginTop: -5, zIndex: 2000, position: 'relative'}} className="solid-color" data-tauri-drag-region>
                 <Flex
@@ -315,7 +374,10 @@ class Menu extends Component {
                         <Button type="text" size="small">Frames</Button>
                     </Dropdown>
                     <Dropdown menu={{ items: [...simulateItems], onClick: e=>this.onMenuClick(e) }}>
-                        <Button type="text" size="small">Simulate&nbsp;<Badge color={this.state.serialStart?"green":"red"} /></Button>
+                        <Button type="text" size="small">
+                            Simulate&nbsp;
+                            <Badge color={this.state.serialStart || this.state.serialToStart?"green":"red"} />
+                        </Button>
                     </Dropdown>
                     <Button type="text" size="small" onClick={()=> {
                         this.aboutRef.current?.show()
