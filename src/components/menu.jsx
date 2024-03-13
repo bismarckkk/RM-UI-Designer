@@ -139,7 +139,6 @@ class Menu extends Component {
     }
 
     setCouldDo(e) {
-        console.log(e)
         this.setState({couldUndo: e.couldPrevious, couldRedo: e.couldNext})
     }
 

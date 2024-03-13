@@ -13,8 +13,8 @@ export default () => {
     return null;
 };
 
-export function setRid(newRid: number) {
-    rid = newRid;
+export function setRid(newRid: any) {
+    rid = parseInt(newRid);
 }
 
 export { message, notification, modal, rid };
