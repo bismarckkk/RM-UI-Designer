@@ -6,7 +6,7 @@
 
 #define FRAME_ID 0
 #define GROUP_ID 0
-#define START_ID 1
+#define START_ID 0
 #define OBJ_NUM 2
 #define FRAME_OBJ_NUM 2
 
