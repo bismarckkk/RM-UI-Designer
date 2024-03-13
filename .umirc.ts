@@ -24,6 +24,10 @@ export default defineConfig({
     href: '/manifest.json',
     rel: 'manifest'
   }],
+  scripts: process.env.NODE_ENV === 'development' ? [] : [{
+    src: 'https://www.googletagmanager.com/gtag/js?id=G-4PDL1SSV9H',
+    async: true,
+  }],
   chainWebpack(memo, { webpack } ) {
     if (!process.env.ref) {
       const { GenerateSW } = require("workbox-webpack-plugin");

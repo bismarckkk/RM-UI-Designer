@@ -47,3 +47,11 @@ if ('serviceWorker' in navigator && process.env.VERSION.slice(0, 7) !== 'nightly
             });
     });
 }
+
+if (process.env.VERSION !== 'development') {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-4PDL1SSV9H');
+}
