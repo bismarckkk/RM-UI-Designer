@@ -111,8 +111,10 @@ function unpackObject(data: Uint8Array) : msgObj {
     let offset = 0;
 
     // figure_name is 3 bytes
-    const group = `${data[offset++]}-${data[offset++]}`;
-    const id = data[offset++];
+    const frame = data[offset++]
+    const _group = data[offset++]
+    const group = `${frame}-${_group}`
+    const id = data[offset++] | _group << 8 | frame << 16;
 
     // Next is a 32-bit integer with several bitfields
     const bitfield1 = getUint32(data, offset);
@@ -179,7 +181,7 @@ export function getEvent(msg: Uint8Array) {
                 group: prop.group,
                 type: objectTypeMap[prop.figure_tpye],
                 id: prop.id,
-                name: `${objectTypeMap[prop.figure_tpye]}_${prop.id}`,
+                name: `${objectTypeMap[prop.figure_tpye]}_${prop.id & 0xFF}`,
                 color: colorType[prop.color],
                 lineWidth: prop.width,
                 x: prop.start_x,
@@ -197,7 +199,7 @@ export function getEvent(msg: Uint8Array) {
                 group: obj.group,
                 type: objectTypeMap[obj.figure_tpye],
                 id: obj.id,
-                name: `${objectTypeMap[obj.figure_tpye]}_${obj.id}`,
+                name: `${objectTypeMap[obj.figure_tpye]}_${obj.id & 0xFF}`,
                 color: colorType[obj.color],
                 lineWidth: obj.width,
                 x: obj.start_x,

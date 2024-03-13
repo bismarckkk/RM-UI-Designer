@@ -32,7 +32,7 @@ function msgObjToArray(obj: msgObj): Uint8Array {
 
 function objectTypeToMsgObj(obj: objectType, type: string = 'add'): msgObj {
     const group = obj.group;
-    const id = obj.id;
+    const id = obj.id & 0xFF;
     const figure_tpye = objectTypeMap.indexOf(obj.type);
     const color = colorType.indexOf(obj.color);
     const layer = obj.layer;
