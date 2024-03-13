@@ -25,6 +25,9 @@ class UpdateModal extends Component {
     }
 
     check() {
+        if (process.env.VERSION.slice(0, 7) === 'nightly' || process.env.VERSION === 'development') {
+            return;
+        }
         let regex_pr = /(https:\/\/github\.com\/bismarckkk\/RM-UI-Designer\/pull\/)(\d+)/g;
         let regex_cl = /(https:\/\/github\.com\/bismarckkk\/RM-UI-Designer\/compare\/)(v\d+\.\d+\.\d+\.\.\.v\d+\.\d+\.\d+)/g;
         (async () => {
