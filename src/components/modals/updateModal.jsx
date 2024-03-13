@@ -3,6 +3,7 @@ import { Modal, Button, Space, Spin, Result } from "antd";
 
 import updater from "@/utils/update"
 import {message} from "@/utils/app";
+import {isTauri} from "@/utils/utils";
 import Markdown from "react-markdown";
 const { checkUpdate, installUpdate, relaunch } = updater
 
@@ -16,7 +17,7 @@ class UpdateModal extends Component {
         try {
             this.setState({step: 2})
             await installUpdate()
-            if (!await relaunch()) {
+            if (!isTauri() || !await relaunch()) {
                 this.setState({step: 3})
             }
         } catch (_) {
@@ -95,11 +96,11 @@ class UpdateModal extends Component {
                 closable={this.state.step > 1}
                 maskClosable={this.state.step > 1}
                 footer={
-                    this.state.step > 1 ? null : <Space>
+                    this.state.step === 1 ? <Space>
                         <Button onClick={this.ignore.bind(this)}>Ignore</Button>
                         <Button onClick={this.handleClose.bind(this)}>Cancel</Button>
                         <Button type="primary" onClick={this.handleOk.bind(this)}>Update</Button>
-                    </Space>
+                    </Space> : null
                 }
             >
                 { content }
