@@ -36,7 +36,8 @@ export default defineConfig({
         clientsClaim: true,
         skipWaiting: true,
         cleanupOutdatedCaches: true,
-        swDest: 'sw.js'
+        swDest: 'sw.js',
+        exclude: [/^nightly\//, /^manifest.*\.js(?:on)?$/]
       }])
     }
     memo.plugin('DefinePlugin').use(webpack.DefinePlugin, [{
