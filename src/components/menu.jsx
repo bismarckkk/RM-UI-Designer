@@ -132,9 +132,15 @@ class Menu extends Component {
     }
 
     async componentDidMount() {
-        if (this.tauri) {
+        const that = this
+        async function resync() {
             const maximized = await appWindow.isMaximized()
-            this.setState({fullscreen: maximized})
+            that.setState({fullscreen: maximized})
+        }
+
+        if (this.tauri) {
+            await resync()
+            await appWindow.onResized(_ => resync())
         }
     }
 
