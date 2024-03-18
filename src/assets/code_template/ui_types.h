@@ -45,7 +45,7 @@ typedef struct {
     uint32_t figure_tpye: 3;
     uint32_t layer: 4;
     uint32_t color: 4;
-    uint32_t _a: 9;
+    uint32_t font_size: 9;
     uint32_t _b: 9;
     uint32_t width: 10;
     uint32_t start_x: 11;
