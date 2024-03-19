@@ -1,12 +1,14 @@
 # RoboMaster UI Designer
 ## 如何使用
+在bbs上有一个简易的[使用教程](https://bbs.robomaster.com/forum.php?mod=viewthread&tid=22955)供参考，也可以直接通过以下途径使用  
+
 1. 直接使用我们的[在线Demo](https://ui.bismarck.xyz/)
 2. 打开在线Demo后使用浏览器弹出的安装应用功能安装PWA应用以供离线使用
 3. 在Release中下载我们使用Tauri打包的本地应用，支持Windows、Linux、MacOS平台
 
 各客户端可自由选择，数据类型互通，均自备自动更新功能  
 
-如果在使用过程中遇到故障，请先测试[nightly版本](https://ui.bismarck.xyz/nightly/)中是否存在相同问题，如有请提交issue或联系作者
+如果在使用过程中遇到故障，请先测试[nightly版本](https://ui.bismarck.xyz/nightly/)中是否存在相同问题，如有请提交issue或联系作者  
 
 ## 自行部署
 本项目为纯前端项目，可直接部署在任何静态服务器上，如Nginx、Apache等，

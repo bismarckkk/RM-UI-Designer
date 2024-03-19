@@ -120,7 +120,7 @@ class Render extends Component {
                 this.setState({properties: null, selectedId: ids})
                 if(!fromCanvas) {
                     let objectsToSelect = ids.map(id => this.objects[this.state.frame][id])
-                    let activeSelection = new fabric.ActiveSelection(objectsToSelect, {canvas: this.canvas, hasControls: false});
+                    let activeSelection = new fabric.ActiveSelection(objectsToSelect, {canvas: this.canvas});
                     this.canvas.setActiveObject(activeSelection)
                     this.canvas.renderAll()
                 }

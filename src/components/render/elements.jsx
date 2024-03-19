@@ -42,11 +42,9 @@ class Elements extends Component {
     }
 
     onElementMenuContainerClick(e) {
-        if (e.target.localName === 'div') {
-            this.setState({rightClickMenuOpen: false})
-            if (e.target.classList.contains('ant-tree') || (!e.ctrlKey && !e.shiftKey)) {
-                this.props.onSelect([])
-            }
+        this.setState({rightClickMenuOpen: false})
+        if (e.target.classList.contains('ant-tree') || (!e.ctrlKey && !e.shiftKey)) {
+            this.props.onSelect([])
         }
     }
 

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { ConfigProvider, App, theme, Watermark } from "antd";
 import Render from "@/components/render/render";
 import UpdateModal from "@/components/modals/updateModal";
+import EulaModal from "@/components/modals/eulaModal";
 import Menu from "@/components/menu";
 import AppHelper from "@/components/appHelper";
 import { modal } from "@/utils/app"
@@ -109,6 +110,7 @@ class Index extends Component {
                     </div>
                     <AppHelper/>
                     <UpdateModal/>
+                    <EulaModal/>
                 </App>
             </ConfigProvider>
         );
