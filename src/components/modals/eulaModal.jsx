@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Modal } from "antd";
+import {Button, Modal, Space} from "antd";
 import Loading from "../../loading";
 import Markdown from "react-markdown";
 
@@ -7,13 +7,18 @@ class EulaModal extends Component {
     state = {open: false, content: null}
 
     componentDidMount() {
-        if (!localStorage.getItem('eula')) {
+        const text = localStorage.getItem('eula')
+        if (!text || !JSON.parse(text)){
             this.setState({open: true})
             fetch(require('../../assets/eula.md')).then(e=>e.text()).then(e=>{
                 this.setState({content: e})
             })
-            localStorage.setItem('eula', 'true')
         }
+    }
+
+    dontShow() {
+        localStorage.setItem('eula', 'true')
+        this.setState({open: false})
     }
 
     render() {
@@ -22,7 +27,10 @@ class EulaModal extends Component {
                 title="Welcome to RM UI Designer!"
                 onOk={()=>this.setState({open: false})}
                 onCancel={()=>this.setState({open: false})}
-                footer={null}
+                footer={<Space>
+                    <Button onClick={this.dontShow.bind(this)}>Don't show</Button>
+                    <Button type="primary" onClick={()=>this.setState({open: false})}>OK</Button>
+                </Space>}
                 open={this.state.open}
             >
                 {
