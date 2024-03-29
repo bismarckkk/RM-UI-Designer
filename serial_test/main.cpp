@@ -9,6 +9,7 @@ serialib serial;
 
 int main() {
     serial.openDevice("COM1", 115200);
+    ui_self_id = 2;
     ui_init_default_Ungroup();
 
     for (int i = 0; i < 100; i++) {
