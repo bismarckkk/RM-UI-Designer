@@ -9,7 +9,7 @@
 #include "ui_types.h"
 #include "serial.h"
 
-#define UI_SELF_ID 1
+extern int ui_self_id;
 
 void print_message(const uint8_t* message, int length);
 

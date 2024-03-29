@@ -234,8 +234,8 @@ class Menu extends Component {
             this.props.setFrame('change', name)
         } else if (key.key === 'Simulate-from-start') {
             try {
-                this.props.setEditable(false)
                 await this.serial.connect()
+                this.props.setEditable(false)
                 this.setState({serialStart: true})
             } catch (e) {
                 message.error(e.text)

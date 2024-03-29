@@ -48,28 +48,34 @@ class Render extends Component {
         return Math.max(...Object.keys(this.state.data)) + 1
     }
 
-    setEditable(editable) {
+    async setEditable(editable) {
         this.setState({editable})
         this.his.catchUpdate = editable
         this.canvas.selection = editable
         fabric.Object.prototype.selectable = editable
 
-        const objs = this.canvas.getObjects()
         if (editable) {
-            for (const obj of objs) {
-                obj.set('selectable', true)
-            }
+            await this.onHistoryEvent('refresh')
         } else {
-            for (const obj of objs) {
-                obj.set('selectable', false)
-            }
+            const rid = this.state.uiWindow.role
+            await this.reset(true)
+            this.cancelHistoryUpdate()
+            this.props.setCouldDo({couldNext: false, couldPrevious: false})
+            this.setRobotId(rid)
+        }
+
+        const objs = this.canvas.getObjects()
+        for (const obj of objs) {
+            obj.set('selectable', editable)
         }
 
         this.select([])
     }
 
-    setRobotId() {
-        let id = this.state.uiWindow.role
+    setRobotId(id = 0) {
+        if (id === 0) {
+            id = this.state.uiWindow.role
+        }
         if (this.state.uiWindow.team === 'blue') {
             id += 100
         }
@@ -578,7 +584,7 @@ class Render extends Component {
     }
 
     async onHistoryEvent(type) {
-        let state
+        let state = this.his.get()
         if (type === 'update') {
             this.updateHistory()
             return
