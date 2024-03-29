@@ -343,6 +343,7 @@ class Menu extends Component {
         simulateItems[0].children[1]['disabled'] = !this.state.serialStart
         simulateItems[1].children[0]['disabled'] = this.state.serialToStart
         simulateItems[1].children[1]['disabled'] = !this.state.serialToStart
+        simulateItems[1].children[2]['disabled'] = !this.state.serialToStart
         return (
             <div style={{width: "100%", height: 32, marginTop: -5, zIndex: 2000, position: 'relative'}} className="solid-color" data-tauri-drag-region>
                 <Flex
