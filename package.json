@@ -34,6 +34,7 @@
     "@tauri-apps/cli": "^1.5.9",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
+    "@types/wicg-file-system-access": "^2023.10.5",
     "typescript": "^5.3.3"
   }
 }
