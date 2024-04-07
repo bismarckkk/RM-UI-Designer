@@ -408,40 +408,39 @@ class Render extends Component {
             }
         })
 
-        const state = this.his.get()
-        this.props.setCouldDo(state)
-        readUiFile(
-            state.now,
-            (t, e) => this.onObjectEvent(t, e),
-            frame => that.onFrameEvent('change', frame),
-            () => this.canvas.renderAll()
-        ).then(() => {
-            this.setRobotId()
-            this.resetCanvasSize()
-        })
-        this.cancelHistoryUpdate()
+        setTimeout(() => {
+            const state = this.his.get()
+            this.props.setCouldDo(state)
+            readUiFile(
+                state.now,
+                (t, e) => this.onObjectEvent(t, e),
+                frame => that.onFrameEvent('change', frame),
+                () => this.canvas.renderAll()
+            ).then(() => {
+                this.setRobotId()
+                this.resetCanvasSize()
+            })
+            this.cancelHistoryUpdate()
+        }, 200)
     }
 
-    upload() {
+    upload(file) {
         const that = this
-        uploadFile('.rmui').then(file => {
-            const reader = new FileReader()
-            reader.onload = async e => {
-                await that.reset()
-                await readUiFile(
-                    JSON.parse(e.target.result),
-                    (t, e) => that.onObjectEvent(t, e),
-                    frame => that.onFrameEvent('change', frame),
-                    () => that.canvas.renderAll()
-                ).then(() => {
-                    this.setRobotId()
-                })
-                that.objectsToData()
-                that.his.reset({version: 2, data: this.data, selected: this.state.frame})
-            }
-            reader.readAsText(file)
-        }).catch(_ => {
-        })
+        const reader = new FileReader()
+        reader.onload = async e => {
+            await that.reset()
+            await readUiFile(
+                JSON.parse(e.target.result),
+                (t, e) => that.onObjectEvent(t, e),
+                frame => that.onFrameEvent('change', frame),
+                () => that.canvas.renderAll()
+            ).then(() => {
+                this.setRobotId()
+            })
+            that.objectsToData()
+            that.his.reset({version: 2, data: this.data, selected: this.state.frame})
+        }
+        reader.readAsText(file)
     }
 
     objectsToData() {

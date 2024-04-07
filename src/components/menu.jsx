@@ -6,6 +6,7 @@ import Icon from '@ant-design/icons';
 import FormModal from "@/components/modals/formModal";
 import { getMenuProps } from "@/utils/fabricObjects";
 import AboutModal from "@/components/modals/aboutModal";
+import ModeModal from "@/components/modals/modeModal";
 import { ReactComponent as MoonSvg } from "@/assets/moon.svg"
 import { ReactComponent as SunSvg } from "@/assets/sun.svg"
 import SerialModal from "@/components/modals/serialModal";
@@ -13,24 +14,33 @@ import LogDrawer from "@/components/modals/logDrawer";
 import { message } from "@/utils/app";
 import { appWindow } from '@tauri-apps/api/window';
 import { exit } from '@tauri-apps/api/process';
-import { isTauri } from "@/utils/utils";
+import {isTauri, saveObj, uploadFile} from "@/utils/utils";
 import Generator from "@/components/generator";
 import SerialFrom from "@/utils/serial/webSerialFromDriver";
 import SerialTo from "@/utils/serial/webSerialToDriver";
+import { FileHandler } from "@/utils/autoSaver";
 
 
 const fileItems = [
     {
         key: 'File-new',
-        label: "New Project"
+        label: "New"
     },
     {
         key: 'File-open',
-        label: "Open .rmui"
+        label: "Open"
     },
     {
         key: 'File-save',
-        label: "Save as .rmui"
+        label: "Save"
+    },
+    {
+        key: 'File-saveAs',
+        label: "Save as"
+    },
+    {
+        key: 'File-autoSave',
+        label: "Auto Save"
     },
     {type: 'divider'},
     {
@@ -107,16 +117,19 @@ class Menu extends Component {
         couldUndo: false,
         couldRedo: false,
         serialStart: false,
-        serialToStart: false
+        serialToStart: false,
+        autoSave: false,
     }
     formRef = createRef()
     aboutRef = createRef()
     generatorRef = createRef()
     logDrawerRef = createRef()
     serialModalRef = createRef()
+    modeModalRef = createRef()
     tauri = isTauri()
     serial = new SerialFrom(e => this.onSerialEvent(e), e => this.onSerialError(e))
     serialTo = new SerialTo()
+    fileHandler = null
 
 
     onSerialEvent(e) {
@@ -141,6 +154,29 @@ class Menu extends Component {
         if (this.tauri) {
             await resync()
             await appWindow.onResized(_ => resync())
+        }
+
+        while (true) {
+            const mode = await this.modeModalRef.current?.open()
+            if (mode === 'new') {
+                this.fileHandler = new FileHandler(() => {
+                    return JSON.stringify({version: 2, data: this.props.getData(), selected: this.state.selectedFrame})
+                })
+                if (await this.fileHandler.create()) {
+                    this.props.upload(await this.fileHandler.read())
+                    break
+                }
+            } else if (mode === 'open') {
+                this.fileHandler = new FileHandler(() => {
+                    return JSON.stringify({version: 2, data: this.props.getData(), selected: this.state.selectedFrame})
+                })
+                if (await this.fileHandler.open()) {
+                    this.props.upload(await this.fileHandler.read())
+                    break
+                }
+            } else {
+                break
+            }
         }
     }
 
@@ -210,12 +246,36 @@ class Menu extends Component {
         } else if (first === 'Edit-redo') {
             this.props.onHistoryEvent('next')
         } else if (first === 'File-new') {
-            this.props.reset()
-            this.props.onHistoryEvent('reset')
+            if (this.fileHandler) {
+                if (await this.fileHandler.create()) {
+                    this.props.upload(await this.fileHandler.read())
+                }
+            } else {
+                this.props.reset()
+                this.props.onHistoryEvent('reset')
+            }
         } else if (first === 'File-save') {
-            this.props.save()
+            if (this.fileHandler) {
+                await this.fileHandler.save()
+            } else {
+                saveObj(this.props.getData(), 'ui.rmui', this.state.selectedFrame)
+            }
+        } else if (first === 'File-saveAs') {
+            if (this.fileHandler) {
+                if (await this.fileHandler.create()) {
+                    await this.fileHandler.save()
+                }
+            }
         } else if (first === 'File-open') {
-            this.props.upload()
+            if (this.fileHandler) {
+                if (await this.fileHandler.open()) {
+                    this.props.upload(await this.fileHandler.read())
+                }
+            } else {
+                uploadFile('.rmui').then(file => {
+                    this.props.upload(file)
+                }).catch(() => {})
+            }
         } else if (first === "File-generate") {
             this.generatorRef.current?.gen(this.props.getData())
         } else if (first === 'FrameOp-add') {
@@ -344,6 +404,8 @@ class Menu extends Component {
         simulateItems[1].children[0]['disabled'] = this.state.serialToStart
         simulateItems[1].children[1]['disabled'] = !this.state.serialToStart
         simulateItems[1].children[2]['disabled'] = !this.state.serialToStart
+        fileItems[3]['disabled'] = !this.fileHandler
+        fileItems[4]['disabled'] = true
         return (
             <div style={{width: "100%", height: 32, marginTop: -5, zIndex: 2000, position: 'relative'}} className="solid-color" data-tauri-drag-region>
                 <Flex
@@ -443,6 +505,7 @@ class Menu extends Component {
                 <Generator ref={this.generatorRef} />
                 <LogDrawer ref={this.logDrawerRef} />
                 <SerialModal ref={this.serialModalRef} />
+                <ModeModal ref={this.modeModalRef} />
             </div>
         );
     }
