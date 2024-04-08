@@ -35,6 +35,8 @@ export class FileHandler {
                 });
                 if (path !== null && path.length > 0 && typeof path === 'string') {
                     this.fileHandle = path.replace(/\\/g, '/');
+                    const fileName = this.fileHandle.split('/').pop();
+                    document.title = `${fileName} - RM UI Designer`;
                 }
             } else {
                 [this.fileHandle] = await window.showOpenFilePicker({
@@ -47,6 +49,8 @@ export class FileHandler {
                         },
                     ]
                 });
+                const fileName = (await this.fileHandle.getFile()).name;
+                document.title = `${fileName} - RM UI Designer`;
             }
             this.enableAutoSave()
         } catch (_) {
@@ -64,6 +68,8 @@ export class FileHandler {
                 });
                 if (path !== null) {
                     this.fileHandle = path.replace(/\\/g, '/');
+                    const fileName = this.fileHandle.split('/').pop();
+                    document.title = `${fileName} - RM UI Designer`;
                 }
             } else {
                 this.fileHandle = await window.showSaveFilePicker({
@@ -76,6 +82,8 @@ export class FileHandler {
                         },
                     ]
                 });
+                const fileName = (await this.fileHandle.getFile()).name;
+                document.title = `${fileName} - RM UI Designer`;
             }
             await this.write(JSON.stringify({version: 2, data: {default: {}}, selected: 'default'}))
             this.enableAutoSave()
