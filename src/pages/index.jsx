@@ -42,7 +42,8 @@ class Index extends Component {
                 that.modal = modal.warning({
                     title: 'Display Aera too Small',
                     content: 'Cannot show all contents on this window. Please resize this window or rotate your phone.',
-                    footer: null
+                    footer: null,
+                    zIndex: 2500
                 });
             }
             if (that.modal && width >= 880) {

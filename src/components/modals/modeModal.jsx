@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { Button, Divider, Modal, Space } from "antd";
-import { isAvailable } from "../../utils/autoSaver";
+import { isAvailable } from "@/utils/autoSaver";
 
 class ModeModal extends Component {
     state = {title: '', open: false, frames: []}
@@ -29,7 +29,7 @@ class ModeModal extends Component {
                 footer={null}
                 maskClosable={false}
                 closeIcon={null}
-                zIndex={800}
+                zIndex={2050}
                 open={this.state.open}
             >
                 <Space direction="vertical" size="middle" style={{width: '100%', padding: 15}}>

@@ -32,6 +32,7 @@ class EulaModal extends Component {
                     <Button type="primary" onClick={()=>this.setState({open: false})}>OK</Button>
                 </Space>}
                 open={this.state.open}
+                zIndex={2200}
             >
                 {
                     this.state.content ?
