@@ -95,6 +95,7 @@ class UpdateModal extends Component {
                 open={this.state.step}
                 closable={this.state.step > 1}
                 maskClosable={this.state.step > 1}
+                zIndex={2100}
                 footer={
                     this.state.step === 1 ? <Space>
                         <Button onClick={this.ignore.bind(this)}>Ignore</Button>

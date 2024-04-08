@@ -3,7 +3,7 @@ import { ConfigProvider, App, theme, Watermark } from "antd";
 import Render from "@/components/render/render";
 import UpdateModal from "@/components/modals/updateModal";
 import EulaModal from "@/components/modals/eulaModal";
-import Menu from "@/components/menu";
+import Menu from "@/components/menu/menu";
 import AppHelper from "@/components/appHelper";
 import { modal } from "@/utils/app"
 import enUS from "antd/locale/en_US";
@@ -42,7 +42,8 @@ class Index extends Component {
                 that.modal = modal.warning({
                     title: 'Display Aera too Small',
                     content: 'Cannot show all contents on this window. Please resize this window or rotate your phone.',
-                    footer: null
+                    footer: null,
+                    zIndex: 2500
                 });
             }
             if (that.modal && width >= 880) {
