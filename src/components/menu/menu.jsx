@@ -11,6 +11,7 @@ import { ReactComponent as MoonSvg } from "@/assets/moon.svg"
 import { ReactComponent as SunSvg } from "@/assets/sun.svg"
 import SerialModal from "@/components/modals/serialModal";
 import LogDrawer from "@/components/modals/logDrawer";
+import CheckedItem from "@/components/menu/checkedItem";
 import { message } from "@/utils/app";
 import { appWindow } from '@tauri-apps/api/window';
 import { exit } from '@tauri-apps/api/process';
@@ -118,7 +119,7 @@ class Menu extends Component {
         couldRedo: false,
         serialStart: false,
         serialToStart: false,
-        autoSave: false,
+        autoSave: true,
     }
     formRef = createRef()
     aboutRef = createRef()
@@ -175,13 +176,29 @@ class Menu extends Component {
                     break
                 }
             } else {
+                this.setState({autoSave: false})
                 break
             }
         }
+
+        window.addEventListener('keydown', async e => {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+
+                if (this.fileHandler) {
+                    await this.fileHandler.save()
+                } else {
+                    saveObj(this.props.getData(), 'ui.rmui', this.state.selectedFrame)
+                }
+            }
+        });
     }
 
     setCouldDo(e) {
         this.setState({couldUndo: e.couldPrevious, couldRedo: e.couldNext})
+        if (this.fileHandler && this.state.autoSave) {
+            this.fileHandler.update()
+        }
     }
 
     fullScreen() {
@@ -247,8 +264,12 @@ class Menu extends Component {
             this.props.onHistoryEvent('next')
         } else if (first === 'File-new') {
             if (this.fileHandler) {
+                await this.fileHandler.disableAutoSave()
+                this.setState({autoSave: false})
                 if (await this.fileHandler.create()) {
                     this.props.upload(await this.fileHandler.read())
+                    this.fileHandler.enableAutoSave()
+                    this.setState({autoSave: true})
                 }
             } else {
                 this.props.reset()
@@ -262,14 +283,31 @@ class Menu extends Component {
             }
         } else if (first === 'File-saveAs') {
             if (this.fileHandler) {
+                await this.fileHandler.disableAutoSave()
+                this.setState({autoSave: false})
                 if (await this.fileHandler.create()) {
                     await this.fileHandler.save()
+                    this.fileHandler.enableAutoSave()
+                    this.setState({autoSave: true})
                 }
+            }
+        } else if (first === 'File-autoSave') {
+            if (this.fileHandler) {
+                if (this.state.autoSave) {
+                    await this.fileHandler.disableAutoSave()
+                } else {
+                    this.fileHandler.enableAutoSave()
+                }
+                this.setState({autoSave: !this.state.autoSave})
             }
         } else if (first === 'File-open') {
             if (this.fileHandler) {
+                await this.fileHandler.disableAutoSave()
+                this.setState({autoSave: false})
                 if (await this.fileHandler.open()) {
                     this.props.upload(await this.fileHandler.read())
+                    this.fileHandler.enableAutoSave()
+                    this.setState({autoSave: true})
                 }
             } else {
                 uploadFile('.rmui').then(file => {
@@ -405,7 +443,10 @@ class Menu extends Component {
         simulateItems[1].children[1]['disabled'] = !this.state.serialToStart
         simulateItems[1].children[2]['disabled'] = !this.state.serialToStart
         fileItems[3]['disabled'] = !this.fileHandler
-        fileItems[4]['disabled'] = true
+        fileItems[4]['disabled'] = !this.fileHandler
+        fileItems[4]['label'] = <CheckedItem checked={this.state.autoSave}>
+            Auto Save
+        </CheckedItem>
         return (
             <div style={{width: "100%", height: 32, marginTop: -5, zIndex: 2000, position: 'relative'}} className="solid-color" data-tauri-drag-region>
                 <Flex
@@ -425,7 +466,7 @@ class Menu extends Component {
                     >
                         RoboMaster UI Designer
                     </div>
-                    <Dropdown menu={{ items: fileItems, onClick: e=>this.onMenuClick(e) }}>
+                    <Dropdown menu={{ items: [...fileItems], onClick: e=>this.onMenuClick(e) }}>
                         <Button type="text" size="small">File</Button>
                     </Dropdown>
                     <Dropdown menu={{ items: [...editItems], onClick: e=>this.onMenuClick(e) }}>

@@ -15,11 +15,13 @@ export class FileHandler {
     private readonly getContentFunc: () => string;
     private fileHandle: IFileHandle | string | null;
     private timerId: NodeJS.Timeout | null;
+    private updateTimerId: NodeJS.Timeout | null;
 
     constructor(getContentFunc: () => string) {
         this.getContentFunc = getContentFunc;
         this.fileHandle = null;
         this.timerId = null;
+        this.updateTimerId = null;
     }
 
     async open(): Promise<boolean> {
@@ -46,10 +48,10 @@ export class FileHandler {
                     ]
                 });
             }
+            this.enableAutoSave()
         } catch (_) {
 
         }
-        // this.enableAutoSave()
         return this.fileHandle !== null
     }
 
@@ -76,10 +78,10 @@ export class FileHandler {
                 });
             }
             await this.write(JSON.stringify({version: 2, data: {default: {}}, selected: 'default'}))
+            this.enableAutoSave()
         } catch (_) {
 
         }
-        // this.enableAutoSave()
         return this.fileHandle !== null
     }
 
@@ -90,9 +92,28 @@ export class FileHandler {
         }, 60000);
     }
 
-    disableAutoSave(): void {
+    async disableAutoSave(): Promise<void> {
+        await this.save()
         if (this.timerId) {
             clearInterval(this.timerId);
+            this.timerId = null;
+        }
+        if (this.updateTimerId) {
+            clearTimeout(this.updateTimerId);
+            this.updateTimerId = null;
+        }
+    }
+
+    update() {
+        if (this.timerId !== null) {
+            if (this.updateTimerId !== null) {
+                clearTimeout(this.updateTimerId);
+                this.updateTimerId = null;
+            }
+            this.updateTimerId = setTimeout(async () => {
+                const content = this.getContentFunc();
+                await this.write(content);
+            }, 2000)
         }
     }
 

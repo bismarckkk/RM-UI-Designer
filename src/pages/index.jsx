@@ -3,7 +3,7 @@ import { ConfigProvider, App, theme, Watermark } from "antd";
 import Render from "@/components/render/render";
 import UpdateModal from "@/components/modals/updateModal";
 import EulaModal from "@/components/modals/eulaModal";
-import Menu from "@/components/menu";
+import Menu from "@/components/menu/menu";
 import AppHelper from "@/components/appHelper";
 import { modal } from "@/utils/app"
 import enUS from "antd/locale/en_US";
