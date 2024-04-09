@@ -41,15 +41,31 @@ export const Line = fabric.util.createClass(fabric.Line, {
         this.transparentCorners = false
     },
     resizeScale: function() {
-        let l = this.left
-        let t = this.top
-        let w = Math.abs(Math.round((this.x2 - this.x1) * this.scaleX))
-        let h = Math.abs(Math.round((this.y2 - this.y1) * this.scaleY))
+        let raw_l = Math.min(this.x1, this.x2)
+        let raw_t = Math.min(this.y1, this.y2)
 
-        this.set('x1', Math.round(l * this.ratio) / this.ratio)
-        this.set('y1', Math.round(t * this.ratio) / this.ratio)
-        this.set('x2', Math.round((l + w) * this.ratio) / this.ratio)
-        this.set('y2', Math.round((t + h) * this.ratio) / this.ratio)
+        let moveX = this.left - raw_l
+        let moveY = this.top - raw_t
+
+        if (this.x1 < this.x2) {
+            let w = Math.round((this.x2 - this.x1) * this.scaleX)
+            this.set('x1', Math.round((this.x1 + moveX) * this.ratio) / this.ratio)
+            this.set('x2', Math.round((this.x1 + w) * this.ratio) / this.ratio)
+        } else {
+            let w = Math.round((this.x1 - this.x2) * this.scaleX)
+            this.set('x2', Math.round((this.x2 + moveX) * this.ratio) / this.ratio)
+            this.set('x1', Math.round((this.x2 + w) * this.ratio) / this.ratio)
+        }
+        if (this.y1 < this.y2) {
+            let h = Math.round((this.y2 - this.y1) * this.scaleY)
+            this.set('y1', Math.round((this.y1 + moveY) * this.ratio) / this.ratio)
+            this.set('y2', Math.round((this.y1 + h) * this.ratio) / this.ratio)
+        } else {
+            let h = Math.round((this.y1 - this.y2) * this.scaleY)
+            this.set('y2', Math.round((this.y2 + moveY) * this.ratio) / this.ratio)
+            this.set('y1', Math.round((this.y2 + h) * this.ratio) / this.ratio)
+        }
+
         this.set('scaleX', 1)
         this.set('scaleY', 1)
     },
