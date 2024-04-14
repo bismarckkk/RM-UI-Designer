@@ -3,6 +3,7 @@ import { ConfigProvider, App, theme, Watermark } from "antd";
 import Render from "@/components/render/render";
 import UpdateModal from "@/components/modals/updateModal";
 import EulaModal from "@/components/modals/eulaModal";
+import Loading from "@/loading";
 import Menu from "@/components/menu/menu";
 import AppHelper from "@/components/appHelper";
 import { modal } from "@/utils/app"
@@ -11,7 +12,7 @@ import enUS from "antd/locale/en_US";
 const { darkAlgorithm, compactAlgorithm } = theme;
 
 class Index extends Component {
-    state = { simulate: false, darkMode: this.isBrowserDarkMode() }
+    state = { simulate: false, darkMode: this.isBrowserDarkMode(), isMounted: false }
     modal = null
     renderRef = React.createRef();
     menuRef = React.createRef();
@@ -63,6 +64,10 @@ class Index extends Component {
         mqList.addEventListener('change', (event) => {
             that.setState({darkMode: event.matches})
         });
+
+        setTimeout(() => {
+            this.setState({isMounted: true})
+        }, 500)
     }
 
     setDarkMode(dark) {
@@ -70,6 +75,9 @@ class Index extends Component {
     }
 
     render() {
+        if (!this.state.isMounted) {
+            return <Loading/>
+        }
         return (
             <ConfigProvider
                 locale={enUS}
