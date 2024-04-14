@@ -421,6 +421,21 @@ class Render extends Component {
                 this.resetCanvasSize()
             })
             this.cancelHistoryUpdate()
+        }, 50)
+
+        setTimeout(() => {
+            const state = this.his.get()
+            this.props.setCouldDo(state)
+            readUiFile(
+                state.now,
+                (t, e) => this.onObjectEvent(t, e),
+                frame => that.onFrameEvent('change', frame),
+                () => this.canvas.renderAll()
+            ).then(() => {
+                this.setRobotId()
+                this.resetCanvasSize()
+            })
+            this.cancelHistoryUpdate()
         }, 200)
     }
 

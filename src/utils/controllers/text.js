@@ -10,6 +10,8 @@ function getTextWidth(text, font) {
     return metrics.width;
 }
 
+const scale = 1.25;
+
 
 export const Text = fabric.util.createClass(fabric.Text, {
     type: 'UiText',
@@ -32,11 +34,14 @@ export const Text = fabric.util.createClass(fabric.Text, {
         this.team = options.team;
         options.flipY = true;
         options.fontSize || (options.fontSize = 20 / this.ratio);
+        options.fontSize *= scale;
         options.fontFamily || (options.fontFamily = 'ds-digitalnormal');
         options.text || (options.text = 'Text');
         options.left || (options.left = 50 / this.ratio);
         options.top || (options.top = 50 / this.ratio);
-        options.width || (options.width = getTextWidth(options.text, options.fontSize + 'px ' + options.fontFamily) / this.ratio);
+        options.top -= options.fontSize / this.ratio * 2
+        options.width || (options.width = getTextWidth(options.text, options.fontSize + 'px ' + options.fontFamily) * this.ratio);
+        console.log(options.width, this.ratio)
         if (this._color && this._color !== 'main') {
             options.fill = ColorMap[this._color];
         } else {
@@ -56,6 +61,9 @@ export const Text = fabric.util.createClass(fabric.Text, {
             mb: false, // middle bottom
             mtr: false, // rotate point
         });
+        setTimeout(()=>{
+            this.set('width', getTextWidth(options.text, options.fontSize + 'px ' + options.fontFamily) * this.ratio)
+        }, 100)
     },
     toObject: function() {
         return {
@@ -64,9 +72,9 @@ export const Text = fabric.util.createClass(fabric.Text, {
             name: this.name,
             layer: this.layer,
             group: this.groupName,
-            fontSize: this.fontSize * this.ratio,
+            fontSize: this.fontSize * this.ratio / scale,
             x: this.left * this.ratio,
-            y: this.top * this.ratio,
+            y: this.top * this.ratio + this.fontSize * 2,
             text: this.text,
             color: this._color,
         };
@@ -77,11 +85,11 @@ export const Text = fabric.util.createClass(fabric.Text, {
         this.name = options.name
         this.layer = options.layer
         this.groupName = options.group
+        this.set('fontSize', options.fontSize / this.ratio * scale)
         this.set('left', options.x / this.ratio)
-        this.set('top', options.y / this.ratio)
-        this.set('fontSize', options.fontSize / this.ratio)
+        this.set('top', options.y / this.ratio - this.fontSize  / this.ratio * 2)
         this.text = options.text
-        this.set('width', getTextWidth(options.text, options.fontSize + 'px ' + this.fontFamily) / this.ratio)
+        this.set('width', getTextWidth(options.text, options.fontSize * scale + 'px ' + this.fontFamily) * this.ratio)
         if (this._color === 'main') {
             this.set('fill', ColorMap[this.team])
         } else {

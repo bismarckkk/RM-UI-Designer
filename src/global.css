@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'ds-digitalnormal';
-    src: url('assets/fonts/ds-digi-webfont.woff2') format('woff2'),
-    url('assets/fonts/ds-digi-webfont.woff') format('woff');
+    src: url('assets/fonts/digital-dream.woff2') format('woff2'),
+    url('assets/fonts/digital-dream.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }

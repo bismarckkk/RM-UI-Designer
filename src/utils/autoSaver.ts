@@ -1,4 +1,6 @@
 import { dialog, fs } from '@tauri-apps/api';
+// @ts-ignore
+import { message } from "@/utils/app";
 import { isTauri } from "@/utils/utils";
 
 interface IFileHandle {
@@ -98,6 +100,8 @@ export class FileHandler {
             const content = this.getContentFunc();
             await this.write(content);
         }, 60000);
+        // @ts-ignore
+        message.success('Auto save enabled')
     }
 
     async disableAutoSave(): Promise<void> {
@@ -110,6 +114,8 @@ export class FileHandler {
             clearTimeout(this.updateTimerId);
             this.updateTimerId = null;
         }
+        // @ts-ignore
+        message.warning('Auto save disabled')
     }
 
     update() {
