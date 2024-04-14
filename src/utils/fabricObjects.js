@@ -20,7 +20,6 @@ const Controller = {
     Float,
 }
 
-let warningTimer = null;
 
 export function createUiElement(options) {
     let obj = {
@@ -32,14 +31,6 @@ export function createUiElement(options) {
         team: options.team
     }
     const type = options.type.slice(2)
-    if (type === 'Text') {
-        if (!warningTimer) {
-            message.warning('Text object is beta now, maybe not same with client!')
-            warningTimer = setTimeout(() => {
-                warningTimer = null
-            }, 2000)
-        }
-    }
     return new Controller[type](obj)
 }
 
