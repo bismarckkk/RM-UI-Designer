@@ -1,5 +1,5 @@
 Before you use this designer, you could read 
-[this thread](https://bbs.robomaster.com/forum.php?mod=viewthread&tid=22955) 
+[this thread](https://bbs.robomaster.com/article/9614) 
 to know more about the designer. 
 And **you must know** these license information of this designer.   
 This designer is open source at [GitHub](https://github.com/bismarckkk/RM-UI-Designer) with license GPL V3. 
