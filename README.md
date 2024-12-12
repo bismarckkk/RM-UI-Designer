@@ -1,6 +1,6 @@
 # RoboMaster UI Designer
 ## 如何使用
-在bbs上有一个简易的[使用教程](https://bbs.robomaster.com/forum.php?mod=viewthread&tid=22955)供参考，也可以直接通过以下途径使用  
+在bbs上有一个简易的[使用教程](https://bbs.robomaster.com/article/9614)供参考，也可以直接通过以下途径使用  
 
 1. 直接使用我们的[在线Demo](https://ui.bismarck.xyz/)
 2. 打开在线Demo后使用浏览器弹出的安装应用功能安装PWA应用以供离线使用
