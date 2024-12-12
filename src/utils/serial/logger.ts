@@ -7,6 +7,8 @@ interface MessageType {
 class Logger {
     private messages: MessageType[] = [];
     public enabled: boolean = false;
+    public log: Uint8Array[] = [];
+    public rx: number = 0;
 
     warn(message: string) {
         if (this.enabled) {
@@ -32,8 +34,23 @@ class Logger {
         this.messages = [];
     }
 
+    logHistory(chunk: Uint8Array) {
+        this.log.push(Uint8Array.from([...chunk]));
+        this.rx += chunk.length;
+        if (this.log.length > 100) {
+            this.log.shift();
+        }
+    }
+
     get() {
         return this.messages;
+    }
+
+    getHistory() {
+        return {
+            log: this.log,
+            rx: this.rx
+        }
     }
 }
 

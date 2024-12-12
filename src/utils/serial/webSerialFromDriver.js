@@ -91,6 +91,10 @@ class Serial {
     getLog() {
         return logger.get()
     }
+
+    getHistory() {
+        return logger.getHistory()
+    }
 }
 
 export default Serial;
