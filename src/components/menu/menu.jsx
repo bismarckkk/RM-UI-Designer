@@ -11,6 +11,7 @@ import { ReactComponent as MoonSvg } from "@/assets/moon.svg"
 import { ReactComponent as SunSvg } from "@/assets/sun.svg"
 import SerialModal from "@/components/modals/serialModal";
 import LogDrawer from "@/components/modals/logDrawer";
+import RxDrawer from "@/components/modals/rxDrawer";
 import CheckedItem from "@/components/menu/checkedItem";
 import { message } from "@/utils/app";
 import { appWindow } from '@tauri-apps/api/window';
@@ -83,6 +84,10 @@ const simulateItems = [
                 key: 'Simulate-from-log',
                 label: "Debug Log"
             },
+            {
+                key: 'Simulate-from-rx',
+                label: "Rx History"
+            },
         ]
     },
     {
@@ -125,6 +130,7 @@ class Menu extends Component {
     aboutRef = createRef()
     generatorRef = createRef()
     logDrawerRef = createRef()
+    rxDrawerRef = createRef()
     serialModalRef = createRef()
     modeModalRef = createRef()
     tauri = isTauri()
@@ -348,6 +354,8 @@ class Menu extends Component {
             }
         } else if (key.key === 'Simulate-from-log') {
             this.logDrawerRef.current?.show(this.serial.getLog())
+        } else if (key.key === 'Simulate-from-rx') {
+            this.rxDrawerRef.current?.show(this.serial.getHistory())
         } else if (key.key === 'Simulate-to-start') {
             try {
                 await this.serialTo.connect()
@@ -545,6 +553,7 @@ class Menu extends Component {
                 <AboutModal ref={this.aboutRef} />
                 <Generator ref={this.generatorRef} />
                 <LogDrawer ref={this.logDrawerRef} />
+                <RxDrawer ref={this.rxDrawerRef} />
                 <SerialModal ref={this.serialModalRef} />
                 <ModeModal ref={this.modeModalRef} />
             </div>

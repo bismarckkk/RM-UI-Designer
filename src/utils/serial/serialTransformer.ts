@@ -14,6 +14,7 @@ class SerialTransformer {
 
     transform(chunk: Uint8Array, controller: TransformStreamDefaultController<Uint8Array>){
         this.buffer = Uint8Array.from([...this.buffer, ...chunk]);
+        logger.logHistory(chunk);
 
         while (this.buffer.length > 7) {
             if (this.buffer[0] !== 0xA5) {
