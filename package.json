@@ -13,28 +13,28 @@
   },
   "dependencies": {
     "@actions/github": "^6.0.0",
-    "@ant-design/icons": "^5.2.6",
-    "@ant-design/pro-components": "^2.6.48",
+    "@ant-design/icons": "^5.5.2",
+    "@ant-design/pro-components": "^2.8.2",
     "@codemirror/lang-cpp": "^6.0.2",
     "@tauri-apps/api": "^1.5.3",
-    "@uiw/codemirror-theme-xcode": "^4.21.22",
-    "@uiw/react-codemirror": "^4.21.22",
-    "@umijs/plugins": "^4.1.1",
-    "antd": "5.14.0",
-    "fabric": "^5.3.0",
+    "@uiw/codemirror-theme-xcode": "^4.23.6",
+    "@uiw/react-codemirror": "^4.23.6",
+    "@umijs/plugins": "^4.3.36",
+    "antd": "5.22.4",
+    "fabric": "^5.4.2",
     "jszip": "^3.10.1",
     "loadsh": "^0.0.4",
     "node-fetch": "^3.3.2",
     "react-markdown": "^9.0.1",
-    "react-resizable-panels": "^2.0.9",
-    "umi": "^4.1.1",
-    "workbox-webpack-plugin": "^7.0.0"
+    "react-resizable-panels": "^2.1.7",
+    "umi": "^4.3.36",
+    "workbox-webpack-plugin": "^7.3.0"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.5.9",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@types/wicg-file-system-access": "^2023.10.5",
-    "typescript": "^5.3.3"
+    "typescript": "^5.7.2"
   }
 }
