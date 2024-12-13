@@ -140,9 +140,14 @@ class Menu extends Component {
 
 
     onSerialEvent(e) {
+        const res = []
         for (let event of e.events) {
-            this.props.onObjectEvent(event.type, event.obj)
+            const rr = this.props.onObjectEvent(event.type, event.obj)
+            if (rr[0] === 'W' || rr[0] === 'E') {
+                res.push(rr)
+            }
         }
+        return res
     }
 
     onSerialError(e) {

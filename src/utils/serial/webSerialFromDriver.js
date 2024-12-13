@@ -74,7 +74,16 @@ class Serial {
                     logger.error(`Receiver ${event.receiver} not match self ${rid}`);
                     continue
                 }
-                this?.onEvent(event);
+                const errs = this?.onEvent(event);
+                if (errs) {
+                    for (const err of errs) {
+                        if (err[0] === 'W') {
+                            logger.warn(err.slice(3));
+                        } else if (err[0] === 'E') {
+                            logger.error(err.slice(3));
+                        }
+                    }
+                }
             }
         } catch (error) {
             try {
