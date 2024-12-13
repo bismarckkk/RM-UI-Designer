@@ -1,5 +1,30 @@
 import Color from "../components/render/color";
 
+const renderRobotId = (idx) => {
+    const rawIdx = idx
+    let type = "Robot";
+    if (idx > 0x100) {
+        type = "Client"
+        idx -= 0x100
+    }
+    let color;
+    if (idx > 100) {
+        color = "Blue"
+    } else {
+        color = "Red"
+    }
+    idx %= 100
+    const map = {
+        1: "Hero",
+        2: "Engineer",
+        3: "No3. Infantry",
+        4: "No4. Infantry",
+        5: "No5. Infantry",
+        6: "Drone",
+    }
+    return `${color} ${map[idx]} ${type} (${rawIdx})`
+}
+
 export const columns = {
     id: {
         title: 'Id',
@@ -174,7 +199,53 @@ export const columns = {
         key: 'backgroundImage',
         dataIndex: 'backgroundImage',
         valueType: 'switch'
-    }
+    },
+    length: {
+        title: 'DataLength',
+        key: 'length',
+        dataIndex: 'length',
+        valueType: 'digit',
+    },
+    seq: {
+        title: 'Seq',
+        key: 'seq',
+        dataIndex: 'seq',
+        valueType: 'digit',
+    },
+    cmd_id: {
+        title: 'Cmd Id',
+        key: 'cmd_id',
+        dataIndex: 'cmd_id',
+        valueType: 'text',
+        renderText: (idx) => `0x${idx.toString(16).padStart(4, '0')}`
+    },
+    sub_id: {
+        title: 'Sub Id',
+        key: 'sub_id',
+        dataIndex: 'sub_id',
+        valueType: 'text',
+        renderText: (idx) => `0x${idx.toString(16).padStart(4, '0')}`
+    },
+    sender: {
+        title: 'Sender',
+        key: 'sender',
+        dataIndex: 'sender',
+        valueType: 'select',
+        renderText: renderRobotId
+    },
+    receiver: {
+        title: 'Receiver',
+        key: 'receiver',
+        dataIndex: 'receiver',
+        valueType: 'select',
+        renderText: renderRobotId
+    },
+    error: {
+        title: 'Error',
+        key: 'error',
+        dataIndex: 'error',
+        valueType: 'text',
+    },
 }
 
 export function getColumnsFromData(data) {

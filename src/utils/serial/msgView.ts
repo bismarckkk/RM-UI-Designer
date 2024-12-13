@@ -1,3 +1,6 @@
+import {calc_crc16, calc_crc8} from "@/utils/serial/crc";
+import logger from "@/utils/serial/logger";
+
 export const objectTypeMap = [
     'UiLine',
     'UiRect',
@@ -64,6 +67,8 @@ export interface objectType {
     float?:number,
     number?:number,
     text?:string,
+    _start: number,
+    _end: number,
 }
 
 interface layerType {
@@ -78,6 +83,7 @@ interface event {
 interface msg {
     sender: number,
     receiver: number,
+    sub_id: number,
     events: event[]
 }
 
@@ -187,7 +193,9 @@ export function getEvent(msg: Uint8Array) {
                 x: prop.start_x,
                 y: prop.start_y,
                 fontSize: prop._a,
-                text
+                text,
+                _start: 6,
+                _end: msg.length
             }
         })
     } else if (cmd_id in cmdId2len) {
@@ -204,6 +212,8 @@ export function getEvent(msg: Uint8Array) {
                 lineWidth: obj.width,
                 x: obj.start_x,
                 y: obj.start_y,
+                _start: 6 + i * 15,
+                _end: 6 + (i + 1) * 15
             }
             switch (objectTypeMap[obj.figure_tpye].slice(2)) {
                 case 'Line':
@@ -248,6 +258,101 @@ export function getEvent(msg: Uint8Array) {
     return <msg>{
         sender,
         receiver,
+        sub_id: cmd_id,
         events
+    }
+}
+
+interface Header {
+    length: number,
+    seq: number,
+    cmd_id: number
+}
+
+interface HeaderResult {
+    code: number,
+    msg?: Uint8Array,
+    header?: Header,
+    error?: string,
+    loc?: number[]
+}
+
+export function getHeader(msg: Uint8Array) : HeaderResult {
+    const possibleLength = [
+        8, 21, 36, 81, 111, 51
+    ]
+
+    if (msg[0] !== 0xA5) {
+        return {
+            code: 1,
+            error: 'Message must start with 0xA5',
+            loc: [0]
+        }
+    }
+
+    if (msg.length < 7) {
+        return {
+            code: 2,
+            error: 'Message length must be at least 7 bytes',
+            loc: [0]
+        }
+    }
+
+    const length = msg[1] | (msg[2] << 8);
+    const seq = msg[3];
+    const crc8 = msg[4];
+    const cmd_id = msg[5] | (msg[6] << 8);
+
+    const header = msg.subarray(0, 4);
+
+    if (calc_crc8(header) !== crc8) {
+        return {
+            code: 3,
+            error: `crc8 error, calc: 0x${calc_crc8(header).toString(16)}, msg: 0x${crc8.toString(16)}`,
+            loc: [4]
+        }
+    }
+
+    if (cmd_id !== 0x0301) {
+        return {
+            code: 4,
+            error: `cmd_id 0x${cmd_id.toString(16)} not match`,
+            loc: [5, 6]
+        }
+    }
+    if (!(possibleLength.includes(length))) {
+        return {
+            code: 5,
+            error: `length error, length: ${length}`,
+            loc: [1, 2]
+        }
+    }
+
+    if (msg.length < 6 + length + 2) {
+        return {
+            code: 6,
+            error: 'Message is not complete',
+            loc: [msg.length - 1]
+        }
+    }
+
+    const crc16 = msg[7 + length] | (msg[8 + length] << 8);
+
+    if (calc_crc16(msg.subarray(0, 7 + length)) !== crc16) {
+        return {
+            code: 7,
+            error: `crc16 error, calc: 0x${calc_crc16(msg.subarray(0, 7 + length)).toString(16)}, msg: 0x${crc16.toString(16)}`,
+            loc: [7 + length, 8 + length]
+        }
+    }
+
+    return {
+        code: 0,
+        msg: msg.subarray(7 + length + 2),
+        header: {
+            length,
+            seq,
+            cmd_id
+        }
     }
 }
