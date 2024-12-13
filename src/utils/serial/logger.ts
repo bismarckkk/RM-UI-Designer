@@ -48,7 +48,7 @@ class Logger {
 
     getHistory() {
         return {
-            log: this.log,
+            log: [...this.log],
             rx: this.rx
         }
     }
