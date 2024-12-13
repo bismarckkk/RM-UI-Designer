@@ -522,6 +522,7 @@ class Render extends Component {
                 addObject(obj, true)
             } else {
                 console.log('id exists', obj.id, this.objects[this.state.frame][obj.id])
+                return `W: Adding Object ${obj.id} exists`
             }
         } else if (type === '_add') {
             obj.id = this.getNewDataId()
@@ -531,6 +532,8 @@ class Render extends Component {
         } else if (type === 'update') {
             if (this.objects[this.state.frame][obj.id]) {
                 this.objects[this.state.frame][obj.id].fromObject(obj)
+            } else {
+                return `E: Updating object ${obj.id} not exists`
             }
         } else if (type === '_update') {
             if (obj.id >= 0 && this.objects[this.state.frame][obj.id]) {
@@ -546,6 +549,8 @@ class Render extends Component {
                 this.canvas.renderAll()
                 delete this.objects[this.state.frame][id]
                 this.objectsToData()
+            } else {
+                return `E: Remove object ${id} not exists`
             }
         } else if (type === 'setAttr') {
             if (this.objects[this.state.frame][obj.id]) {
@@ -563,6 +568,7 @@ class Render extends Component {
 
         this.objectsToData()
         this.canvas.renderAll()
+        return 'S'
     }
 
     setFrame(frame) {
