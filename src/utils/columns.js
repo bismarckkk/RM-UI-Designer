@@ -246,6 +246,12 @@ export const columns = {
         dataIndex: 'error',
         valueType: 'text',
     },
+    operation: {
+        title: 'Operation',
+        key: 'operation',
+        dataIndex: 'operation',
+        valueType: 'text',
+    }
 }
 
 export function getColumnsFromData(data) {

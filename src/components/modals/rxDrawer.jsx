@@ -177,7 +177,7 @@ class RxDrawer extends Component {
                             const res = [renderPopContent(_msg.slice(0, 6), 'purple', msg, 'Info')]
                             let color = "geekblue";
                             for (const event of msg.events) {
-                                res.push(renderPopContent(_msg.slice(event.obj._start, event.obj._end), color, event.obj, 'Object'))
+                                res.push(renderPopContent(_msg.slice(event.obj._start, event.obj._end), color, {operation: event.type, ...event.obj}, 'Object'))
                                 if (color === "geekblue") {
                                     color = "cyan";
                                 } else {
