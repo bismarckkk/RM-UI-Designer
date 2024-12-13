@@ -235,7 +235,7 @@ class RxDrawer extends Component {
                         ), "Object", headerRes, 'Error'))
                         addSuffix(5)
                     } else if (headerRes.code <= 7) {
-                        res.push(renderPopContent(maybeMsg.slice(0, 7), 'green', headerRes, 'Header'))
+                        res.push(renderPopContent(maybeMsg.slice(0, 7), 'green', headerRes.header, 'Header'))
                         res.push(...renderContent(maybeMsg.slice(7, headerRes.loc[0])))
                         res.push(renderPopContent(maybeMsg.slice(headerRes.loc[0], headerRes.loc[1] + 1), 'red', headerRes, 'Error'))
                         addSuffix(headerRes.loc[1] + 1)

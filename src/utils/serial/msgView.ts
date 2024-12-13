@@ -342,7 +342,12 @@ export function getHeader(msg: Uint8Array) : HeaderResult {
         return {
             code: 7,
             error: `crc16 error, calc: 0x${calc_crc16(msg.subarray(0, 7 + length)).toString(16)}, msg: 0x${crc16.toString(16)}`,
-            loc: [7 + length, 8 + length]
+            loc: [7 + length, 8 + length],
+            header: {
+                length,
+                    seq,
+                    cmd_id
+            }
         }
     }
 
