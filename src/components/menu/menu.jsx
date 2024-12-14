@@ -505,9 +505,25 @@ class Menu extends Component {
                         this.aboutRef.current?.show()
                     }}>About</Button>
                     <div
-                        style={{ marginRight: 5, justifyContent: 'flex-end', marginLeft: 'auto', marginTop: 2}}
+                        style={{marginRight: 5, justifyContent: 'flex-end', marginLeft: 'auto', marginTop: 2}}
                         data-tauri-drag-region
                     >
+                        {
+                            process.env.VERSION.slice(0, 7) !== 'nightly' && <div
+                                style={{
+                                    display: 'inline', marginRight: 15, fontSize: 10, cursor: 'default',
+                                    color: 'var(--ant-color-text)'
+                                }}
+                                data-tauri-drag-region
+                            >
+                                Try&nbsp;
+                                <a href="/nightly">
+                                    <Button type="link" style={{padding: 0}} size="small" data-tauri-drag-region>
+                                        Nightly
+                                    </Button>
+                                </a>
+                            </div>
+                        }
                         <div
                             style={{
                                 display: 'inline', marginRight: 15, fontSize: 10, cursor: 'default',
@@ -529,7 +545,7 @@ class Menu extends Component {
                         }
                         <a href="https://github.com/bismarckkk/RM-UI-Designer" target="_blank">
                             <Button type="text" size="small">
-                                <GithubOutlined style={{ color: 'var(--ant-color-text)' }} />
+                                <GithubOutlined style={{color: 'var(--ant-color-text)'}}/>
                             </Button>
                         </a>
                         <Button
@@ -537,7 +553,7 @@ class Menu extends Component {
                             onClick={() => appWindow.minimize()}
                             style={{display: this.tauri ? 'inline' : 'none'}}
                         >
-                            <MinusOutlined style={{ color: 'var(--ant-color-text)' }} />
+                            <MinusOutlined style={{color: 'var(--ant-color-text)'}}/>
                         </Button>
                         {
                             this.state.fullscreen ?
@@ -550,17 +566,17 @@ class Menu extends Component {
                             onClick={() => exit()}
                             style={{display: this.tauri ? 'inline' : 'none'}}
                         >
-                            <CloseOutlined style={{ color: 'var(--ant-color-text)' }} />
+                            <CloseOutlined style={{color: 'var(--ant-color-text)'}}/>
                         </Button>
                     </div>
                 </Flex>
-                <FormModal ref={this.formRef} />
-                <AboutModal ref={this.aboutRef} />
-                <Generator ref={this.generatorRef} />
-                <LogDrawer ref={this.logDrawerRef} />
-                <RxDrawer ref={this.rxDrawerRef} />
-                <SerialModal ref={this.serialModalRef} />
-                <ModeModal ref={this.modeModalRef} />
+                <FormModal ref={this.formRef}/>
+                <AboutModal ref={this.aboutRef}/>
+                <Generator ref={this.generatorRef}/>
+                <LogDrawer ref={this.logDrawerRef}/>
+                <RxDrawer ref={this.rxDrawerRef}/>
+                <SerialModal ref={this.serialModalRef}/>
+                <ModeModal ref={this.modeModalRef}/>
             </div>
         );
     }

@@ -26,29 +26,53 @@ class UpdateModal extends Component {
     }
 
     check() {
-        if (process.env.VERSION.slice(0, 7) === 'nightly' || process.env.VERSION === 'development') {
-            return;
-        }
-        let regex_pr = /(https:\/\/github\.com\/bismarckkk\/RM-UI-Designer\/pull\/)(\d+)/g;
-        let regex_cl = /(https:\/\/github\.com\/bismarckkk\/RM-UI-Designer\/compare\/)(v\d+\.\d+\.\d+\.\.\.v\d+\.\d+\.\d+)/g;
-        (async () => {
-            try {
-                const { shouldUpdate, manifest } = await checkUpdate()
-                if (shouldUpdate) {
-                    this.setState({
-                        step: 1,
-                        content: manifest.body.replace(regex_pr, (match, p1, p2) => {
-                            return `[#${p2}](${p1}${p2})`;
-                        }).replace(regex_cl, (match, p1, p2) => {
-                            return `[#${p2}](${p1}${p2})`;
-                        }),
-                        version: manifest.version
-                    })
-                }
-            } catch (e) {
-                message.warning('Failed to check update.')
+        if (process.env.VERSION === 'development') {
+
+        } else if (process.env.VERSION.slice(0, 7) === 'nightly') {
+            if (!isTauri()) {
+                (async () => {
+                    try {
+                        const response = await fetch(`/nightly/version?timestamp=${new Date().getTime()}`);
+                        const version = await response.text();
+                        if (version.trim() !== process.env.ref.slice(0, 7)) {
+                            this.setState({ step: 2 });
+                            setTimeout(async () => {
+                                const response = await fetch(`/nightly/version?timestamp=${new Date().getTime()}`);
+                                const newVersion = await response.text();
+                                if (newVersion.trim() === 'no') {
+                                    window.location.href = '/';
+                                } else {
+                                    window.location.reload();
+                                }
+                            }, 3000);
+                        }
+                    } catch (e) {
+                        message.warning('Failed to check nightly version.');
+                    }
+                })();
             }
-        })()
+        } else {
+            let regex_pr = /(https:\/\/github\.com\/bismarckkk\/RM-UI-Designer\/pull\/)(\d+)/g;
+            let regex_cl = /(https:\/\/github\.com\/bismarckkk\/RM-UI-Designer\/compare\/)(v\d+\.\d+\.\d+\.\.\.v\d+\.\d+\.\d+)/g;
+            (async () => {
+                try {
+                    const { shouldUpdate, manifest } = await checkUpdate()
+                    if (shouldUpdate) {
+                        this.setState({
+                            step: 1,
+                            content: manifest.body.replace(regex_pr, (match, p1, p2) => {
+                                return `[#${p2}](${p1}${p2})`;
+                            }).replace(regex_cl, (match, p1, p2) => {
+                                return `[#${p2}](${p1}${p2})`;
+                            }),
+                            version: manifest.version
+                        })
+                    }
+                } catch (e) {
+                    message.warning('Failed to check update.')
+                }
+            })()
+        }
     }
 
     ignore() {
