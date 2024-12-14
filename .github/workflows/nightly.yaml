@@ -54,7 +54,10 @@ jobs:
           rm -rf dist/nightly
           rm -rf last/nightly
           mv dist last/nightly
+          echo ${{ github.sha }} > last/nightly/version
           touch last/.nojekyll
+        env:
+          ref: ${{ github.sha }}
 
       - name: deploy
         uses: JamesIves/github-pages-deploy-action@v4
