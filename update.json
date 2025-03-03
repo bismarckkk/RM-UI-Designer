@@ -1,35 +1,35 @@
 {
-  "version": "v1.2.13",
-  "notes": "## What's Changed\n* fix: 代码生成器自带内存对齐指令现在支持keil编译器 by @bismarckkk in https://github.com/bismarckkk/RM-UI-Designer/pull/69\n\n\n**Full Changelog**: https://github.com/bismarckkk/RM-UI-Designer/compare/v1.2.12...v1.2.13",
-  "pub_date": "2024-12-17T11:00:21.641Z",
+  "version": "v1.2.17",
+  "notes": "## What's Changed\n* fix: 继续修复ubuntu ci by @bismarckkk in https://github.com/bismarckkk/RM-UI-Designer/pull/72\n\n\n**Full Changelog**: https://github.com/bismarckkk/RM-UI-Designer/compare/v1.2.16...v1.2.17",
+  "pub_date": "2025-03-03T10:07:14.079Z",
   "platforms": {
     "win64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q25VbEZxWGlYVHJwMEljQyswOTBseWJmaGh6S2d6dWpVaGFuYXpmZzBjQ1NHQ2Q3VnIrVjFycFJyWEppYnF3VTlVUzBsMlNDWFV3Y2hRL1UvelhBeXdNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0NDMzMTE4CWZpbGU6Um9ib01hc3RlciBVSSBEZXNpZ25lcl8xLjIuMTNfeDY0X2VuLVVTLm1zaS56aXAKT1pNanVNRVRnZ3FaTVo0V0d6aVRDV01lTkxLRXNORmhGd1grd0FlYzFETUM1UVFUMXEwL3RvaWMySlZ1WVVUeEFFaFFFTnVmNTdhL1dhM3dsa0lUREE9PQo=",
-      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.13/RoboMaster.UI.Designer_1.2.13_x64_en-US.msi.zip"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q3ZabXZXVm9yRTFQZXlVNnl6c0V4WUdlNzVlN2YwMkFjUjJVeU9NbGhNT0tqT3ZXaCtkejhUcTVYZi9URFVDWGxqK2NzZERzMHAzTkllSlo5cHdLdUFNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzQwOTk2MjUwCWZpbGU6Um9ib01hc3RlciBVSSBEZXNpZ25lcl8xLjIuMTdfeDY0X2VuLVVTLm1zaS56aXAKWWhkRWJyODBqN2VQL0RqVFNxN2VWL1FidXBCTmN2K3JvZWNCdXZqb1ZpZWI4TWc0c2NLb2tIUjFzT1FJV21uVDluYkdmZ2dSNkJJYStra1N2cGJ6Q0E9PQo=",
+      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.17/RoboMaster.UI.Designer_1.2.17_x64_en-US.msi.zip"
     },
     "linux": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q20zaEhBNlJDcDNMek5oL3EycG16dXp5djBkUjV6ekpTbTMrVVM5bFRSOG00TUpJbHlYOFN6Z2o2elBKWjVJYkI1d1BHUkZ4NmliVTNXamxCSFdhcHdrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0NDMyODg1CWZpbGU6cm9iby1tYXN0ZXItdWktZGVzaWduZXJfMS4yLjEzX2FtZDY0LkFwcEltYWdlLnRhci5negpKMTl3VzNaRml1NUkrQkRSKzlySjBrcmdoSUx6Rm9aU3Z6N3U3TFU5Ukd5SHdBak9yOENZVkljY2pKVWc1M2h0VG04aURlMUN3bHlXaCtYNHQxNytDQT09Cg==",
-      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.13/robo-master-ui-designer_1.2.13_amd64.AppImage.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q2pGTUc0WVhVckVLaUlXcDU0NkxJdlpuUElaY0o4aCswNmpMVm8zUkVZQkV0QjJ2VVcvTVUveS94bnF5a0I3VWdHU1FlRng2WForZlN3QW9CR2ZLTEFrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzQwOTk1ODk0CWZpbGU6cm9iby1tYXN0ZXItdWktZGVzaWduZXJfMS4yLjE3X2FtZDY0LkFwcEltYWdlLnRhci5negp0emprd0JnMWNkdjhVNmZLOGRIcXJTdXE5bkFLcEVGdU13VU5oUjhQT0VMNU80QkFxMkd6bHU2OVdVN2cvSGsvc0t0NVd4RzgyeFZTWWFnSVludmZCQT09Cg==",
+      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.17/robo-master-ui-designer_1.2.17_amd64.AppImage.tar.gz"
     },
     "darwin": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q3Q5NkhTMmptcENvank4NFhUM1MrZkdLcVNPb0E4YmVjTzNseDcyQkw3WEhKUzJXUnJSOVFsWDUvRGx2WGVVYU8wYXpYSkZRL25qUVZWbExzUXlpaUFJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0NDMyNzI4CWZpbGU6Um9ib01hc3RlciBVSSBEZXNpZ25lci5hcHAudGFyLmd6CmhiVHpQNHZtQUVwT2RadXNWcGluRzhWTUpoRHkvWkVHMzUrT1hLOXNqNWpxT3MvVk9CamdHSURxeGd3Vk5QdnhLNGxDTU9URkw4UmFFVXZvbkpiRUFRPT0K",
-      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.13/RoboMaster.UI.Designer_aarch64.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q3FzRWo4RlBhNFR6c2JCUm51UkJlQUNiWFZTZW1MYkZYSk9OUUxDRElQWFhuVWViRktzOTluNFNteHhyekM3T1hNdzFneHhjSGRmMTQydjNoK2lyaVE4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzQwOTk1NzAxCWZpbGU6Um9ib01hc3RlciBVSSBEZXNpZ25lci5hcHAudGFyLmd6CmllNzdYRGFLQzRYc2NnL3RXSEJyZFgvN2ZmckpGdEI0YVJvdE9rS294dm0rOFltRWgxT2tlclUvamoyTjZNS1BBQVNYNTcrcjJpQzdkTlUvWVNlRENRPT0K",
+      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.17/RoboMaster.UI.Designer_aarch64.app.tar.gz"
     },
     "darwin-aarch64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q3Q5NkhTMmptcENvank4NFhUM1MrZkdLcVNPb0E4YmVjTzNseDcyQkw3WEhKUzJXUnJSOVFsWDUvRGx2WGVVYU8wYXpYSkZRL25qUVZWbExzUXlpaUFJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0NDMyNzI4CWZpbGU6Um9ib01hc3RlciBVSSBEZXNpZ25lci5hcHAudGFyLmd6CmhiVHpQNHZtQUVwT2RadXNWcGluRzhWTUpoRHkvWkVHMzUrT1hLOXNqNWpxT3MvVk9CamdHSURxeGd3Vk5QdnhLNGxDTU9URkw4UmFFVXZvbkpiRUFRPT0K",
-      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.13/RoboMaster.UI.Designer_aarch64.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q3FzRWo4RlBhNFR6c2JCUm51UkJlQUNiWFZTZW1MYkZYSk9OUUxDRElQWFhuVWViRktzOTluNFNteHhyekM3T1hNdzFneHhjSGRmMTQydjNoK2lyaVE4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzQwOTk1NzAxCWZpbGU6Um9ib01hc3RlciBVSSBEZXNpZ25lci5hcHAudGFyLmd6CmllNzdYRGFLQzRYc2NnL3RXSEJyZFgvN2ZmckpGdEI0YVJvdE9rS294dm0rOFltRWgxT2tlclUvamoyTjZNS1BBQVNYNTcrcjJpQzdkTlUvWVNlRENRPT0K",
+      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.17/RoboMaster.UI.Designer_aarch64.app.tar.gz"
     },
     "darwin-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q3Q5NkhTMmptcENvank4NFhUM1MrZkdLcVNPb0E4YmVjTzNseDcyQkw3WEhKUzJXUnJSOVFsWDUvRGx2WGVVYU8wYXpYSkZRL25qUVZWbExzUXlpaUFJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0NDMyNzI4CWZpbGU6Um9ib01hc3RlciBVSSBEZXNpZ25lci5hcHAudGFyLmd6CmhiVHpQNHZtQUVwT2RadXNWcGluRzhWTUpoRHkvWkVHMzUrT1hLOXNqNWpxT3MvVk9CamdHSURxeGd3Vk5QdnhLNGxDTU9URkw4UmFFVXZvbkpiRUFRPT0K",
-      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.13/RoboMaster.UI.Designer_aarch64.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q3FzRWo4RlBhNFR6c2JCUm51UkJlQUNiWFZTZW1MYkZYSk9OUUxDRElQWFhuVWViRktzOTluNFNteHhyekM3T1hNdzFneHhjSGRmMTQydjNoK2lyaVE4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzQwOTk1NzAxCWZpbGU6Um9ib01hc3RlciBVSSBEZXNpZ25lci5hcHAudGFyLmd6CmllNzdYRGFLQzRYc2NnL3RXSEJyZFgvN2ZmckpGdEI0YVJvdE9rS294dm0rOFltRWgxT2tlclUvamoyTjZNS1BBQVNYNTcrcjJpQzdkTlUvWVNlRENRPT0K",
+      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.17/RoboMaster.UI.Designer_aarch64.app.tar.gz"
     },
     "linux-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q20zaEhBNlJDcDNMek5oL3EycG16dXp5djBkUjV6ekpTbTMrVVM5bFRSOG00TUpJbHlYOFN6Z2o2elBKWjVJYkI1d1BHUkZ4NmliVTNXamxCSFdhcHdrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0NDMyODg1CWZpbGU6cm9iby1tYXN0ZXItdWktZGVzaWduZXJfMS4yLjEzX2FtZDY0LkFwcEltYWdlLnRhci5negpKMTl3VzNaRml1NUkrQkRSKzlySjBrcmdoSUx6Rm9aU3Z6N3U3TFU5Ukd5SHdBak9yOENZVkljY2pKVWc1M2h0VG04aURlMUN3bHlXaCtYNHQxNytDQT09Cg==",
-      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.13/robo-master-ui-designer_1.2.13_amd64.AppImage.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q2pGTUc0WVhVckVLaUlXcDU0NkxJdlpuUElaY0o4aCswNmpMVm8zUkVZQkV0QjJ2VVcvTVUveS94bnF5a0I3VWdHU1FlRng2WForZlN3QW9CR2ZLTEFrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzQwOTk1ODk0CWZpbGU6cm9iby1tYXN0ZXItdWktZGVzaWduZXJfMS4yLjE3X2FtZDY0LkFwcEltYWdlLnRhci5negp0emprd0JnMWNkdjhVNmZLOGRIcXJTdXE5bkFLcEVGdU13VU5oUjhQT0VMNU80QkFxMkd6bHU2OVdVN2cvSGsvc0t0NVd4RzgyeFZTWWFnSVludmZCQT09Cg==",
+      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.17/robo-master-ui-designer_1.2.17_amd64.AppImage.tar.gz"
     },
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q25VbEZxWGlYVHJwMEljQyswOTBseWJmaGh6S2d6dWpVaGFuYXpmZzBjQ1NHQ2Q3VnIrVjFycFJyWEppYnF3VTlVUzBsMlNDWFV3Y2hRL1UvelhBeXdNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0NDMzMTE4CWZpbGU6Um9ib01hc3RlciBVSSBEZXNpZ25lcl8xLjIuMTNfeDY0X2VuLVVTLm1zaS56aXAKT1pNanVNRVRnZ3FaTVo0V0d6aVRDV01lTkxLRXNORmhGd1grd0FlYzFETUM1UVFUMXEwL3RvaWMySlZ1WVVUeEFFaFFFTnVmNTdhL1dhM3dsa0lUREE9PQo=",
-      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.13/RoboMaster.UI.Designer_1.2.13_x64_en-US.msi.zip"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRMHBnaG5qVUt3Q3ZabXZXVm9yRTFQZXlVNnl6c0V4WUdlNzVlN2YwMkFjUjJVeU9NbGhNT0tqT3ZXaCtkejhUcTVYZi9URFVDWGxqK2NzZERzMHAzTkllSlo5cHdLdUFNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzQwOTk2MjUwCWZpbGU6Um9ib01hc3RlciBVSSBEZXNpZ25lcl8xLjIuMTdfeDY0X2VuLVVTLm1zaS56aXAKWWhkRWJyODBqN2VQL0RqVFNxN2VWL1FidXBCTmN2K3JvZWNCdXZqb1ZpZWI4TWc0c2NLb2tIUjFzT1FJV21uVDluYkdmZ2dSNkJJYStra1N2cGJ6Q0E9PQo=",
+      "url": "https://github.com/bismarckkk/RM-UI-Designer/releases/download/v1.2.17/RoboMaster.UI.Designer_1.2.17_x64_en-US.msi.zip"
     }
   }
 }
