@@ -42,6 +42,10 @@ class Elements extends Component {
     }
 
     onElementMenuContainerClick(e) {
+        if (e.target.classList.value.includes('ant-dropdown-menu')) {
+            return;
+        }
+        console.log(e.target.className)
         this.setState({rightClickMenuOpen: false})
         if (e.target.classList.contains('ant-tree') || (!e.ctrlKey && !e.shiftKey)) {
             this.props.onSelect([])
@@ -59,7 +63,8 @@ class Elements extends Component {
             }
         } else if (e.key === 'D2-delete') {
             for (let id of this.props.selectedId) {
-                this.props.onObjectEvent('remove', {id})
+                console.log(id)
+                console.log(this.props.onObjectEvent('remove', {id}))
             }
         }
     }
