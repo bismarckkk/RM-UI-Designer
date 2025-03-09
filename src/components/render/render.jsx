@@ -1,6 +1,6 @@
 import React, { Component, createRef } from 'react';
 import { Button, Card, Empty, Space } from "antd";
-import { message, modal, setRid } from "@/utils/app";
+import {message, modal, rid, setRid} from "@/utils/app";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ProDescriptions } from '@ant-design/pro-components';
 import Elements from "./elements";
@@ -76,10 +76,14 @@ class Render extends Component {
         if (id === 0) {
             id = this.state.uiWindow.role
         }
+        if (typeof id === 'string') {
+            id = parseInt(id)
+        }
         if (this.state.uiWindow.team === 'blue') {
             id += 100
         }
         setRid(id)
+        console.log('b add', id)
     }
 
     cancelHistoryUpdate() {
