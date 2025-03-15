@@ -12,8 +12,15 @@ class Group {
         let start_id = 0
         let namesSet = new Set()
 
+        if (!/^[a-zA-Z_]+\w?$/.test(this.group_name)) {
+            this.errors.push({
+                level: 'error',
+                info: `Name of Frame "${this.frame_name}" Group "${this.group_name}" does not compliant.`
+            })
+        }
+
         for (let obj of _objs) {
-            if (!/^[a-zA-Z_]+\w+$/.test(obj.name)) {
+            if (!/^[a-zA-Z_]+\w?$/.test(obj.name)) {
                 this.errors.push({
                     level: 'error',
                     info: `Name of Frame "${this.frame_name}" Group "${this.group_name}" Object "${obj.name}" does not compliant.`

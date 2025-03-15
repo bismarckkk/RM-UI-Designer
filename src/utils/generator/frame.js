@@ -5,6 +5,14 @@ class Frame {
         this.name = name
         this.id = id
         this.groups = []
+        this.errors = []
+
+        if (!/^[a-zA-Z_]+\w?$/.test(this.name)) {
+            this.errors.push({
+                level: 'error',
+                info: `Name of Frame "${this.name}" does not compliant.`
+            })
+        }
 
         let _groups = {}
         for (let obj_name in objs) {
@@ -31,7 +39,7 @@ class Frame {
     }
 
     check() {
-        let res = []
+        let res = this.errors
         for (let group of this.groups) {
             res = res.concat(group.check())
         }

@@ -4,8 +4,12 @@ import Frame from "./frame";
 class GeneratorHelper {
     constructor(data) {
         this.frames = []
-        for (let frame_name in data) {
-            this.frames.push(new Frame(frame_name, this.frames.length, data[frame_name]))
+        if (Object.keys(data).length === 1) {
+            this.frames.push(new Frame('g', 0, data[Object.keys(data)[0]]))
+        } else {
+            for (let frame_name in data) {
+                this.frames.push(new Frame(frame_name, this.frames.length, data[frame_name]))
+            }
         }
     }
 

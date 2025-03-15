@@ -83,7 +83,6 @@ class Render extends Component {
             id += 100
         }
         setRid(id)
-        console.log('b add', id)
     }
 
     cancelHistoryUpdate() {
@@ -441,6 +440,10 @@ class Render extends Component {
             })
             this.cancelHistoryUpdate()
         }, 200)
+
+        window.dispatch = (type, payload) => {
+            this.onObjectEvent(type, payload)
+        }
     }
 
     upload(file) {
