@@ -7,7 +7,7 @@ class Frame {
         this.groups = []
         this.errors = []
 
-        if (!/^[a-zA-Z_]+\w?$/.test(this.name)) {
+        if (!/^[a-zA-Z_]+\w*$/.test(this.name)) {
             this.errors.push({
                 level: 'error',
                 info: `Name of Frame "${this.name}" does not compliant.`
