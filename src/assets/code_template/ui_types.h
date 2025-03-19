@@ -5,7 +5,7 @@
 #ifndef SERIAL_TEST_UI_TYPES_H
 #define SERIAL_TEST_UI_TYPES_H
 
-#ifdef __CC_ARM || __GNUC__
+#if defined(__GNUC__) || defined(__CC_ARM)
 #define MESSAGE_PACKED __attribute__((packed))
 #include <stdint.h>
 #else
