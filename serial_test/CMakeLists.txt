@@ -7,7 +7,7 @@ add_executable(serial_test main.cpp
         ui_interface.c
         ui_interface.h
         ui_types.h
-        ui_default_ungroup_0.c
-        ui_default_ungroup_1.c
+        ui_objects.c
+        ui_objects.h
         serialib.cpp
 )

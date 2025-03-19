@@ -96,4 +96,10 @@ typedef struct {
     uint16_t crc16;
 } MESSAGE_PACKED ui_string_frame_t;
 
+extern ui_string_frame_t _ui_string_frame;
+extern ui_1_frame_t _ui_1_frame;
+extern ui_2_frame_t _ui_2_frame;
+extern ui_5_frame_t _ui_5_frame;
+extern ui_7_frame_t _ui_7_frame;
+
 #endif //SERIAL_TEST_UI_TYPES_H

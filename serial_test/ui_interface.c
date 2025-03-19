@@ -8,6 +8,12 @@
 uint8_t seq = 0;
 int ui_self_id = 1;
 
+ui_string_frame_t _ui_string_frame;
+ui_1_frame_t _ui_1_frame;
+ui_2_frame_t _ui_2_frame;
+ui_5_frame_t _ui_5_frame;
+ui_7_frame_t _ui_7_frame;
+
 void print_message(const uint8_t *message, const int length) {
     for (int i = 0; i < length; i++) {
         printf("%02x ", message[i]);
