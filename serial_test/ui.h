@@ -1,5 +1,6 @@
 //
 // Created by RM UI Designer
+// Dynamic Edition
 //
 
 #ifndef UI_H
@@ -9,7 +10,8 @@ extern "C" {
 #endif
 
 #include "ui_interface.h"
-#include "ui_objects.h"
+
+#include "ui_g.h"
 
 #ifdef __cplusplus
 }

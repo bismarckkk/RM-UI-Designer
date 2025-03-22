@@ -306,16 +306,15 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
     return res
 }
 
-const interfaceHUrl = require('@/assets/code_template/ui_interface.h')
-const interfaceCUrl = require('@/assets/code_template/ui_interface.c')
-const typesHUrl = require('@/assets/code_template/ui_types.h')
+const interfaceHUrl = require('@/assets/code_template/static/ui_interface.h')
+const interfaceCUrl = require('@/assets/code_template/static/ui_interface.c')
+const typesHUrl = require('@/assets/code_template/static/ui_types.h')
 
 let interfaceH = await (await fetch(interfaceHUrl)).text()
 let interfaceC = await (await fetch(interfaceCUrl)).text()
 let typesH = await (await fetch(typesHUrl)).text()
 
 export async function getUiBase() {
-
     return {
         ui_interface: {
             h: interfaceH,

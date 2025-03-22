@@ -4,6 +4,7 @@ import CheckPanel from "@/components/generator/checkPanel";
 import DownloadPanel from "@/components/generator/downloadPanel";
 
 import GeneratorHelper from "@/utils/generator/generatorHelper";
+import GeneratorHelper2 from "@/utils/generator2/generatorHelper";
 
 class Generator extends Component {
     state = {show: false, step: 'check'}
@@ -11,20 +12,33 @@ class Generator extends Component {
     data = {}
     errors = []
 
-    gen(data) {
-        this.helper = new GeneratorHelper(data)
-        this.data = data
-        this.code = {ui: {h: this.helper.toUiH()}}
-        for (let frame of this.helper.frames) {
-            for (let group of frame.groups) {
-                for (let split of group.splits) {
-                    this.code[`ui_${frame.name}_${group.group_name}_${split.split_id}`] = {
-                        c: split.toSplitC(),
-                        h: split.toSplitH()
+    gen(data, mode) {
+        if (mode === 'dynamic') {
+            this.helper = new GeneratorHelper2(data)
+            this.data = data
+            this.code = {ui: {h: this.helper.toUiH()}}
+            for (let frame of this.helper.frames) {
+                this.code[`ui_${frame.name}`] = {
+                    c: frame.toC(),
+                    h: frame.toH()
+                }
+            }
+        } else {
+            this.helper = new GeneratorHelper(data)
+            this.data = data
+            this.code = {ui: {h: this.helper.toUiH()}}
+            for (let frame of this.helper.frames) {
+                for (let group of frame.groups) {
+                    for (let split of group.splits) {
+                        this.code[`ui_${frame.name}_${group.group_name}_${split.split_id}`] = {
+                            c: split.toSplitC(),
+                            h: split.toSplitH()
+                        }
                     }
                 }
             }
         }
+
         this.errors = this.helper.check()
         this.setState({show: true, step: 'check'})
     }

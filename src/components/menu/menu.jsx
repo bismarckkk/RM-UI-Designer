@@ -46,8 +46,13 @@ const fileItems = [
     },
     {type: 'divider'},
     {
-        key: 'File-generate',
-        label: "Generate Code",
+        key: 'File-generate1',
+        label: "Generate Static Code",
+        icon: <ThunderboltOutlined />
+    },
+    {
+        key: 'File-generate2',
+        label: "Generate Dynamic Code",
         icon: <ThunderboltOutlined />
     }
 ]
@@ -325,8 +330,10 @@ class Menu extends Component {
                     this.props.upload(file)
                 }).catch(() => {})
             }
-        } else if (first === "File-generate") {
-            this.generatorRef.current?.gen(this.props.getData())
+        } else if (first === "File-generate1") {
+            this.generatorRef.current?.gen(this.props.getData(), 'static')
+        } else if (first === "File-generate2") {
+            this.generatorRef.current?.gen(this.props.getData(), 'dynamic')
         } else if (first === 'FrameOp-add') {
             const name = await this.formRef.current.open('New Frame', this.state.frames)
             this.props.setFrame('add', name)

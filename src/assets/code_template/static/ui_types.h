@@ -2,8 +2,8 @@
 // Created by bismarckkk on 2024/2/17.
 //
 
-#ifndef SERIAL_TEST_UI_TYPES_H
-#define SERIAL_TEST_UI_TYPES_H
+#ifndef UI_TYPES_H
+#define UI_TYPES_H
 
 #if defined(__GNUC__) || defined(__CC_ARM)
 #define MESSAGE_PACKED __attribute__((packed))
@@ -96,4 +96,4 @@ typedef struct {
     uint16_t crc16;
 } MESSAGE_PACKED ui_string_frame_t;
 
-#endif //SERIAL_TEST_UI_TYPES_H
+#endif //UI_TYPES_H
