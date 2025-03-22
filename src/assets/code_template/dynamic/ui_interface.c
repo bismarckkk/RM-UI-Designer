@@ -1,5 +1,6 @@
 //
-// Created by bismarckkk on 2024/2/17.
+// Created by bismarckkk on 2025/3/22.
+// Dynamic Edition
 //
 
 #include "ui_interface.h"

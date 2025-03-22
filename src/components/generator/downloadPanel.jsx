@@ -6,7 +6,6 @@ import { xcodeLight, xcodeDark } from "@uiw/codemirror-theme-xcode";
 import { cpp } from '@codemirror/lang-cpp';
 
 import { saveText, saveBlob, code2zip } from "@/utils/utils";
-import { getUiBase } from "@/utils/generator/template";
 
 function getSuffix(obj) {
     let res = ''
@@ -49,7 +48,7 @@ class DownloadPanel extends Component {
             return
         }
         let files = {}
-        let code = {...this.props.code, ...(await getUiBase())}
+        let code = {...this.props.code, ...(await this.props.getUiBase())}
         for (let key of this.checked) {
             files[key] = code[key]
         }
@@ -104,7 +103,7 @@ class DownloadPanel extends Component {
                                         )
                                     } else {
                                         return <Button type="link" onClick={async () => {
-                                            const code = await getUiBase()
+                                            const code = await this.props.getUiBase()
                                             const zip = await code2zip(code)
                                             saveBlob(zip, 'ui_base.zip')
                                         }}>Download .zip</Button>
