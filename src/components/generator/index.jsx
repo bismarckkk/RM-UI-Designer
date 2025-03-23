@@ -15,30 +15,11 @@ class Generator extends Component {
     gen(data, mode) {
         if (mode === 'dynamic') {
             this.helper = new GeneratorHelper2(data)
-            this.data = data
-            this.code = {ui: {h: this.helper.toUiH()}}
-            for (let frame of this.helper.frames) {
-                this.code[`ui_${frame.name}`] = {
-                    c: frame.toC(),
-                    h: frame.toH()
-                }
-            }
         } else {
             this.helper = new GeneratorHelper(data)
-            this.data = data
-            this.code = {ui: {h: this.helper.toUiH()}}
-            for (let frame of this.helper.frames) {
-                for (let group of frame.groups) {
-                    for (let split of group.splits) {
-                        this.code[`ui_${frame.name}_${group.group_name}_${split.split_id}`] = {
-                            c: split.toSplitC(),
-                            h: split.toSplitH()
-                        }
-                    }
-                }
-            }
         }
-
+        this.data = data
+        this.code = this.helper.gen()
         this.errors = this.helper.check()
         this.setState({show: true, step: 'check'})
     }
@@ -86,7 +67,7 @@ class Generator extends Component {
                     {
                         this.state.step === 'check' ?
                             <CheckPanel errors={this.errors}/> :
-                            <DownloadPanel code={this.code} ref={this.downloadRef}/>
+                            <DownloadPanel code={this.code} getUiBase={()=>this.helper.getUiBase()} ref={this.downloadRef}/>
                     }
                 </Drawer>
             </div>
