@@ -6,11 +6,13 @@
 #ifndef UI_TYPES_H
 #define UI_TYPES_H
 
+// #define MANUAL_DIRTY
+
 #if defined(__GNUC__) || defined(__CC_ARM)
 #define MESSAGE_PACKED __attribute__((packed))
 #include <stdint.h>
 #else
-#define MESSAGE_PACKED
+#error "MESSAGE_PACKED not defined for this compiler"
 #endif
 
 #define PRIMITIVE_CAT(x, y) x ## y
