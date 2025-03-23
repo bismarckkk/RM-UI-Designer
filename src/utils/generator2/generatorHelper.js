@@ -1,4 +1,4 @@
-import { ui_h } from "./template";
+import { ui_h, getUiBase } from "./template";
 import Frame from "./frame";
 
 class GeneratorHelper2 {
@@ -11,6 +11,21 @@ class GeneratorHelper2 {
                 this.frames.push(new Frame(frame_name, this.frames.length, data[frame_name]))
             }
         }
+    }
+
+    gen() {
+        let code = {ui: {h: this.toUiH()}}
+        for (let frame of this.frames) {
+            code[`ui_${frame.name}`] = {
+                c: frame.toC(),
+                h: frame.toH()
+            }
+        }
+        return code
+    }
+
+    getUiBase() {
+        return getUiBase();
     }
 
     toUiH() {
