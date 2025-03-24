@@ -99,6 +99,13 @@ typedef struct {
     uint16_t crc16;
 } MESSAGE_PACKED ui_string_frame_t;
 
+typedef struct {
+    ui_frame_header_t header;
+    uint8_t delete_type;
+    uint8_t layer;
+    uint16_t crc16;
+} MESSAGE_PACKED ui_delete_frame_t;
+
 extern ui_string_frame_t _ui_string_frame;
 extern ui_1_frame_t _ui_1_frame;
 extern ui_2_frame_t _ui_2_frame;

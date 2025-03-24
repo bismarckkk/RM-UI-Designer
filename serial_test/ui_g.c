@@ -10,77 +10,13 @@
 #define TOTAL_FIGURE 13
 #define TOTAL_STRING 16
 
-ui_interface_figure_t ui_now_figures[TOTAL_FIGURE];
-ui_interface_string_t ui_now_strings[TOTAL_STRING];
-uint8_t ui_dirty_figure[TOTAL_FIGURE];
-uint8_t ui_dirty_string[TOTAL_STRING];
+ui_interface_figure_t ui_g_now_figures[TOTAL_FIGURE];
+ui_interface_string_t ui_g_now_strings[TOTAL_STRING];
+uint8_t ui_g_dirty_figure[TOTAL_FIGURE];
+uint8_t ui_g_dirty_string[TOTAL_STRING];
 #ifndef MANUAL_DIRTY
-ui_interface_figure_t ui_last_figures[TOTAL_FIGURE];
-ui_interface_string_t ui_last_strings[TOTAL_STRING];
-#endif
-
-ui_interface_arc_t *ui_g_Ungroup_NewArc = (ui_interface_arc_t*)&(ui_now_figures[0]);
-ui_interface_line_t *ui_g_Ungroup_NewLine1 = (ui_interface_line_t*)&(ui_now_figures[1]);
-ui_interface_line_t *ui_g_Ungroup_NewLine2 = (ui_interface_line_t*)&(ui_now_figures[2]);
-ui_interface_line_t *ui_g_Ungroup_NewLine3 = (ui_interface_line_t*)&(ui_now_figures[3]);
-ui_interface_rect_t *ui_g_Ungroup_NewRect4 = (ui_interface_rect_t*)&(ui_now_figures[4]);
-ui_interface_rect_t *ui_g_Ungroup_NewRect5 = (ui_interface_rect_t*)&(ui_now_figures[5]);
-ui_interface_rect_t *ui_g_Ungroup_NewRect6 = (ui_interface_rect_t*)&(ui_now_figures[6]);
-ui_interface_rect_t *ui_g_Ungroup_NewRect7 = (ui_interface_rect_t*)&(ui_now_figures[7]);
-ui_interface_rect_t *ui_g_Ungroup_NewRect8 = (ui_interface_rect_t*)&(ui_now_figures[8]);
-ui_interface_rect_t *ui_g_Ungroup_NewRect9 = (ui_interface_rect_t*)&(ui_now_figures[9]);
-ui_interface_rect_t *ui_g_Ungroup_NewRect10 = (ui_interface_rect_t*)&(ui_now_figures[10]);
-ui_interface_number_t *ui_g_AIM_SHOW_aim_ID = (ui_interface_number_t*)&(ui_now_figures[11]);
-ui_interface_number_t *ui_g_AIM_SHOW_robo_HP = (ui_interface_number_t*)&(ui_now_figures[12]);
-
-ui_interface_string_t *ui_g_Text_GIMPOWER = &(ui_now_strings[0]);
-ui_interface_string_t *ui_g_Text_POWERLIM = &(ui_now_strings[1]);
-ui_interface_string_t *ui_g_Text_SPEEDLIM = &(ui_now_strings[2]);
-ui_interface_string_t *ui_g_Text_NORMAL = &(ui_now_strings[3]);
-ui_interface_string_t *ui_g_Text_SMLBUFF = &(ui_now_strings[4]);
-ui_interface_string_t *ui_g_Text_LARBUFF = &(ui_now_strings[5]);
-ui_interface_string_t *ui_g_Text_ANTIRO = &(ui_now_strings[6]);
-ui_interface_string_t *ui_g_Text_LOCK = &(ui_now_strings[7]);
-ui_interface_string_t *ui_g_Text_FRIC = &(ui_now_strings[8]);
-ui_interface_string_t *ui_g_Text_CAP = &(ui_now_strings[9]);
-ui_interface_string_t *ui_g_Text_PTE = &(ui_now_strings[10]);
-ui_interface_string_t *ui_g_Text_JUP = &(ui_now_strings[11]);
-ui_interface_string_t *ui_g_Text_PWR = &(ui_now_strings[12]);
-ui_interface_string_t *ui_g_Text_WHE = &(ui_now_strings[13]);
-ui_interface_string_t *ui_g_Text_LES = &(ui_now_strings[14]);
-ui_interface_string_t *ui_g_Ungroup_NewText = &(ui_now_strings[15]);
-
-#ifdef MANUAL_DIRTY
-uint8_t *ui_g_Ungroup_NewArc_dirty = &(ui_dirty_figure[0]);
-uint8_t *ui_g_Ungroup_NewLine1_dirty = &(ui_dirty_figure[1]);
-uint8_t *ui_g_Ungroup_NewLine2_dirty = &(ui_dirty_figure[2]);
-uint8_t *ui_g_Ungroup_NewLine3_dirty = &(ui_dirty_figure[3]);
-uint8_t *ui_g_Ungroup_NewRect4_dirty = &(ui_dirty_figure[4]);
-uint8_t *ui_g_Ungroup_NewRect5_dirty = &(ui_dirty_figure[5]);
-uint8_t *ui_g_Ungroup_NewRect6_dirty = &(ui_dirty_figure[6]);
-uint8_t *ui_g_Ungroup_NewRect7_dirty = &(ui_dirty_figure[7]);
-uint8_t *ui_g_Ungroup_NewRect8_dirty = &(ui_dirty_figure[8]);
-uint8_t *ui_g_Ungroup_NewRect9_dirty = &(ui_dirty_figure[9]);
-uint8_t *ui_g_Ungroup_NewRect10_dirty = &(ui_dirty_figure[10]);
-uint8_t *ui_g_AIM_SHOW_aim_ID_dirty = &(ui_dirty_figure[11]);
-uint8_t *ui_g_AIM_SHOW_robo_HP_dirty = &(ui_dirty_figure[12]);
-
-uint8_t *ui_g_Text_GIMPOWER_dirty = &(ui_dirty_string[0]);
-uint8_t *ui_g_Text_POWERLIM_dirty = &(ui_dirty_string[1]);
-uint8_t *ui_g_Text_SPEEDLIM_dirty = &(ui_dirty_string[2]);
-uint8_t *ui_g_Text_NORMAL_dirty = &(ui_dirty_string[3]);
-uint8_t *ui_g_Text_SMLBUFF_dirty = &(ui_dirty_string[4]);
-uint8_t *ui_g_Text_LARBUFF_dirty = &(ui_dirty_string[5]);
-uint8_t *ui_g_Text_ANTIRO_dirty = &(ui_dirty_string[6]);
-uint8_t *ui_g_Text_LOCK_dirty = &(ui_dirty_string[7]);
-uint8_t *ui_g_Text_FRIC_dirty = &(ui_dirty_string[8]);
-uint8_t *ui_g_Text_CAP_dirty = &(ui_dirty_string[9]);
-uint8_t *ui_g_Text_PTE_dirty = &(ui_dirty_string[10]);
-uint8_t *ui_g_Text_JUP_dirty = &(ui_dirty_string[11]);
-uint8_t *ui_g_Text_PWR_dirty = &(ui_dirty_string[12]);
-uint8_t *ui_g_Text_WHE_dirty = &(ui_dirty_string[13]);
-uint8_t *ui_g_Text_LES_dirty = &(ui_dirty_string[14]);
-uint8_t *ui_g_Ungroup_NewText_dirty = &(ui_dirty_string[15]);
+ui_interface_figure_t ui_g_last_figures[TOTAL_FIGURE];
+ui_interface_string_t ui_g_last_strings[TOTAL_STRING];
 #endif
 
 void ui_init_g() {
@@ -366,52 +302,52 @@ void ui_init_g() {
 
     uint32_t idx = 0;
     for (int i = 0; i < TOTAL_FIGURE; i++) {
-        ui_now_figures[i].figure_name[2] = idx & 0xFF;
-        ui_now_figures[i].figure_name[1] = (idx >> 8) & 0xFF;
-        ui_now_figures[i].figure_name[0] = (idx >> 16) & 0xFF;
-        ui_now_figures[i].operate_tpyel = 1;
+        ui_g_now_figures[i].figure_name[2] = idx & 0xFF;
+        ui_g_now_figures[i].figure_name[1] = (idx >> 8) & 0xFF;
+        ui_g_now_figures[i].figure_name[0] = (idx >> 16) & 0xFF;
+        ui_g_now_figures[i].operate_tpyel = 1;
 #ifndef MANUAL_DIRTY
-        ui_last_figures[i] = ui_now_figures[i];
+        ui_g_last_figures[i] = ui_g_now_figures[i];
 #endif
-        ui_dirty_figure[i] = 1;
+        ui_g_dirty_figure[i] = 1;
         idx++;
     }
     for (int i = 0; i < TOTAL_STRING; i++) {
-        ui_now_strings[i].figure_name[2] = idx & 0xFF;
-        ui_now_strings[i].figure_name[1] = (idx >> 8) & 0xFF;
-        ui_now_strings[i].figure_name[0] = (idx >> 16) & 0xFF;
-        ui_now_strings[i].operate_tpyel = 1;
+        ui_g_now_strings[i].figure_name[2] = idx & 0xFF;
+        ui_g_now_strings[i].figure_name[1] = (idx >> 8) & 0xFF;
+        ui_g_now_strings[i].figure_name[0] = (idx >> 16) & 0xFF;
+        ui_g_now_strings[i].operate_tpyel = 1;
 #ifndef MANUAL_DIRTY
-        ui_last_strings[i] = ui_now_strings[i];
+        ui_g_last_strings[i] = ui_g_now_strings[i];
 #endif
-        ui_dirty_string[i] = 1;
+        ui_g_dirty_string[i] = 1;
         idx++;
     }
 
-    scan_and_send(ui_now_figures, ui_dirty_figure, ui_now_strings, ui_dirty_string, TOTAL_FIGURE, TOTAL_STRING);
+    ui_scan_and_send(ui_g_now_figures, ui_g_dirty_figure, ui_g_now_strings, ui_g_dirty_string, TOTAL_FIGURE, TOTAL_STRING);
 
     for (int i = 0; i < TOTAL_FIGURE; i++) {
-        ui_now_figures[i].operate_tpyel = 2;
+        ui_g_now_figures[i].operate_tpyel = 2;
     }
     for (int i = 0; i < TOTAL_STRING; i++) {
-        ui_now_strings[i].operate_tpyel = 2;
+        ui_g_now_strings[i].operate_tpyel = 2;
     }
 }
 
 void ui_update_g() {
 #ifndef MANUAL_DIRTY
     for (int i = 0; i < TOTAL_FIGURE; i++) {
-        if (memcmp(&ui_now_figures[i], &ui_last_figures[i], sizeof(ui_now_figures[i])) != 0) {
-            ui_dirty_figure[i] = 1;
-            ui_last_figures[i] = ui_now_figures[i];
+        if (memcmp(&ui_g_now_figures[i], &ui_g_last_figures[i], sizeof(ui_g_now_figures[i])) != 0) {
+            ui_g_dirty_figure[i] = 1;
+            ui_g_last_figures[i] = ui_g_now_figures[i];
         }
     }
     for (int i = 0; i < TOTAL_STRING; i++) {
-        if (memcmp(&ui_now_strings[i], &ui_last_strings[i], sizeof(ui_now_strings[i])) != 0) {
-            ui_dirty_string[i] = 1;
-            ui_last_strings[i] = ui_now_strings[i];
+        if (memcmp(&ui_g_now_strings[i], &ui_g_last_strings[i], sizeof(ui_g_now_strings[i])) != 0) {
+            ui_g_dirty_string[i] = 1;
+            ui_g_last_strings[i] = ui_g_now_strings[i];
         }
     }
 #endif
-    scan_and_send(ui_now_figures, ui_dirty_figure, ui_now_strings, ui_dirty_string, TOTAL_FIGURE, TOTAL_STRING);
+    ui_scan_and_send(ui_g_now_figures, ui_g_dirty_figure, ui_g_now_strings, ui_g_dirty_string, TOTAL_FIGURE, TOTAL_STRING);
 }
