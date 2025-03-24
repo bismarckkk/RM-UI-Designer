@@ -87,26 +87,35 @@ export function ui_frame_h(frame_name, objs, textObjs) {
         N}${
         N}#include "ui_interface.h"${
         N}${
+        N}extern ui_interface_figure_t ui_${frame_name}_now_figures[${objs.length}];${
+        N}extern ui_interface_string_t ui_${frame_name}_now_strings[${textObjs.length}];${
+        N}extern uint8_t ui_${frame_name}_dirty_figure[${objs.length}];${
+        N}extern uint8_t ui_${frame_name}_dirty_string[${textObjs.length}];${
+        N}${
         N}`
 
-    for (let obj of objs) {
-        res += `extern ui_interface_${fabricType2type[obj.type]}_t *ui_${frame_name}_${obj.group}_${obj.name};\n`
+    for (let i = 0; i < objs.length; i++) {
+        const obj = objs[i]
+        res += `#define ui_${frame_name}_${obj.group}_${obj.name} ((ui_interface_${fabricType2type[obj.type]}_t*)&(ui_${frame_name}_now_figures[${i}]))\n`
     }
 
     res += '\n';
 
-    for (let obj of textObjs) {
-        res += `extern ui_interface_${fabricType2type[obj.type]}_t *ui_${frame_name}_${obj.group}_${obj.name};\n`
+    for (let i = 0; i < textObjs.length; i++) {
+        const obj = textObjs[i]
+        res += `#define ui_${frame_name}_${obj.group}_${obj.name} (&(ui_${frame_name}_now_strings[${i}]))\n`
     }
     res += '\n#ifdef MANUAL_DIRTY\n';
 
-    for (let obj of objs) {
-        res += `extern uint8_t *ui_${frame_name}_${obj.group}_${obj.name}_dirty;\n`
+    for (let i = 0; i < objs.length; i++) {
+        const obj = objs[i]
+        res += `#define ui_${frame_name}_${obj.group}_${obj.name}_dirty (ui_${frame_name}_dirty_figure[${i}])\n`
     }
     res += '\n';
 
-    for (let obj of textObjs) {
-        res += `extern uint8_t *ui_${frame_name}_${obj.group}_${obj.name}_dirty;\n`
+    for (let i = 0; i < textObjs.length; i++) {
+        const obj = textObjs[i]
+        res += `#define ui_${frame_name}_${obj.group}_${obj.name}_dirty (ui_${frame_name}_dirty_string[${i}])\n`
     }
 
     res += `#endif\n`
@@ -178,8 +187,6 @@ function ui_obj_c(frame_name, _obj) {
         res += `    ${pointer}->${fabricKey2key[key]} = ${value};\n`
     }
     return `${res}\n`
-
-
 }
 
 export function ui_frame_c(frame_name, objs, textObjs) {
@@ -205,32 +212,8 @@ export function ui_frame_c(frame_name, objs, textObjs) {
         N}#endif${
         N}${
         N}`
-    
-    for (let i = 0; i < objs.length; i++) {
-        const obj = objs[i]
-        res += `ui_interface_${fabricType2type[obj.type]}_t *ui_${frame_name}_${obj.group}_${obj.name} = (ui_interface_${fabricType2type[obj.type]}_t*)&(ui_${frame_name}_now_figures[${i}]);\n`
-    }
-    res += '\n'
 
-    for (let i = 0; i < textObjs.length; i++) {
-        const obj = textObjs[i]
-        res += `ui_interface_string_t *ui_${frame_name}_${obj.group}_${obj.name} = &(ui_${frame_name}_now_strings[${i}]);\n`
-    }
-    res += '\n#ifdef MANUAL_DIRTY\n'
-
-    for (let i = 0; i < objs.length; i++) {
-        const obj = objs[i]
-        res += `uint8_t *ui_${frame_name}_${obj.group}_${obj.name}_dirty = &(ui_${frame_name}_dirty_figure[${i}]);\n`
-    }
-    res += '\n'
-
-    for (let i = 0; i < textObjs.length; i++) {
-        const obj = textObjs[i]
-        res += `uint8_t *ui_${frame_name}_${obj.group}_${obj.name}_dirty = &(ui_${frame_name}_dirty_string[${i}]);\n`
-    }
-
-    res += `#endif\n`
-    res += `\nvoid ui_init_${frame_name}() {\n`
+    res += `void ui_init_${frame_name}() {\n`
 
     for (let obj of objs) {
         res += ui_obj_c(frame_name, obj)
