@@ -134,7 +134,28 @@ void ui_proc_string_frame(ui_string_frame_t *msg) {
     msg->crc16 = calc_crc16((uint8_t *) msg, 58);
 }
 
-void scan_and_send(const ui_interface_figure_t* ui_now_figures, uint8_t* ui_dirty_figure, const ui_interface_string_t* ui_now_strings, uint8_t* ui_dirty_string, const int total_figures, const int total_strings) {
+void ui_proc_delete_frame(ui_delete_frame_t *msg) {
+    msg->header.SOF = 0xA5;
+    msg->header.length = 8;
+    msg->header.seq = seq++;
+    msg->header.crc8 = calc_crc8((uint8_t *) msg, 4);
+    msg->header.cmd_id = 0x0301;
+    msg->header.sub_id = 0x0100;
+    msg->header.send_id = ui_self_id;
+    msg->header.recv_id = ui_self_id + 256;
+    msg->crc16 = calc_crc16((uint8_t *) msg, 15);
+}
+
+ui_delete_frame_t ui_delete_frame;
+
+void ui_delete_layer(const uint8_t delete_type, const uint8_t layer) {
+    ui_delete_frame.delete_type = delete_type;
+    ui_delete_frame.layer = layer;
+    ui_proc_delete_frame(&ui_delete_frame);
+    SEND_MESSAGE((uint8_t *) &ui_delete_frame, sizeof(ui_delete_frame));
+}
+
+void ui_scan_and_send(const ui_interface_figure_t* ui_now_figures, uint8_t* ui_dirty_figure, const ui_interface_string_t* ui_now_strings, uint8_t* ui_dirty_string, const int total_figures, const int total_strings) {
 int total_figure = 0;
     for (int i = 0; i < total_figures; i++) {
         if (ui_dirty_figure[i] == 1) {
