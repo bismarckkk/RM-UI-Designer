@@ -87,10 +87,14 @@ export function ui_frame_h(frame_name, objs, textObjs) {
         N}${
         N}#include "ui_interface.h"${
         N}${
+        N}#if ${objs.length} != 0${
         N}extern ui_interface_figure_t ui_${frame_name}_now_figures[${objs.length}];${
-        N}extern ui_interface_string_t ui_${frame_name}_now_strings[${textObjs.length}];${
         N}extern uint8_t ui_${frame_name}_dirty_figure[${objs.length}];${
+        N}#endif${
+        N}#if ${textObjs.length} != 0${
+        N}extern ui_interface_string_t ui_${frame_name}_now_strings[${textObjs.length}];${
         N}extern uint8_t ui_${frame_name}_dirty_string[${textObjs.length}];${
+        N}#endif${
         N}${
         N}`
 
@@ -202,13 +206,30 @@ export function ui_frame_c(frame_name, objs, textObjs) {
         N}#define TOTAL_FIGURE ${objs.length}${
         N}#define TOTAL_STRING ${textObjs.length}${
         N}${
+        N}#if TOTAL_FIGURE != 0${
         N}ui_interface_figure_t ui_${frame_name}_now_figures[TOTAL_FIGURE];${
-        N}ui_interface_string_t ui_${frame_name}_now_strings[TOTAL_STRING];${
         N}uint8_t ui_${frame_name}_dirty_figure[TOTAL_FIGURE];${
+        N}#endif${
+        N}#if TOTAL_STRING != 0${
+        N}ui_interface_string_t ui_${frame_name}_now_strings[TOTAL_STRING];${
         N}uint8_t ui_${frame_name}_dirty_string[TOTAL_STRING];${
+        N}#endif${
+        N}${
         N}#ifndef MANUAL_DIRTY${
+        N}#if TOTAL_FIGURE != 0${
         N}ui_interface_figure_t ui_${frame_name}_last_figures[TOTAL_FIGURE];${
+        N}#endif${
+        N}#if TOTAL_STRING != 0${
         N}ui_interface_string_t ui_${frame_name}_last_strings[TOTAL_STRING];${
+        N}#endif${
+        N}#endif${
+        N}${
+        N}#if TOTAL_FIGURE != 0 && TOTAL_STRING != 0${
+        N}#define SCAN_AND_SEND() ui_scan_and_send(ui_g_now_figures, ui_g_dirty_figure, ui_g_now_strings, ui_g_dirty_string, TOTAL_FIGURE, TOTAL_STRING)${
+        N}#elif TOTAL_FIGURE != 0${
+        N}#define SCAN_AND_SEND() ui_scan_and_send(ui_g_now_figures, ui_g_dirty_figure, NULL, NULL, TOTAL_FIGURE, TOTAL_STRING)${
+        N}#elif TOTAL_STRING != 0${
+        N}#define SCAN_AND_SEND() ui_scan_and_send(NULL, NULL, ui_g_now_strings, ui_g_dirty_string, TOTAL_FIGURE, TOTAL_STRING)${
         N}#endif${
         N}${
         N}`
@@ -224,6 +245,7 @@ export function ui_frame_c(frame_name, objs, textObjs) {
     
     res += `${
     N}    uint32_t idx = 0;${
+    N}#if TOTAL_FIGURE != 0${
     N}    for (int i = 0; i < TOTAL_FIGURE; i++) {${
     N}        ui_${frame_name}_now_figures[i].figure_name[2] = idx & 0xFF;${
     N}        ui_${frame_name}_now_figures[i].figure_name[1] = (idx >> 8) & 0xFF;${
@@ -235,6 +257,8 @@ export function ui_frame_c(frame_name, objs, textObjs) {
     N}        ui_${frame_name}_dirty_figure[i] = 1;${
     N}        idx++;${
     N}    }${
+    N}#endif${
+    N}#if TOTAL_STRING != 0${
     N}    for (int i = 0; i < TOTAL_STRING; i++) {${
     N}        ui_${frame_name}_now_strings[i].figure_name[2] = idx & 0xFF;${
     N}        ui_${frame_name}_now_strings[i].figure_name[1] = (idx >> 8) & 0xFF;${
@@ -246,25 +270,33 @@ export function ui_frame_c(frame_name, objs, textObjs) {
     N}        ui_${frame_name}_dirty_string[i] = 1;${
     N}        idx++;${
     N}    }${
+    N}#endif${
     N}${
-    N}    ui_scan_and_send(ui_${frame_name}_now_figures, ui_${frame_name}_dirty_figure, ui_${frame_name}_now_strings, ui_${frame_name}_dirty_string, TOTAL_FIGURE, TOTAL_STRING);${
+    N}    SCAN_AND_SEND();${
     N}${
+    N}#if TOTAL_FIGURE != 0${
     N}    for (int i = 0; i < TOTAL_FIGURE; i++) {${
     N}        ui_${frame_name}_now_figures[i].operate_tpyel = 2;${
     N}    }${
+    N}#endif${
+    N}#if TOTAL_STRING != 0${
     N}    for (int i = 0; i < TOTAL_STRING; i++) {${
     N}        ui_${frame_name}_now_strings[i].operate_tpyel = 2;${
     N}    }${
+    N}#endif${
     N}}${
     N}${
     N}void ui_update_${frame_name}() {${
     N}#ifndef MANUAL_DIRTY${
+    N}#if TOTAL_FIGURE != 0${
     N}    for (int i = 0; i < TOTAL_FIGURE; i++) {${
     N}        if (memcmp(&ui_${frame_name}_now_figures[i], &ui_${frame_name}_last_figures[i], sizeof(ui_${frame_name}_now_figures[i])) != 0) {${
     N}            ui_${frame_name}_dirty_figure[i] = 1;${
     N}            ui_${frame_name}_last_figures[i] = ui_${frame_name}_now_figures[i];${
     N}        }${
     N}    }${
+    N}#endif${
+    N}#if TOTAL_STRING != 0${
     N}    for (int i = 0; i < TOTAL_STRING; i++) {${
     N}        if (memcmp(&ui_${frame_name}_now_strings[i], &ui_${frame_name}_last_strings[i], sizeof(ui_${frame_name}_now_strings[i])) != 0) {${
     N}            ui_${frame_name}_dirty_string[i] = 1;${
@@ -272,7 +304,8 @@ export function ui_frame_c(frame_name, objs, textObjs) {
     N}        }${
     N}    }${
     N}#endif${
-    N}    ui_scan_and_send(ui_${frame_name}_now_figures, ui_${frame_name}_dirty_figure, ui_${frame_name}_now_strings, ui_${frame_name}_dirty_string, TOTAL_FIGURE, TOTAL_STRING);${
+    N}#endif${
+    N}    SCAN_AND_SEND();${
     N}}${
     N}`
 
