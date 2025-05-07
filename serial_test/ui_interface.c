@@ -190,13 +190,13 @@ void ui_scan_and_send(const ui_interface_figure_t *ui_now_figures, uint8_t *ui_d
                 if (now_idx + 1 == pack_size || now_cap + 1 == total_figure) {
                     for (int j = now_idx + 1; j < pack_size + 1; j++) {
                         if (pack_size == 7) {
-                            _ui_7_frame.data[j].operate_tpyel = 0;
+                            _ui_7_frame.data[j].operate_type = 0;
                         } else if (pack_size == 5) {
-                            _ui_5_frame.data[j].operate_tpyel = 0;
+                            _ui_5_frame.data[j].operate_type = 0;
                         } else if (pack_size == 2) {
-                            _ui_2_frame.data[j].operate_tpyel = 0;
+                            _ui_2_frame.data[j].operate_type = 0;
                         } else {
-                            _ui_1_frame.data[j].operate_tpyel = 0;
+                            _ui_1_frame.data[j].operate_type = 0;
                         }
                     }
                     if (pack_size == 7) {

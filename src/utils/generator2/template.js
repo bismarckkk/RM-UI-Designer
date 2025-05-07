@@ -150,7 +150,7 @@ function ui_obj_c(frame_name, _obj) {
         delete obj.name
         delete obj.group
 
-        let res = `    ${pointer}->figure_tpye = ${fabricType2id['UiText']};\n`
+        let res = `    ${pointer}->figure_type = ${fabricType2id['UiText']};\n`
         for (let key in obj) {
             let value = obj[key]
             if (typeof value === "number") {
@@ -182,7 +182,7 @@ function ui_obj_c(frame_name, _obj) {
     delete obj.group
 
 
-    let res = `    ${pointer}->figure_tpye = ${typeId};\n`
+    let res = `    ${pointer}->figure_type = ${typeId};\n`
     for (let key in obj) {
         let value = obj[key]
         if (typeof value === "number") {
@@ -250,7 +250,7 @@ export function ui_frame_c(frame_name, objs, textObjs) {
     N}        ui_${frame_name}_now_figures[i].figure_name[2] = idx & 0xFF;${
     N}        ui_${frame_name}_now_figures[i].figure_name[1] = (idx >> 8) & 0xFF;${
     N}        ui_${frame_name}_now_figures[i].figure_name[0] = (idx >> 16) & 0xFF;${
-    N}        ui_${frame_name}_now_figures[i].operate_tpyel = 1;${
+    N}        ui_${frame_name}_now_figures[i].operate_type = 1;${
     N}#ifndef MANUAL_DIRTY${
     N}        ui_${frame_name}_last_figures[i] = ui_${frame_name}_now_figures[i];${
     N}#endif${
@@ -263,7 +263,7 @@ export function ui_frame_c(frame_name, objs, textObjs) {
     N}        ui_${frame_name}_now_strings[i].figure_name[2] = idx & 0xFF;${
     N}        ui_${frame_name}_now_strings[i].figure_name[1] = (idx >> 8) & 0xFF;${
     N}        ui_${frame_name}_now_strings[i].figure_name[0] = (idx >> 16) & 0xFF;${
-    N}        ui_${frame_name}_now_strings[i].operate_tpyel = 1;${
+    N}        ui_${frame_name}_now_strings[i].operate_type = 1;${
     N}#ifndef MANUAL_DIRTY${
     N}        ui_${frame_name}_last_strings[i] = ui_${frame_name}_now_strings[i];${
     N}#endif${
@@ -276,12 +276,12 @@ export function ui_frame_c(frame_name, objs, textObjs) {
     N}${
     N}#if TOTAL_FIGURE != 0${
     N}    for (int i = 0; i < TOTAL_FIGURE; i++) {${
-    N}        ui_${frame_name}_now_figures[i].operate_tpyel = 2;${
+    N}        ui_${frame_name}_now_figures[i].operate_type = 2;${
     N}    }${
     N}#endif${
     N}#if TOTAL_STRING != 0${
     N}    for (int i = 0; i < TOTAL_STRING; i++) {${
-    N}        ui_${frame_name}_now_strings[i].operate_tpyel = 2;${
+    N}        ui_${frame_name}_now_strings[i].operate_type = 2;${
     N}    }${
     N}#endif${
     N}}${

@@ -157,7 +157,7 @@ function ui_c_obj(frame_name, group_name, _obj) {
 
     const pointer = `ui_${frame_name}_${group_name}_${name}`
 
-    let res = `    ${pointer}->figure_tpye = ${typeId};\n`
+    let res = `    ${pointer}->figure_type = ${typeId};\n`
     for (let key in obj) {
         let value = obj[key]
         if (typeof value === "number") {
@@ -199,10 +199,10 @@ export function ui_c_split(frame_name, frame_id, group_name, group_id,
     N}        ui_${split_name}.data[i].figure_name[0] = FRAME_ID;${
     N}        ui_${split_name}.data[i].figure_name[1] = GROUP_ID;${
     N}        ui_${split_name}.data[i].figure_name[2] = i + START_ID;${
-    N}        ui_${split_name}.data[i].operate_tpyel = 1;${
+    N}        ui_${split_name}.data[i].operate_type = 1;${
     N}    }${
     N}    for (int i = OBJ_NUM; i < FRAME_OBJ_NUM; i++) {${
-    N}        ui_${split_name}.data[i].operate_tpyel = 0;${
+    N}        ui_${split_name}.data[i].operate_type = 0;${
     N}    }${
     N}${N}`
 
@@ -217,7 +217,7 @@ export function ui_c_split(frame_name, frame_id, group_name, group_id,
     N}${
     N}void _ui_update_${split_name}() {${
     N}    for (int i = 0; i < OBJ_NUM; i++) {${
-    N}        ui_${split_name}.data[i].operate_tpyel = 2;${
+    N}        ui_${split_name}.data[i].operate_type = 2;${
     N}    }${
     N}${
     N}    CAT(ui_proc_, CAT(FRAME_OBJ_NUM, _frame))(&ui_${split_name});${
@@ -226,7 +226,7 @@ export function ui_c_split(frame_name, frame_id, group_name, group_id,
     N}${
     N}void _ui_remove_${split_name}() {${
     N}    for (int i = 0; i < OBJ_NUM; i++) {${
-    N}        ui_${split_name}.data[i].operate_tpyel = 3;${
+    N}        ui_${split_name}.data[i].operate_type = 3;${
     N}    }${
     N}${
     N}    CAT(ui_proc_, CAT(FRAME_OBJ_NUM, _frame))(&ui_${split_name});${
@@ -271,10 +271,10 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
         N}    ui_${split_name}.option.figure_name[0] = FRAME_ID;${
         N}    ui_${split_name}.option.figure_name[1] = GROUP_ID;${
         N}    ui_${split_name}.option.figure_name[2] = START_ID;${
-        N}    ui_${split_name}.option.operate_tpyel = 1;${
+        N}    ui_${split_name}.option.operate_type = 1;${
         N}`
 
-    res += `    ui_${split_name}.option.figure_tpye = ${fabricType2id['UiText']};\n`
+    res += `    ui_${split_name}.option.figure_type = ${fabricType2id['UiText']};\n`
     for (let key in obj) {
         let value = obj[key]
         if (typeof value === "number") {
@@ -290,14 +290,14 @@ export function ui_c_string_split(frame_name, frame_id, group_name, group_id,
         N}}${
         N}${
         N}void _ui_update_${split_name}() {${
-        N}    ui_${split_name}.option.operate_tpyel = 2;${
+        N}    ui_${split_name}.option.operate_type = 2;${
         N}${
         N}    ui_proc_string_frame(&ui_${split_name});${
         N}    SEND_MESSAGE((uint8_t *) &ui_${split_name}, sizeof(ui_${split_name}));${
         N}}${
         N}${
         N}void _ui_remove_${split_name}() {${
-        N}    ui_${split_name}.option.operate_tpyel = 3;${
+        N}    ui_${split_name}.option.operate_type = 3;${
         N}${
         N}    ui_proc_string_frame(&ui_${split_name});${
         N}    SEND_MESSAGE((uint8_t *) &ui_${split_name}, sizeof(ui_${split_name}));${

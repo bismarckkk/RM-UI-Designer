@@ -21,8 +21,8 @@
 #define DEFINE_MESSAGE(name, p_a, p_b, p_c, p_d, p_e)   \
 typedef struct {                                        \
 uint8_t figure_name[3];                                 \
-uint32_t operate_tpyel:3;                               \
-uint32_t figure_tpye:3;                                 \
+uint32_t operate_type:3;                               \
+uint32_t figure_type:3;                                 \
 uint32_t layer:4;                                       \
 uint32_t color:4;                                       \
 uint32_t PRIMITIVE_CAT(,p_a) :9;                        \
@@ -44,8 +44,8 @@ DEFINE_MESSAGE(arc, start_angle, end_angle, _c, rx, ry);
 
 typedef struct {
     uint8_t figure_name[3];
-    uint32_t operate_tpyel: 3;
-    uint32_t figure_tpye: 3;
+    uint32_t operate_type: 3;
+    uint32_t figure_type: 3;
     uint32_t layer: 4;
     uint32_t color: 4;
     uint32_t font_size: 9;
@@ -58,8 +58,8 @@ typedef struct {
 
 typedef struct {
     uint8_t figure_name[3];
-    uint32_t operate_tpyel: 3;
-    uint32_t figure_tpye: 3;
+    uint32_t operate_type: 3;
+    uint32_t figure_type: 3;
     uint32_t layer: 4;
     uint32_t color: 4;
     uint32_t font_size: 9;
