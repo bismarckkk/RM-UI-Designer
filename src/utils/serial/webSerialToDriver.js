@@ -43,7 +43,6 @@ class Serial {
         const generatorHelper = new GeneratorHelper(data.data);
         const msgss = generatorHelper.toSerialMsg();
         const msgs = msgss[data.selected]
-        console.log(data)
         for (let msg of msgs) {
             setTimeout(() => {
                 this.writer.write(msg);

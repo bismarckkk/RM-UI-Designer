@@ -42,6 +42,7 @@ export default defineConfig({
     }
     memo.plugin('DefinePlugin').use(webpack.DefinePlugin, [{
       'process.env.VERSION': JSON.stringify(version),
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }])
   }
 });

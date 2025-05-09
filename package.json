@@ -3,9 +3,11 @@
   "author": "bismarck <zuoqingyu@nuaa.edu.cn>",
   "scripts": {
     "dev": "umi dev",
+    "prebuild": "node scripts/downloadWasm.js",
     "build": "umi build",
     "postinstall": "umi setup",
     "setup": "umi setup",
+    "prestart": "node scripts/downloadWasm.js",
     "start": "npm run dev",
     "tauri": "tauri",
     "release": "node scripts/release.mjs",

@@ -4,7 +4,6 @@ import CheckPanel from "@/components/generator/checkPanel";
 import DownloadPanel from "@/components/generator/downloadPanel";
 
 import GeneratorHelper from "@/utils/generator/generatorHelper";
-import GeneratorHelper2 from "@/utils/generator2/generatorHelper";
 
 class Generator extends Component {
     state = {show: false, step: 'check'}
@@ -13,11 +12,7 @@ class Generator extends Component {
     errors = []
 
     gen(data, mode) {
-        if (mode === 'dynamic') {
-            this.helper = new GeneratorHelper2(data)
-        } else {
-            this.helper = new GeneratorHelper(data)
-        }
+        this.helper = new GeneratorHelper(data, mode !== 'dynamic')
         this.data = data
         this.code = this.helper.gen()
         this.errors = this.helper.check()
@@ -67,7 +62,7 @@ class Generator extends Component {
                     {
                         this.state.step === 'check' ?
                             <CheckPanel errors={this.errors}/> :
-                            <DownloadPanel code={this.code} getUiBase={()=>this.helper.getUiBase()} ref={this.downloadRef}/>
+                            <DownloadPanel code={this.code} getUiBase={this.helper.getUiBase()} ref={this.downloadRef}/>
                     }
                 </Drawer>
             </div>
