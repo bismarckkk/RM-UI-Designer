@@ -24,11 +24,16 @@ export default defineConfig({
     href: '/manifest.json',
     rel: 'manifest'
   }],
+  esbuildMinifyIIFE: true,
   scripts: process.env.NODE_ENV === 'development' ? [] : [{
     src: 'https://www.googletagmanager.com/gtag/js?id=G-4PDL1SSV9H',
     async: true,
   }],
   chainWebpack(memo, { webpack } ) {
+    memo.module
+        .rule('generator')
+        .test(/^rm_ui_generator/)
+        .type('asset/resource');
     if (!process.env.ref) {
       const { GenerateSW } = require("workbox-webpack-plugin");
       memo.plugin('workbox').use(GenerateSW, [{

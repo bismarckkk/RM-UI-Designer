@@ -63,4 +63,6 @@ var Module = {
 }
 window.Module = Module
 
-import('./assets/rm_ui_generator.js')
+const generatorScript = document.createElement('script')
+generatorScript.src = '/rm_ui_generator.js'
+document.head.appendChild(generatorScript);

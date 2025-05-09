@@ -9,3 +9,4 @@
 .swc
 actions/test.yaml
 sign.*
+rm_ui_generator.*

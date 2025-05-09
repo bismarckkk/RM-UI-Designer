@@ -5,12 +5,13 @@ const https = require('https');
 const CONFIG = {
     url: "https://github.com/bismarckkk/RM_UI_Generator/releases/latest/download/",
     files: ['rm_ui_generator.wasm', 'rm_ui_generator.js'],
-    outputDir: 'src/assets'
+    outputDir: ['src/assets', 'public']
 };
 
 async function downloadWasm() {
-    for (const file of CONFIG.files) {
-        const outputPath = path.join(CONFIG.outputDir, file);
+    for (let i = 0; i < CONFIG.outputDir.length; i++) {
+        const file = CONFIG.files[i];
+        const outputPath = path.join(CONFIG.outputDir[i], file);
         const url = CONFIG.url + file;
 
         await downloadFile(url, outputPath);
