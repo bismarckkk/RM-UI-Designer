@@ -55,3 +55,12 @@ if (process.env.VERSION !== 'development') {
 
     gtag('config', 'G-4PDL1SSV9H');
 }
+
+var Module = {
+    locateFile: (file, _) => {
+        return require(`@/assets/${file}`);
+    }
+}
+window.Module = Module
+
+import('./assets/rm_ui_generator.js')

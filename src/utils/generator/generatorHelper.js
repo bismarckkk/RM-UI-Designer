@@ -1,47 +1,60 @@
-import { ui_h, getUiBase } from "./template";
 import Frame from "./frame";
 
+const interfaceHUrlS = require('@/assets/code_template/static/ui_interface.h')
+const interfaceCUrlS = require('@/assets/code_template/static/ui_interface.c')
+const typesHUrlS = require('@/assets/code_template/static/ui_types.h')
+
+const interfaceHUrlD = require('@/assets/code_template/dynamic/ui_interface.h')
+const interfaceCUrlD = require('@/assets/code_template/dynamic/ui_interface.c')
+const typesHUrlD = require('@/assets/code_template/dynamic/ui_types.h')
+
+async function getUiBase(static_mode) {
+    if (static_mode) {
+        return {
+            ui_interface: {
+                h: await (await fetch(interfaceHUrlS)).text(),
+                c: await (await fetch(interfaceCUrlS)).text()
+            },
+            ui_types: {
+                h: await (await fetch(typesHUrlS)).text()
+            }
+        }
+    } else {
+        return {
+            ui_interface: {
+                h: await (await fetch(interfaceHUrlD)).text(),
+                c: await (await fetch(interfaceCUrlD)).text()
+            },
+            ui_types: {
+                h: await (await fetch(typesHUrlD)).text()
+            }
+        }
+    }
+}
+
 class GeneratorHelper {
-    constructor(data) {
+    constructor(data, static_mode) {
+        this.res = JSON.parse(window.Module.generate(JSON.stringify(data), static_mode))
         this.frames = []
         if (Object.keys(data).length === 1) {
-            this.frames.push(new Frame('g', 0, data[Object.keys(data)[0]]))
+            this.frames.push(new Frame('g', data[Object.keys(data)[0]]))
         } else {
             for (let frame_name in data) {
-                this.frames.push(new Frame(frame_name, this.frames.length, data[frame_name]))
+                this.frames.push(new Frame(frame_name, data[frame_name]))
             }
         }
     }
 
     gen() {
-        let code = {ui: {h: this.toUiH()}}
-        for (let frame of this.frames) {
-            for (let group of frame.groups) {
-                for (let split of group.splits) {
-                    code[`ui_${frame.name}_${group.group_name}_${split.split_id}`] = {
-                        c: split.toSplitC(),
-                        h: split.toSplitH()
-                    }
-                }
-            }
-        }
-        return code
+        return this.res.code
     }
 
-    getUiBase() {
-        return getUiBase();
-    }
-
-    toUiH() {
-        return ui_h(this.frames)
+    getUiBase(static_mode) {
+        return () => getUiBase(static_mode);
     }
 
     check() {
-        let res = []
-        for (let frame of this.frames) {
-            res = res.concat(frame.check())
-        }
-        return res
+        return this.res.info
     }
 
     toSerialMsg() {
@@ -51,7 +64,6 @@ class GeneratorHelper {
         }
         return res
     }
-
 }
 
 export default GeneratorHelper

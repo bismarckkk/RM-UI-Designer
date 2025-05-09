@@ -16,13 +16,16 @@ RM-UI-Designer
 src
 │  favicon.ico                  // 网站图标
 │  global.css                   // 全局样式
-│  global.js                    // 全局js，注册了PWA的sw线程，并完成了一些对fabricjs的注入操作
+│  global.js                    // 全局js，注册了PWA的sw线程，加载了代码生成器，并完成了一些对fabricjs的注入操作
 │  loading.jsx                  // 加载动画组件
 ├─assets                    // 静态资源目录
 │  │      about.md              // 关于页的markdown文件
+│  │      eula.md               // 许可协议markdown文件
 │  │      background.png        // 默认背景图
 │  │      moon.svg              // 夜间模式图标
 │  │      sun.svg               // 日间模式图标
+│  │      rm_ui_generator.js    // 代码生成器入口文件，来自项目rm_ui_generator
+│  │      rm_ui_generator.wasm  // 代码生成器程序文件，来自项目rm_ui_generator
 │  ├─code_template              // 代码生成模板目录
 │  └─fonts                      // 字体文件目录
 ├─components                // 组件目录
@@ -58,11 +61,18 @@ src
   │      rect.js                    // 矩形控件
   │      round.js                   // 正圆控件
   │      text.js                    // 文本控件
-  └─generator                   // 代码生成器相关代码
-        generatorHelper.js          // 代码生成类入口
-        frame.js                    // frame代码生成
-        group.js                    // group代码生成（每个group会被切分成数个split（消息包））
-        groupSplit.js               // group代码生成
-        object.js                   // 单个元素代码生成
-        template.js                 // 代码生成模板
+  ├─generator                   // 代码生成器相关代码
+  │     generatorHelper.js          // 代码生成类入口
+  │     frame.js                    // frame代码生成
+  │     group.js                    // group代码生成（每个group会被切分成数个split（消息包））
+  │     groupSplit.js               // group代码生成
+  │     object.js                   // 单个元素代码生成
+  └serial                       // 串口通信相关代码
+        crc.ts                      // CRC校验函数
+        logger.ts                   // 日志库
+        msgView.ts                  // 从uint8Array数据包中解析信息
+        packObject.ts               // 将对象打包成uint8Array
+        serialTransformer.ts        // 将串口数据流拆分成数据包
+        webSerialFromDriver.js      // 从机器人读取模式串口驱动
+        webSerialToDriver.js        // 向裁判系统发送模式串口驱动
 ```
