@@ -5,7 +5,7 @@
     "dev": "umi dev",
     "prebuild": "node scripts/downloadWasm.js",
     "build": "umi build",
-    "postinstall": "umi setup",
+    "postinstall": "node scripts/downloadWasm.js && umi setup",
     "setup": "umi setup",
     "prestart": "node scripts/downloadWasm.js",
     "start": "npm run dev",
