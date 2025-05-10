@@ -1,4 +1,5 @@
 import { fabric } from "fabric";
+import {isNightly} from "./utils/utils";
 
 fabric.Object.prototype.isOnScreen = () => true
 fabric.ActiveSelection.prototype.hasControls = false
@@ -64,5 +65,9 @@ var Module = {
 window.Module = Module
 
 const generatorScript = document.createElement('script')
-generatorScript.src = '/rm_ui_generator.js'
+if (isNightly()) {
+    generatorScript.src = '/nightly/rm_ui_generator.js'
+} else {
+    generatorScript.src = '/rm_ui_generator.js'
+}
 document.head.appendChild(generatorScript);

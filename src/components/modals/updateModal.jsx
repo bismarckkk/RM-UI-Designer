@@ -3,7 +3,7 @@ import { Modal, Button, Space, Spin, Result } from "antd";
 
 import updater from "@/utils/update"
 import {message} from "@/utils/app";
-import {isTauri} from "@/utils/utils";
+import {isTauri, isNightly} from "@/utils/utils";
 import Markdown from "react-markdown";
 const { checkUpdate, installUpdate, relaunch } = updater
 
@@ -28,13 +28,20 @@ class UpdateModal extends Component {
     check() {
         if (process.env.VERSION === 'development') {
 
-        } else if (process.env.VERSION.slice(0, 7) === 'nightly') {
+        } else if (isNightly()) {
             if (!isTauri()) {
                 (async () => {
                     try {
                         const response = await fetch(`/nightly/version?timestamp=${new Date().getTime()}`);
+                        if (response.status === 404) {
+                            message.error("There is no nightly version now.");
+                            setTimeout(() => {
+                                window.location.href = '/';
+                            }, 2000)
+                            return;
+                        }
                         const version = await response.text();
-                        if (version.trim() !== process.env.ref.slice(0, 7)) {
+                        if (version.trim().slice(0, 7) !== process.env.VERSION.slice(8)) {
                             this.setState({ step: 2 });
                             setTimeout(async () => {
                                 const response = await fetch(`/nightly/version?timestamp=${new Date().getTime()}`);
