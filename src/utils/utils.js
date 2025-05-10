@@ -92,6 +92,10 @@ export function isTauri() {
     return window !== undefined && window.__TAURI__ !== undefined
 }
 
+export function isNightly() {
+    return process.env.VERSION.slice(0, 7) === 'nightly'
+}
+
 async function createZip(files) {
     let zip = new JSZip();
 
