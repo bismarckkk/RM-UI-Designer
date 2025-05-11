@@ -27,7 +27,7 @@ class Generator extends Component {
         let generateButton = <Button
             type="primary"
             onClick={() => this.setState({step: 'generate'})}
-            disabled={this.errors.filter(error => error.level === 'error').length > 0}
+            disabled={this.errors.filter(error => error.level === 'Error').length > 0}
         >
             Generate
         </Button>

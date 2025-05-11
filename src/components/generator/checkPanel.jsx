@@ -4,8 +4,11 @@ import {CloseCircleOutlined, WarningOutlined} from "@ant-design/icons";
 
 class CheckPanel extends Component {
     render() {
+
         let warnings = this.props.errors.filter(error => error.level === 'Warn');
         let errors = this.props.errors.filter(error => error.level === 'Error');
+        console.log(this.props.errors)
+        console.log(errors)
 
         let res = <Result
             status="success"
