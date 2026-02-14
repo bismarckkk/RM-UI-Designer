@@ -24,7 +24,7 @@ class CheckPanel extends Component {
                         renderItem={(item) => (
                             <List.Item>
                                 <Space size="middle">
-                                    { item.level === 'warning' ?
+                                    { item.level === 'Warn' ?
                                         <WarningOutlined /> :
                                         <CloseCircleOutlined />
                                     }
