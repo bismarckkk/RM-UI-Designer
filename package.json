@@ -1,6 +1,12 @@
 {
   "private": true,
   "author": "bismarck <zuoqingyu@nuaa.edu.cn>",
+  "overrides": {
+    "http-deceiver": "npm:http-deceiver-fixes@1.2.8"
+  },
+  "resolutions": {
+    "http-deceiver": "npm:http-deceiver-fixes@1.2.8"
+  },
   "scripts": {
     "dev": "umi dev",
     "prebuild": "node scripts/downloadWasm.js",
