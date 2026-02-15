@@ -21,8 +21,8 @@ export const Arc = fabric.util.createClass(Ellipse, {
         });
     },
     _render: function(ctx) {
-        var startAngle = (this.startAngle - 90) * (Math.PI / 180);
-        var endAngle = (this.endAngle - 90) * (Math.PI / 180);
+        var startAngle = -(this.endAngle - 90) * (Math.PI / 180);
+        var endAngle = -(this.startAngle - 90) * (Math.PI / 180);
 
         ctx.beginPath()
         ctx.ellipse(0, 0, this.rx, this.ry, 0, startAngle, endAngle, false)
