@@ -16,4 +16,5 @@ declare const process: {
 interface Window {
   dataLayer?: unknown[][];
   Module?: unknown;
+  createObjectURL?: (file: Blob) => string;
 }

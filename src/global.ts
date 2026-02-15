@@ -51,7 +51,7 @@ if ('serviceWorker' in navigator && process.env.VERSION.slice(0, 7) !== 'nightly
 
 if (process.env.VERSION !== 'development') {
     window.dataLayer = window.dataLayer || [];
-    function gtag(...args: unknown[]){window.dataLayer!.push(args);}
+    const gtag = (...args: unknown[]) => {window.dataLayer!.push(args);}
     gtag('js', new Date());
 
     gtag('config', 'G-4PDL1SSV9H');

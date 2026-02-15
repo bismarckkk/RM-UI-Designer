@@ -41,7 +41,7 @@ const Index = () => {
             if (!modalRef.current && width < 880 && width !== lastWidth) {
                 lastWidth = width;
                 modalRef.current = modal.warning({
-                    title: 'Display Aera too Small',
+                    title: 'Display Area too Small',
                     content: 'Cannot show all contents on this window. Please resize this window or rotate your phone.',
                     footer: null,
                     zIndex: 2500

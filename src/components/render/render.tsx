@@ -12,7 +12,6 @@ import {createUiElement} from "@/utils/fabricObjects";
 import {readUiFile} from "@/utils/rmuiReader";
 import History from "@/utils/history";
 import lodash from 'lodash'
-import {toLower} from "loadsh/string";
 
 class RenderController {
     objects = {default: {}}
@@ -331,7 +330,7 @@ class RenderController {
                 e.preventDefault();
                 this.onHistoryEvent('previous');
             }
-            else if (e.ctrlKey && toLower(e.key) === 'z' && e.shiftKey) {
+            else if (e.ctrlKey && e.key.toLowerCase() === 'z' && e.shiftKey) {
                 e.preventDefault();
                 this.onHistoryEvent('next');
             }
@@ -523,16 +522,6 @@ class RenderController {
             }
             element.setRatio(that.state.uiWindow.ratio)
 
-            const fabricObjs = that.canvas.getObjects()
-            let ok = true
-            for (const key of Object.keys(fabricObjs)) {
-                if (fabricObjs[key].id === element.id) {
-                    ok = false
-                    break
-                }
-            }
-            if (ok) {
-            }
             that.canvas.add(element)
         }
 
