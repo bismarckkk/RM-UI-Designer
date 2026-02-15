@@ -1,12 +1,12 @@
 import Frame from "./frame";
 
-const interfaceHUrlS = require('@/assets/code_template/static/ui_interface.h')
-const interfaceCUrlS = require('@/assets/code_template/static/ui_interface.c')
-const typesHUrlS = require('@/assets/code_template/static/ui_types.h')
+const interfaceHUrlS = new URL('../../assets/code_template/static/ui_interface.h', import.meta.url).href
+const interfaceCUrlS = new URL('../../assets/code_template/static/ui_interface.c', import.meta.url).href
+const typesHUrlS = new URL('../../assets/code_template/static/ui_types.h', import.meta.url).href
 
-const interfaceHUrlD = require('@/assets/code_template/dynamic/ui_interface.h')
-const interfaceCUrlD = require('@/assets/code_template/dynamic/ui_interface.c')
-const typesHUrlD = require('@/assets/code_template/dynamic/ui_types.h')
+const interfaceHUrlD = new URL('../../assets/code_template/dynamic/ui_interface.h', import.meta.url).href
+const interfaceCUrlD = new URL('../../assets/code_template/dynamic/ui_interface.c', import.meta.url).href
+const typesHUrlD = new URL('../../assets/code_template/dynamic/ui_types.h', import.meta.url).href
 
 async function getUiBase(static_mode) {
     if (static_mode) {

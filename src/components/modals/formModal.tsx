@@ -1,71 +1,72 @@
-import React, {Component} from 'react';
+import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react';
 import { ModalForm, ProFormText } from "@ant-design/pro-components";
 
-class FormModal extends Component {
-    state = {title: '', open: false, frames: []}
-    promise = null
+const FormModal = forwardRef((props, ref: any) => {
+    const [title, setTitle] = useState('')
+    const [open, setOpen] = useState(false)
+    const [frames, setFrames] = useState<string[]>([])
+    const promiseRef = useRef<any>(null)
 
-    open(title, frames) {
-        return new Promise((resolve, reject) => {
-            this.setState({title, open: true, frames})
-            if (this.promise) {
-                this.promise.reject()
-            }
-            this.promise = {resolve, reject}
-        })
-    }
+    useImperativeHandle(ref, () => ({
+        open: (_title: string, _frames: string[]) => {
+            return new Promise((resolve, reject) => {
+                setTitle(_title)
+                setOpen(true)
+                setFrames(_frames)
+                if (promiseRef.current) {
+                    promiseRef.current.reject()
+                }
+                promiseRef.current = {resolve, reject}
+            })
+        }
+    }))
 
-    render() {
-        return (
-            <ModalForm
-                title={this.state.title}
-                autoFocusFirstInput
-                width={240}
-                open={this.state.open}
-                onOpenChange={(e)=>{
-                    if (this.promise && !e && this.state.open) {
-                        this.promise.reject()
-                    }
-                    this.setState({open: e})
-                }}
-                onFinish={async (e)=>{
-                    this.promise.resolve(e.frame)
-                    this.promise = null
-                    return true
-                }}
-            >
-                <ProFormText
-                    name="frame"
-                    label="New Frame Name"
-                    width="sm"
-                    rules={[
-                        { required: true, message: 'Please input frame name!' },
-                        ({ getFieldValue }) => {
-                            const that = this
-                            return {
-                                validator: (_, __)=>{
-                                    {
-                                        let ok = true
-                                        const frame = getFieldValue('frame')
-                                        for (const it of that.state.frames) {
-                                            if (it === frame) {
-                                                ok = false
-                                                break
-                                            }
-                                        }
-                                        if (ok) {
-                                            return Promise.resolve();
-                                        }
-                                        return Promise.reject(new Error('Cannot create same name frame!'));
+    return (
+        <ModalForm
+            title={title}
+            autoFocusFirstInput
+            width={240}
+            open={open}
+            onOpenChange={(e)=>{
+                if (promiseRef.current && !e && open) {
+                    promiseRef.current.reject()
+                }
+                setOpen(e)
+            }}
+            onFinish={async (e: any)=>{
+                promiseRef.current.resolve(e.frame)
+                promiseRef.current = null
+                return true
+            }}
+        >
+            <ProFormText
+                name="frame"
+                label="New Frame Name"
+                width="sm"
+                rules={[
+                    { required: true, message: 'Please input frame name!' },
+                    ({ getFieldValue }) => {
+                        return {
+                            validator: ()=>{
+                                let ok = true
+                                const frame = getFieldValue('frame')
+                                for (const it of frames) {
+                                    if (it === frame) {
+                                        ok = false
+                                        break
                                     }
                                 }
+                                if (ok) {
+                                    return Promise.resolve();
+                                }
+                                return Promise.reject(new Error('Cannot create same name frame!'));
                             }
                         }
-                    ]}
-                />
-            </ModalForm>
-        );
-    }
-}
+                    }
+                ]}
+            />
+        </ModalForm>
+    );
+});
 
 export default FormModal;

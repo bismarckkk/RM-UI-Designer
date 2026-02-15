@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Modal, Button, Space, Spin, Result } from "antd";
 
 import updater from "@/utils/update"
@@ -7,25 +7,27 @@ import {isTauri, isNightly} from "@/utils/utils";
 import Markdown from "react-markdown";
 const { checkUpdate, installUpdate, relaunch } = updater
 
-class UpdateModal extends Component {
-    state = { step: 0, content: '', version: '' }
-    handleClose() {
-        this.setState({step: 0})
+const UpdateModal = () => {
+    const [step, setStep] = useState(0)
+    const [content, setContent] = useState('')
+    const [version, setVersion] = useState('')
+    const handleClose = () => {
+        setStep(0)
     }
 
-    async handleOk() {
+    const handleOk = async () => {
         try {
-            this.setState({step: 2})
+            setStep(2)
             await installUpdate()
             if (!isTauri() || !await relaunch()) {
-                this.setState({step: 3})
+                setStep(3)
             }
         } catch (_) {
-            this.setState({step: -1})
+            setStep(-1)
         }
     }
 
-    check() {
+    const check = () => {
         if (process.env.VERSION === 'development') {
 
         } else if (isNightly()) {
@@ -42,7 +44,7 @@ class UpdateModal extends Component {
                         }
                         const version = await response.text();
                         if (version.trim().slice(0, 7) !== process.env.VERSION.slice(8)) {
-                            this.setState({ step: 2 });
+                            setStep(2);
                             setTimeout(async () => {
                                 const response = await fetch(`/nightly/version?timestamp=${new Date().getTime()}`);
                                 const newVersion = await response.text();
@@ -65,15 +67,13 @@ class UpdateModal extends Component {
                 try {
                     const { shouldUpdate, manifest } = await checkUpdate()
                     if (shouldUpdate) {
-                        this.setState({
-                            step: 1,
-                            content: manifest.body.replace(regex_pr, (match, p1, p2) => {
-                                return `[#${p2}](${p1}${p2})`;
-                            }).replace(regex_cl, (match, p1, p2) => {
-                                return `[#${p2}](${p1}${p2})`;
-                            }),
-                            version: manifest.version
-                        })
+                        setStep(1)
+                        setContent(manifest.body.replace(regex_pr, (match, p1, p2) => {
+                            return `[#${p2}](${p1}${p2})`;
+                        }).replace(regex_cl, (match, p1, p2) => {
+                            return `[#${p2}](${p1}${p2})`;
+                        }))
+                        setVersion(manifest.version)
                     }
                 } catch (e) {
                     message.warning('Failed to check update.')
@@ -82,63 +82,61 @@ class UpdateModal extends Component {
         }
     }
 
-    ignore() {
-        localStorage.setItem('version_ignored', this.state.version)
-        this.handleClose()
+    const ignore = () => {
+        localStorage.setItem('version_ignored', version)
+        handleClose()
     }
 
-    componentDidMount() {
-        this.check()
-    }
+    useEffect(() => {
+        check()
+    }, [])
 
-    render() {
-        let content = <div />
-        if (this.state.step === -1) {
-            content = <Result
+    let modalContent = <div />
+    if (step === -1) {
+        modalContent = <Result
                 status="error"
                 title="Update Failed"
             />
-        } else if (this.state.step === 1) {
-            content = <Markdown
+    } else if (step === 1) {
+        modalContent = <Markdown
                 components={{
-                    a: ({node, ...props}) => <a {...props} target="_blank" />
+                    a: ({node, ...rest}) => <a {...rest} target="_blank" />
                 }}
             >
-                {this.state.content}
+                {content}
             </Markdown>
-        } else if (this.state.step === 2) {
-            content = <div style={{padding: 40, textAlign: 'center', color: 'var(--ant-color-text)'}}>
+    } else if (step === 2) {
+        modalContent = <div style={{padding: 40, textAlign: 'center', color: 'var(--ant-color-text)'}}>
                 <Space direction="vertical">
                     <Spin size="large"/>
                     <h3>Updating...</h3>
                 </Space>
             </div>
-        } else if (this.state.step === 3) {
-            content = <Result
+    } else if (step === 3) {
+        modalContent = <Result
                 status="success"
                 title="Update Success"
                 subTitle="Please restart the app to apply the update."
             />
-        }
-        return (
-            <Modal
-                title="Auto Update"
-                open={this.state.step}
-                closable={this.state.step > 1}
-                maskClosable={this.state.step > 1}
-                zIndex={2100}
-                footer={
-                    this.state.step === 1 ? <Space>
-                        <Button onClick={this.ignore.bind(this)}>Ignore</Button>
-                        <Button onClick={this.handleClose.bind(this)}>Cancel</Button>
-                        <Button type="primary" onClick={this.handleOk.bind(this)}>Update</Button>
-                    </Space> : null
-                }
-            >
-                { content }
-            </Modal>
-        );
     }
+    return (
+        <Modal
+            title="Auto Update"
+            open={!!step}
+            closable={step > 1}
+            maskClosable={step > 1}
+            zIndex={2100}
+            footer={
+                step === 1 ? <Space>
+                    <Button onClick={ignore}>Ignore</Button>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button type="primary" onClick={handleOk}>Update</Button>
+                </Space> : null
+            }
+        >
+            { modalContent }
+        </Modal>
+    );
 }
 
 export default UpdateModal;

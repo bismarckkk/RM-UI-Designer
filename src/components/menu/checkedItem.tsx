@@ -1,21 +1,17 @@
-import React, {Component} from 'react';
+import React from 'react';
 import { Flex } from "antd";
 import { CheckOutlined } from "@ant-design/icons";
 
-class CheckedItem extends Component {
-    render() {
-        return (
-            <Flex style={{width: '100%'}} justify="space-between">
-                {this.props.children}
-                <div>
-                    {
-                        this.props.checked &&
-                        <CheckOutlined />
-                    }
-                </div>
-            </Flex>
-        );
-    }
-}
+const CheckedItem = (props: any) => (
+    <Flex style={{width: '100%'}} justify="space-between">
+        {props.children}
+        <div>
+            {
+                props.checked &&
+                <CheckOutlined />
+            }
+        </div>
+    </Flex>
+);
 
 export default CheckedItem;

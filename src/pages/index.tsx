@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { ConfigProvider, App, theme, Watermark } from "antd";
 import Render from "@/components/render/render";
 import UpdateModal from "@/components/modals/updateModal";
@@ -11,45 +11,45 @@ import enUS from "antd/locale/en_US";
 
 const { darkAlgorithm, compactAlgorithm } = theme;
 
-class Index extends Component {
-    state = { simulate: false, darkMode: this.isBrowserDarkMode(), isMounted: false }
-    modal = null
-    renderRef = React.createRef();
-    menuRef = React.createRef();
-
-    isBrowserDarkMode() {
-        try {
-            return window.matchMedia('(prefers-color-scheme: dark)').matches
-        } catch (_) {
-            return false
-        }
+function isBrowserDarkMode() {
+    try {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches
+    } catch (_) {
+        return false
     }
+}
 
-    componentDidMount() {
-        const that = this;
+const Index = () => {
+    const [darkMode, setDarkMode] = useState(isBrowserDarkMode())
+    const [isMounted, setIsMounted] = useState(false)
+    const modalRef = useRef<any>(null)
+    const renderRef = useRef<any>(null);
+    const menuRef = useRef<any>(null);
+
+    useEffect(() => {
         let lastWidth = 0;
 
         window.addEventListener("drop", (e) => e.preventDefault(), false);
         window.addEventListener("dragover", (e) => e.preventDefault(), false);
         window.addEventListener("contextmenu", (e) => {
-            if (e.target.tagName.toLowerCase() !== 'input') {
+            if ((e.target as HTMLElement).tagName.toLowerCase() !== 'input') {
                 e.preventDefault();
             }
         }, false);
 
         function resizeHandle(width) {
-            if (!that.modal && width < 880 && width !== lastWidth) {
+            if (!modalRef.current && width < 880 && width !== lastWidth) {
                 lastWidth = width;
-                that.modal = modal.warning({
+                modalRef.current = modal.warning({
                     title: 'Display Aera too Small',
                     content: 'Cannot show all contents on this window. Please resize this window or rotate your phone.',
                     footer: null,
                     zIndex: 2500
                 });
             }
-            if (that.modal && width >= 880) {
-                that.modal.destroy()
-                that.modal = null
+            if (modalRef.current && width >= 880) {
+                modalRef.current.destroy()
+                modalRef.current = null
             }
         }
 
@@ -62,68 +62,62 @@ class Index extends Component {
         const mqList = window.matchMedia('(prefers-color-scheme: dark)');
 
         mqList.addEventListener('change', (event) => {
-            that.setState({darkMode: event.matches})
+            setDarkMode(event.matches)
         });
 
         setTimeout(() => {
-            this.setState({isMounted: true})
+            setIsMounted(true)
         }, 500)
-    }
+    }, [])
 
-    setDarkMode(dark) {
-        this.setState({darkMode: dark})
+    if (!isMounted) {
+        return <Loading/>
     }
-
-    render() {
-        if (!this.state.isMounted) {
-            return <Loading/>
-        }
-        return (
-            <ConfigProvider
-                locale={enUS}
-                theme={{
-                    cssVar: {key: 'rmui'}, hashed: false,
-                    algorithm: this.state.darkMode ? [darkAlgorithm, compactAlgorithm] : compactAlgorithm
-                }}
-            >
-                <App>
-                    <div className="rmui">
-                        <div className="container background-color"
-                             style={{height: '100vh', paddingBottom: 12, overflow: 'hidden'}}>
-                            <Menu
-                                save={() => this.renderRef.current.save()}
-                                onObjectEvent={(t, e) => this.renderRef.current.onObjectEvent(t, e)}
-                                onHistoryEvent={(t) => this.renderRef.current.onHistoryEvent(t)}
-                                reset={() => this.renderRef.current.reset()}
-                                setFrame={(t, f) => this.renderRef.current.onFrameEvent(t, f)}
-                                upload={(e) => this.renderRef.current.upload(e)}
-                                getData={() => this.renderRef.current.getData()}
-                                setEditable={(e) => this.renderRef.current.setEditable(e)}
-                                setDarkMode={(e) => this.setDarkMode(e)}
-                                ref={this.menuRef}
-                                darkMode={this.state.darkMode}
-                            />
-                            <Watermark content={['RM Ui Designer', process.env.VERSION]} zIndex={0} style={{height: '100%'}} gap={[30, 30]}>
-                                <div id="content-in" style={{width: '100vw', height: '100%', zIndex: 2, position: 'relative'}}>
-                                    <Render
-                                        style={{width: '100vw', height: '100%'}}
-                                        editable={true}
-                                        ref={this.renderRef}
-                                        onFrameChange={e => this.menuRef.current?.setFrames(e)}
-                                        setCouldDo={e => {this.menuRef.current?.setCouldDo(e)}}
-                                        setRobotId={e => {this.menuRef.current?.setRobotId(e)}}
-                                    />
-                                </div>
-                            </Watermark>
-                        </div>
+    return (
+        <ConfigProvider
+            locale={enUS}
+            theme={{
+                cssVar: {key: 'rmui'}, hashed: false,
+                algorithm: darkMode ? [darkAlgorithm, compactAlgorithm] : compactAlgorithm
+            }}
+        >
+            <App>
+                <div className="rmui">
+                    <div className="container background-color"
+                         style={{height: '100vh', paddingBottom: 12, overflow: 'hidden'}}>
+                        <Menu
+                            save={() => renderRef.current.save()}
+                            onObjectEvent={(t, e) => renderRef.current.onObjectEvent(t, e)}
+                            onHistoryEvent={(t) => renderRef.current.onHistoryEvent(t)}
+                            reset={() => renderRef.current.reset()}
+                            setFrame={(t, f) => renderRef.current.onFrameEvent(t, f)}
+                            upload={(e) => renderRef.current.upload(e)}
+                            getData={() => renderRef.current.getData()}
+                            setEditable={(e) => renderRef.current.setEditable(e)}
+                            setDarkMode={(e) => setDarkMode(e)}
+                            ref={menuRef}
+                            darkMode={darkMode}
+                        />
+                        <Watermark content={['RM Ui Designer', process.env.VERSION]} zIndex={0} style={{height: '100%'}} gap={[30, 30]}>
+                            <div id="content-in" style={{width: '100vw', height: '100%', zIndex: 2, position: 'relative'}}>
+                                <Render
+                                    style={{width: '100vw', height: '100%'}}
+                                    editable={true}
+                                    ref={renderRef}
+                                    onFrameChange={e => menuRef.current?.setFrames(e)}
+                                    setCouldDo={e => {menuRef.current?.setCouldDo(e)}}
+                                    setRobotId={e => {menuRef.current?.setRobotId(e)}}
+                                />
+                            </div>
+                        </Watermark>
                     </div>
-                    <AppHelper/>
-                    <UpdateModal/>
-                    <EulaModal/>
-                </App>
-            </ConfigProvider>
-        );
-    }
+                </div>
+                <AppHelper/>
+                <UpdateModal/>
+                <EulaModal/>
+            </App>
+        </ConfigProvider>
+    );
 }
 
 export default Index;

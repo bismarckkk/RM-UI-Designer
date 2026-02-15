@@ -6,7 +6,14 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <title>RM UI Designer</title>
     <link rel="manifest" href="/manifest.json" />
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4PDL1SSV9H"></script>
+    <script>
+      if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-4PDL1SSV9H';
+        document.head.appendChild(script);
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

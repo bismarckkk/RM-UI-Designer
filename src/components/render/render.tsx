@@ -146,7 +146,7 @@ class Render extends Component {
             this.canvas.renderAll();
         } else {
             this.canvas.clear()
-            this.setBackground(require("../../assets/background.png"))
+            this.setBackground(new URL('../../assets/background.png', import.meta.url).href)
             this.canvas.backgroundColor = '#fff'
         }
         if (!Object.keys(this.objects).includes('default')) {
@@ -249,7 +249,7 @@ class Render extends Component {
     componentDidMount() {
         const that = this
         this.canvas = new fabric.Canvas('ui')
-        this.setBackground(require("../../assets/background.png"))
+        this.setBackground(new URL('../../assets/background.png', import.meta.url).href)
         this.canvas.backgroundColor = '#fff'
 
         window.addEventListener('resize', () => {
@@ -739,7 +739,7 @@ class Render extends Component {
                                                         Upload Background
                                                     </Button>
                                                     <Button onClick={() =>
-                                                        this.setBackground(require("../../assets/background.png"))
+                                                        this.setBackground(new URL('../../assets/background.png', import.meta.url).href)
                                                     }>
                                                         Reset Background
                                                     </Button>

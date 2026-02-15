@@ -1,53 +1,52 @@
-import React, {Component} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Modal, Space} from "antd";
 import Loading from "../../loading";
 import Markdown from "react-markdown";
 
-class EulaModal extends Component {
-    state = {open: false, content: null}
+const EulaModal = () => {
+    const [open, setOpen] = useState(false)
+    const [content, setContent] = useState<string | null>(null)
 
-    componentDidMount() {
+    useEffect(() => {
         const text = localStorage.getItem('eula')
         if (!text || !JSON.parse(text)){
-            this.setState({open: true})
-            fetch(require('../../assets/eula.md')).then(e=>e.text()).then(e=>{
-                this.setState({content: e})
+            setOpen(true)
+            fetch(new URL('../../assets/eula.md', import.meta.url).href).then(e=>e.text()).then(e=>{
+                setContent(e)
             })
         }
-    }
+    }, [])
 
-    dontShow() {
+    const dontShow = () => {
         localStorage.setItem('eula', 'true')
-        this.setState({open: false})
+        setOpen(false)
     }
 
-    render() {
-        return (
-            <Modal
-                title="Welcome to RM UI Designer!"
-                onOk={()=>this.setState({open: false})}
-                onCancel={()=>this.setState({open: false})}
-                footer={<Space>
-                    <Button onClick={this.dontShow.bind(this)}>Don't show</Button>
-                    <Button type="primary" onClick={()=>this.setState({open: false})}>OK</Button>
-                </Space>}
-                open={this.state.open}
-                zIndex={2200}
-            >
-                {
-                    this.state.content ?
-                        <Markdown
-                            components={{
-                                a: ({node, ...props}) => <a {...props} target="_blank" />
-                            }}
-                        >
-                            {this.state.content}
-                        </Markdown> :
-                        <Loading />
-                }
-            </Modal>
-        );
-    }
+    return (
+        <Modal
+            title="Welcome to RM UI Designer!"
+            onOk={()=>setOpen(false)}
+            onCancel={()=>setOpen(false)}
+            footer={<Space>
+                <Button onClick={dontShow}>Don't show</Button>
+                <Button type="primary" onClick={()=>setOpen(false)}>OK</Button>
+            </Space>}
+            open={open}
+            zIndex={2200}
+        >
+            {
+                content ?
+                    <Markdown
+                        components={{
+                            a: ({node, ...rest}) => <a {...rest} target="_blank" />
+                        }}
+                    >
+                        {content}
+                    </Markdown> :
+                    <Loading />
+            }
+        </Modal>
+    );
 }
 
 export default EulaModal;

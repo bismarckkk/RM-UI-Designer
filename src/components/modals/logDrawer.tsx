@@ -1,21 +1,20 @@
-import React, {Component} from 'react';
+import React, {forwardRef, useImperativeHandle, useState} from 'react';
 import {Result, List, Space, Drawer} from "antd";
 import {CloseCircleOutlined, WarningOutlined} from "@ant-design/icons";
 
-class LogDrawer extends Component {
-    state = {show: false, errors: []}
+const LogDrawer = forwardRef((props, ref: any) => {
+    const [show, setShow] = useState(false)
+    const [errorsData, setErrorsData] = useState<any[]>([])
 
-    onClose() {
-        this.setState({show: false})
-    }
+    useImperativeHandle(ref, () => ({
+        show: (data: any[]) => {
+            setShow(true)
+            setErrorsData(data)
+        }
+    }))
 
-    show(data) {
-        this.setState({show: true, errors: data})
-    }
-
-    render() {
-        let warnings = this.state.errors.filter(error => error.level === 'warn');
-        let errors = this.state.errors.filter(error => error.level === 'error');
+    let warnings = errorsData.filter(error => error.level === 'warn');
+    let errors = errorsData.filter(error => error.level === 'error');
 
         let res = <Result
             status="success"
@@ -29,7 +28,7 @@ class LogDrawer extends Component {
                 <div style={{paddingBottom: 10}} className="card-body">
                     <List
                         bordered
-                        dataSource={this.state.errors}
+                        dataSource={errorsData}
                         renderItem={(item) => (
                             <List.Item>
                                 <Space size="middle">
@@ -50,8 +49,8 @@ class LogDrawer extends Component {
             <Drawer
                 title="Serial Debug Log"
                 placement="right"
-                onClose={() => this.onClose()}
-                open={this.state.show}
+                onClose={() => setShow(false)}
+                open={show}
                 size="large"
                 getContainer={document.getElementById('content-in')}
                 rootStyle={{inset: '25px 0 0 0'}}
@@ -65,7 +64,6 @@ class LogDrawer extends Component {
                 </div>
             </Drawer>
         );
-    }
-}
+});
 
 export default LogDrawer;
