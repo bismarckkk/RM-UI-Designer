@@ -38,7 +38,7 @@ export const Text = fabric.util.createClass(fabric.Text, {
         options.text || (options.text = 'Text');
         options.left || (options.left = 50 / this.ratio);
         options.top || (options.top = 50 / this.ratio);
-        options.top -= options.fontSize / this.ratio * 2
+        options.top -= options.fontSize
         options.width || (options.width = getTextWidth(options.text, options.fontSize + 'px ' + options.fontFamily) * this.ratio);
         this.rawFontSize = options.fontSize;
         if (this._color && this._color !== 'main') {
@@ -73,7 +73,7 @@ export const Text = fabric.util.createClass(fabric.Text, {
             group: this.groupName,
             fontSize: this.fontSize * this.ratio / scale,
             x: this.left * this.ratio,
-            y: this.top * this.ratio + this.fontSize * 2,
+            y: (this.top + this.fontSize) * this.ratio,
             text: this.text,
             color: this._color,
         };
@@ -86,7 +86,7 @@ export const Text = fabric.util.createClass(fabric.Text, {
         this.groupName = options.group
         this.set('fontSize', options.fontSize / this.ratio * scale)
         this.set('left', options.x / this.ratio)
-        this.set('top', options.y / this.ratio - this.fontSize  / this.ratio * 2)
+        this.set('top', options.y / this.ratio - this.fontSize)
         this.text = options.text
         this.set('width', getTextWidth(options.text, options.fontSize + 'px ' + this.fontFamily) / this.ratio)
         this.rawFontSize = options.fontSize
@@ -104,8 +104,8 @@ export const Text = fabric.util.createClass(fabric.Text, {
     setRatio: function (ratio) {
         this.set('width', this.width * this.ratio / ratio)
         this.set('left', this.left * this.ratio / ratio)
-        this.set('top', this.top * this.ratio / ratio)
         this.set('fontSize', this.fontSize * this.ratio / ratio)
+        this.set('top', this.top * this.ratio / ratio)
         this.set('width', getTextWidth(this.text, this.rawFontSize + 'px ' + this.fontFamily) / ratio)
         this.ratio = ratio
     },
