@@ -1,4 +1,4 @@
-import React, { Component, createRef } from 'react';
+import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Button, Card, Empty, Space } from "antd";
 import {message, modal, rid, setRid} from "@/utils/app";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -14,7 +14,7 @@ import History from "@/utils/history";
 import lodash from 'lodash'
 import {toLower} from "loadsh/string";
 
-class Render extends Component {
+class RenderController {
     objects = {default: {}}
     data = {}
     state = {
@@ -40,6 +40,18 @@ class Render extends Component {
     his = new History()
     moveTimer = null
     moveTimeout = null
+
+    constructor(props, notify) {
+        this.props = props
+        this.notify = notify
+    }
+
+    setState(update, cb) {
+        const next = typeof update === 'function' ? update(this.state) : update
+        this.state = {...this.state, ...next}
+        this.notify()
+        cb && cb()
+    }
 
     getNewDataId() {
         if (Object.keys(this.state.data).length === 0) {
@@ -763,5 +775,22 @@ class Render extends Component {
         );
     }
 }
+
+const Render = forwardRef((props: any, ref: any) => {
+    const [, setTick] = useState(0)
+    const controllerRef = useRef<any>(null)
+    if (!controllerRef.current) {
+        controllerRef.current = new RenderController(props, () => setTick((x) => x + 1))
+    }
+    controllerRef.current.props = props
+
+    useImperativeHandle(ref, () => controllerRef.current)
+
+    useEffect(() => {
+        controllerRef.current.componentDidMount?.()
+    }, [])
+
+    return controllerRef.current.render()
+})
 
 export default Render;

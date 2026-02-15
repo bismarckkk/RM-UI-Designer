@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {useRef, useState} from 'react';
 import {Card, Dropdown, Tree, Space, Flex} from "antd";
 import { DownOutlined, EyeOutlined, EyeInvisibleOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import SwitchButton from "./switchButton";
@@ -12,15 +12,12 @@ const items = [
     {key: 'D1-group-group', label: 'group'}
 ]
 
-class Elements extends Component {
-    state = {
-        treeData: [], 
-        rightClickMenuOpen: false,
-        groupKey: 'layer',
-    }
-    treeData = []
+const Elements = (props: any) => {
+    const [rightClickMenuOpen, setRightClickMenuOpen] = useState(false)
+    const [groupKey, setGroupKey] = useState('layer')
+    const treeDataRef = useRef<any[]>([])
 
-     selectKey2id(keys) {
+    const selectKey2id = (keys: any[]) => {
         let res = []
         for (let key of keys) {
             if (key === 'window') {
@@ -29,7 +26,7 @@ class Elements extends Component {
                 if (key.startsWith('E-')) {
                     res.push(parseInt(key.slice(2)))
                 } else {
-                    const ids = this.treeData.find(e => e.key === key).children.map(e => parseInt(e.key.slice(2)))
+                    const ids = treeDataRef.current.find(e => e.key === key).children.map(e => parseInt(e.key.slice(2)))
                     for (let id of ids) {
                         if (!res.includes(id)) {
                             res.push(id)
@@ -41,104 +38,103 @@ class Elements extends Component {
         return res
     }
 
-    onElementMenuContainerClick(e) {
+    const onElementMenuContainerClick = (e) => {
         if (e.target.classList.value.includes('ant-dropdown-menu')) {
             return;
         }
         console.log(e.target.className)
-        this.setState({rightClickMenuOpen: false})
+        setRightClickMenuOpen(false)
         if (e.target.classList.contains('ant-tree') || (!e.ctrlKey && !e.shiftKey)) {
-            this.props.onSelect([])
+            props.onSelect([])
         }
     }
 
-    onElementMenuClick(e) {
-        this.setState({rightClickMenuOpen: false})
+    const onElementMenuClick = (e) => {
+        setRightClickMenuOpen(false)
         if (e.key === 'D2-copy') {
             let info = null
-            if (e.target.localName !== 'input' && this.props.selectedId.length !== 0 &&this.props.selectedId[0] !== -2) {
+            if (e.target.localName !== 'input' && props.selectedId.length !== 0 &&props.selectedId[0] !== -2) {
                 e.preventDefault()
-                info = JSON.stringify(this.props.selectedId.map(id => this.props.data[id]))
+                info = JSON.stringify(props.selectedId.map(id => props.data[id]))
                 e.clipboardData.setData('text', info)
             }
         } else if (e.key === 'D2-delete') {
-            for (let id of this.props.selectedId) {
+            for (let id of props.selectedId) {
                 console.log(id)
-                console.log(this.props.onObjectEvent('remove', {id}))
+                console.log(props.onObjectEvent('remove', {id}))
             }
         }
     }
 
-    onElementRightClick(e) {
-        let id = this.selectKey2id([e.node.key])
-        if (!(id[0] in this.props.selectedId)) {
-            this.props.onSelect(id)
+    const onElementRightClick = (e) => {
+        let id = selectKey2id([e.node.key])
+        if (!(id[0] in props.selectedId)) {
+            props.onSelect(id)
         }
     }
 
-    onSelect(nodes) {
+    const onSelect = (nodes) => {
         if (nodes.length === 0) {
             return
         }
-        let ids = this.selectKey2id(nodes)
+        let ids = selectKey2id(nodes)
         if (ids.includes(-2)) {
             ids = [ids[ids.length - 1]]
         }
-        this.props.onSelect(ids)
+        props.onSelect(ids)
     }
 
-    onMenuOpenChange(e) {
+    const onMenuOpenChange = (e) => {
         if (e) {
-            const that = this
             setTimeout(()=>{
-                if (that.props.selectedId.length !== 0 && that.props.selectedId[0] !== -2) {
-                    that.setState({rightClickMenuOpen: true})
+                if (props.selectedId.length !== 0 && props.selectedId[0] !== -2) {
+                    setRightClickMenuOpen(true)
                 } else {
-                    that.setState({rightClickMenuOpen: false})
+                    setRightClickMenuOpen(false)
                 }
             }, 100)
         } else {
-            this.setState({rightClickMenuOpen: false})
+            setRightClickMenuOpen(false)
         }
     }
 
-    elementsMenuOnClick(key) {
-        this.setState({groupKey: key.key.slice(9)}, ()=>this.updateTree())
+    const elementsMenuOnClick = (key) => {
+        setGroupKey(key.key.slice(9))
     }
 
-    updateTree() {
-        const key = this.state.groupKey
-        let treeData = []
-        const keys = Object.keys(this.props.data)
+    const updateTree = () => {
+        const key = groupKey
+        let treeDataList = []
+        const keys = Object.keys(props.data)
         for (let i = 0; i < keys.length; i++) {
-            const node = this.props.data[keys[i]]
+            const node = props.data[keys[i]]
 
             let pos = -1
-            for (let j = 0; j < treeData.length; j++) {
-                if (treeData[j].key === `${key}-${node[key]}`) {
+            for (let j = 0; j < treeDataList.length; j++) {
+                if (treeDataList[j].key === `${key}-${node[key]}`) {
                     pos = j
                     break
                 }
             }
             if (pos === -1) {
-                treeData.push({
+                treeDataList.push({
                     title: `${key} ${node[key]}`, key: `${key}-${node[key]}`, children: [], isLeaf: false
                 })
-                pos = treeData.length - 1
+                pos = treeDataList.length - 1
             }
 
-            treeData[pos].children.push({
+            treeDataList[pos].children.push({
                 title: <Flex justify="space-between" style={{width: '100%'}}>
                     {node.name}
                     <Space>
                         <SwitchButton
-                            onChange={(e)=>this.props.onObjectEvent('setAttr', {id: node.id, payload: {visible: e}})}
+                            onChange={(e)=>props.onObjectEvent('setAttr', {id: node.id, payload: {visible: e}})}
                             defaultStatus={true}
                             offNode={<EyeInvisibleOutlined/>}
                             onNode={<EyeOutlined/>}
                         />
                         <SwitchButton
-                            onChange={(e)=>this.props.onObjectEvent('setAttr', {id: node.id, payload: {selectable: e}})}
+                            onChange={(e)=>props.onObjectEvent('setAttr', {id: node.id, payload: {selectable: e}})}
                             defaultStatus={true}
                             offNode={<LockOutlined/>}
                             onNode={<UnlockOutlined style={{transform: 'scaleX(-1)'}}/>}
@@ -149,15 +145,14 @@ class Elements extends Component {
             })
         }
 
-        treeData = treeData.sort((a, b) => a.key.toString().localeCompare(b.key.toString()))
-        treeData.unshift({title: "UI Window", key: 'window'})
+        treeDataList = treeDataList.sort((a, b) => a.key.toString().localeCompare(b.key.toString()))
+        treeDataList.unshift({title: "UI Window", key: 'window'})
 
-        this.treeData = treeData
-        return treeData
+        treeDataRef.current = treeDataList
+        return treeDataList
     }
 
-    render() {
-        return (
+    return (
             <Card
                 size="small"
                 title="Elements"
@@ -166,9 +161,9 @@ class Elements extends Component {
                     <Dropdown
                         menu={{
                             items,
-                            onClick: (e)=>this.elementsMenuOnClick(e),
+                            onClick: (e)=>elementsMenuOnClick(e),
                             selectable: true,
-                            selectedKeys: [`D1-group-${this.state.groupKey}`]
+                            selectedKeys: [`D1-group-${groupKey}`]
                         }}
                     >
                         <Space style={{fontSize: 11}}>
@@ -180,7 +175,7 @@ class Elements extends Component {
             >
                 <div
                     className="card-body"
-                    onMouseUp={(e)=>this.onElementMenuContainerClick(e)}
+                    onMouseUp={(e)=>onElementMenuContainerClick(e)}
                 >
                     <Dropdown
                         menu={{
@@ -188,29 +183,28 @@ class Elements extends Component {
                                 {key: 'D2-copy', label: 'Copy'},
                                 {key: 'D2-delete', label: 'Delete', danger: true}
                             ],
-                            onClick: (e)=>{this.onElementMenuClick(e)}
+                            onClick: (e)=>{onElementMenuClick(e)}
                         }}
                         trigger={['contextMenu']}
-                        open={this.state.rightClickMenuOpen}
-                        onOpenChange={(e)=>{this.onMenuOpenChange(e)}}
+                        open={rightClickMenuOpen}
+                        onOpenChange={(e)=>{onMenuOpenChange(e)}}
                     >
                         <Tree
                             className="full"
-                            treeData={this.updateTree()}
-                            onSelect={(e)=>this.onSelect(e)}
-                            selectedKeys={selectId2Key(this.props.selectedId)}
-                            onRightClick={(e)=>this.onElementRightClick(e)}
+                            treeData={updateTree()}
+                            onSelect={(e)=>onSelect(e)}
+                            selectedKeys={selectId2Key(props.selectedId)}
+                            onRightClick={(e)=>onElementRightClick(e)}
                             treeDefaultExpandAll={true}
                             showLine={true}
                             blockNode={true}
                             multiple={true}
-                            selectable={this.props.editable}
+                            selectable={props.editable}
                         />
                     </Dropdown>
                 </div>
             </Card>
-        );
-    }
+    );
 }
 
 export default Elements;

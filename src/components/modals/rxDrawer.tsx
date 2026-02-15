@@ -1,24 +1,24 @@
-import React, {Component} from 'react';
+import React, {forwardRef, useImperativeHandle, useState} from 'react';
 import {Empty, Tag, Drawer, Divider, Popover, Flex, Space, Button} from "antd";
 import {ProDescriptions} from "@ant-design/pro-components";
 import {getHeader, getEvent} from "@/utils/serial/msgView";
 import {getColumnsFromData} from "@/utils/columns";
 import {saveText, uploadFile} from "@/utils/utils";
 
-class RxDrawer extends Component {
-    state = {show: false, history: {rx: 0, log: [], start: -1}}
+const RxDrawer = forwardRef((props, ref: any) => {
+    const [show, setShow] = useState(false)
+    const [history, setHistory] = useState<any>({rx: 0, log: [], start: -1})
 
-    onClose() {
-        this.setState({show: false})
-    }
+    useImperativeHandle(ref, () => ({
+        show: (data: any) => {
+            setShow(true)
+            setHistory({...data, start: -1})
+        }
+    }))
 
-    show(data) {
-        this.setState({show: true, history: {...data, start: -1}})
-    }
-
-    save() {
+    const save = () => {
         let res = ''
-        for (const chunk of this.state.history.log) {
+        for (const chunk of history.log) {
             for (const byte of chunk) {
                 res += byte.toString(16).padStart(2, '0').toUpperCase() + ' '
             }
@@ -28,7 +28,7 @@ class RxDrawer extends Component {
         saveText(res, 'rx.log')
     }
 
-    async load() {
+    const load = async () => {
         const file = await uploadFile('.log')
         const reader = new FileReader()
         reader.onload = () => {
@@ -45,15 +45,12 @@ class RxDrawer extends Component {
                 res.push(new Uint8Array(chunk))
                 rx += chunk.length
             }
-            this.setState({history: {rx, log: res, start: -1}})
+            setHistory({rx, log: res, start: -1})
         }
         reader.readAsText(file)
     }
 
-    render() {
-        const that = this;
-        let history = this.state.history;
-        let res;
+    let res;
         if (history.log.length === 0) {
             res = <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No log yet."/>
         } else {
@@ -64,7 +61,7 @@ class RxDrawer extends Component {
                     return <Tag
                         key={_idx}
                         color="blue"
-                        onClick={() => that.setState({history: {...that.state.history, start: _idx}})}
+                        onClick={() => setHistory({...history, start: _idx})}
                     >
                         {item}
                     </Tag>
@@ -244,12 +241,12 @@ class RxDrawer extends Component {
             }
         }
 
-        return (
+    return (
             <Drawer
                 title="Serial Rx History"
                 placement="right"
-                onClose={() => this.onClose()}
-                open={this.state.show}
+                onClose={() => setShow(false)}
+                open={show}
                 size="large"
                 getContainer={document.getElementById('content-in')}
                 rootStyle={{inset: '25px 0 0 0'}}
@@ -266,10 +263,10 @@ class RxDrawer extends Component {
                                 This is not a real-time display, close and reopen to refresh.
                             </p>
                             <Space>
-                                <Button size="small" type="primary" onClick={() => this.save()}>
+                                <Button size="small" type="primary" onClick={() => save()}>
                                     Save
                                 </Button>
-                                <Button size="small" onClick={() => this.load()}>
+                                <Button size="small" onClick={() => load()}>
                                     load
                                 </Button>
                             </Space>
@@ -281,7 +278,6 @@ class RxDrawer extends Component {
                 </div>
             </Drawer>
         );
-    }
-}
+});
 
 export default RxDrawer;

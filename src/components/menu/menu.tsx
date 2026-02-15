@@ -1,14 +1,13 @@
-import React, { Component, createRef } from 'react';
+import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Flex, Button, Dropdown, Badge } from "antd";
 import { FullscreenExitOutlined, FullscreenOutlined, ThunderboltOutlined,
     GithubOutlined, CloseOutlined, MinusOutlined } from "@ant-design/icons";
-import Icon from '@ant-design/icons';
 import FormModal from "@/components/modals/formModal";
 import { getMenuProps } from "@/utils/fabricObjects";
 import AboutModal from "@/components/modals/aboutModal";
 import ModeModal from "@/components/modals/modeModal";
-import { ReactComponent as MoonSvg } from "@/assets/moon.svg"
-import { ReactComponent as SunSvg } from "@/assets/sun.svg"
+import MoonSvg from "@/assets/moon.svg"
+import SunSvg from "@/assets/sun.svg"
 import SerialModal from "@/components/modals/serialModal";
 import LogDrawer from "@/components/modals/logDrawer";
 import RxDrawer from "@/components/modals/rxDrawer";
@@ -119,7 +118,7 @@ const simulateItems = [
     }
 ]
 
-class Menu extends Component {
+class MenuController {
     state = {
         fullscreen: false,
         frames: ['default'],
@@ -142,6 +141,18 @@ class Menu extends Component {
     serial = new SerialFrom(e => this.onSerialEvent(e), e => this.onSerialError(e))
     serialTo = new SerialTo()
     fileHandler = null
+
+    constructor(props, notify) {
+        this.props = props
+        this.notify = notify
+    }
+
+    setState(update, cb) {
+        const next = typeof update === 'function' ? update(this.state) : update
+        this.state = {...this.state, ...next}
+        this.notify()
+        cb && cb()
+    }
 
 
     onSerialEvent(e) {
@@ -444,12 +455,12 @@ class Menu extends Component {
         );
         const moonButton = (
             <Button type='text' onClick={() => this.props.setDarkMode(true)} size="small">
-                <Icon component={MoonSvg} />
+                <img src={MoonSvg} alt="moon" style={{width: 14, height: 14}} />
             </Button>
         )
         const sunButton = (
             <Button type='text' onClick={() => this.props.setDarkMode(false)} size="small">
-                <Icon component={SunSvg} />
+                <img src={SunSvg} alt="sun" style={{width: 14, height: 14}} />
             </Button>
         )
         editItems[0]['disabled'] = !this.state.couldUndo
@@ -588,5 +599,22 @@ class Menu extends Component {
         );
     }
 }
+
+const Menu = forwardRef((props: any, ref: any) => {
+    const [, setTick] = useState(0)
+    const controllerRef = useRef<any>(null)
+    if (!controllerRef.current) {
+        controllerRef.current = new MenuController(props, () => setTick((x) => x + 1))
+    }
+    controllerRef.current.props = props
+
+    useImperativeHandle(ref, () => controllerRef.current)
+
+    useEffect(() => {
+        controllerRef.current.componentDidMount?.()
+    }, [])
+
+    return controllerRef.current.render()
+})
 
 export default Menu;
