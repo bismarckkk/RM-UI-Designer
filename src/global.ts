@@ -29,7 +29,7 @@ for(let corner in fabric.Object.prototype.controls) {
 }
 
 
-if ('serviceWorker' in navigator && process.env.VERSION.slice(0, 7) !== 'nightly') {
+if ('serviceWorker' in navigator && process.env.VERSION !== 'development' && process.env.VERSION.slice(0, 7) !== 'nightly') {
     navigator.serviceWorker.getRegistrations()
         .then(function(registrations) {
             for(let registration of registrations) {

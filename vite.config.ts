@@ -44,6 +44,7 @@ export default defineConfig({
               clientsClaim: true,
               skipWaiting: true,
               cacheId: 'rmui-pwa',
+              maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
               globIgnores: ['nightly/**', 'manifest*.json'],
             },
           }),

@@ -1,6 +1,6 @@
 import Color from "../components/render/color";
 
-const renderRobotId = (idx) => {
+const renderRobotId = (idx: number) => {
     const rawIdx = idx
     let type = "Robot";
     if (idx > 0x100) {
@@ -254,7 +254,7 @@ export const columns = {
     }
 }
 
-export function getColumnsFromData(data) {
+export function getColumnsFromData(data: Record<string, unknown>) {
     const keys = Object.keys(data)
     let _columns = []
     for(let i = 0; i < keys.length; i++) {
