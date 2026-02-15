@@ -162,7 +162,7 @@ class Render extends Component {
     }
 
     resetCanvasSize() {
-        if (this.canvas) {
+        if (this.canvas && this.canvasRef.current) {
             let width = this.canvasRef.current.clientWidth
             let height = this.canvasRef.current.clientHeight
             let uiWindow = {...this.state.uiWindow}
