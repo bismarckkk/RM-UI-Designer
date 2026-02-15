@@ -1,5 +1,6 @@
 import { fabric } from "fabric";
 import {isNightly} from "./utils/utils";
+import generatorWasmUrl from './assets/rm_ui_generator.wasm?url'
 
 fabric.Object.prototype.isOnScreen = () => true
 fabric.ActiveSelection.prototype.hasControls = false
@@ -60,7 +61,7 @@ if (process.env.VERSION !== 'development') {
 var Module = {
     locateFile: (file: string) => {
         if (file === 'rm_ui_generator.wasm') {
-            return new URL('./assets/rm_ui_generator.wasm', import.meta.url).href;
+            return generatorWasmUrl;
         }
         return file;
     }

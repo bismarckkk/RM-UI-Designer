@@ -12,6 +12,7 @@ import {createUiElement} from "@/utils/fabricObjects";
 import {readUiFile} from "@/utils/rmuiReader";
 import History from "@/utils/history";
 import lodash from 'lodash'
+import backgroundUrl from '@/assets/background.png?url'
 
 class RenderController {
     objects = {default: {}}
@@ -157,7 +158,7 @@ class RenderController {
             this.canvas.renderAll();
         } else {
             this.canvas.clear()
-            this.setBackground(new URL('../../assets/background.png', import.meta.url).href)
+            this.setBackground(backgroundUrl)
             this.canvas.backgroundColor = '#fff'
         }
         if (!Object.keys(this.objects).includes('default')) {
@@ -260,7 +261,7 @@ class RenderController {
     componentDidMount() {
         const that = this
         this.canvas = new fabric.Canvas('ui')
-        this.setBackground(new URL('../../assets/background.png', import.meta.url).href)
+        this.setBackground(backgroundUrl)
         this.canvas.backgroundColor = '#fff'
 
         window.addEventListener('resize', () => {
@@ -740,7 +741,7 @@ class RenderController {
                                                         Upload Background
                                                     </Button>
                                                     <Button onClick={() =>
-                                                        this.setBackground(new URL('../../assets/background.png', import.meta.url).href)
+                                                        this.setBackground(backgroundUrl)
                                                     }>
                                                         Reset Background
                                                     </Button>

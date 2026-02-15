@@ -15,6 +15,7 @@
     "preview": "vite preview",
     "prestart": "node scripts/downloadWasm.js",
     "start": "npm run dev",
+    "verify:install:no-mirror": "yarn install --no-lockfile --registry https://registry.npmjs.org --network-timeout 1000000",
     "tauri": "tauri",
     "release": "node scripts/release.mjs",
     "updateJson": "node scripts/updater.mjs"
@@ -31,6 +32,8 @@
     "fabric": "^5.4.2",
     "jszip": "^3.10.1",
     "node-fetch": "^3.3.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-markdown": "^9.0.1",
     "react-resizable-panels": "^2.1.7"
   },

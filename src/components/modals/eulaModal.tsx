@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Button, Modal, Space} from "antd";
 import Loading from "../../loading";
 import Markdown from "react-markdown";
+import eulaMdUrl from '../../assets/eula.md?url'
 
 const EulaModal = () => {
     const [open, setOpen] = useState(false)
@@ -11,7 +12,7 @@ const EulaModal = () => {
         const text = localStorage.getItem('eula')
         if (!text || !JSON.parse(text)){
             setOpen(true)
-            fetch(new URL('../../assets/eula.md', import.meta.url).href).then(e=>e.text()).then(e=>{
+            fetch(eulaMdUrl).then(e=>e.text()).then(e=>{
                 setContent(e)
             })
         }

@@ -2,6 +2,7 @@ import React, {forwardRef, useEffect, useImperativeHandle, useState} from 'react
 import { Modal } from "antd";
 import Loading from "../../loading";
 import Markdown from "react-markdown";
+import aboutMdUrl from '../../assets/about.md?url'
 
 const AboutModal = forwardRef((props, ref: any) => {
     const [open, setOpen] = useState(false)
@@ -12,7 +13,7 @@ const AboutModal = forwardRef((props, ref: any) => {
     }))
 
     useEffect(() => {
-        fetch(new URL('../../assets/about.md', import.meta.url).href).then(e=>e.text()).then(e=>{
+        fetch(aboutMdUrl).then(e=>e.text()).then(e=>{
             setContent(e)
         })
     }, [])

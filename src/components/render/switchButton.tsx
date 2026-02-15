@@ -1,7 +1,14 @@
 import React, {useState} from 'react';
 import { Button } from "antd";
 
-const SwitchButton = (props: any) => {
+interface SwitchButtonProps {
+    defaultStatus?: boolean;
+    onChange?: (value: boolean) => void;
+    onNode?: React.ReactNode;
+    offNode?: React.ReactNode;
+}
+
+const SwitchButton = (props: SwitchButtonProps) => {
     const [status, setStatus] = useState(props.defaultStatus || false)
     return (
         <Button

@@ -1,7 +1,11 @@
 import React from 'react';
 import { ColorMap } from "../../utils/utils";
 
-const Color = (props: any) => {
+interface ColorProps {
+    color: string;
+}
+
+const Color = (props: ColorProps) => {
     if (props.color === 'Main') {
         return (
             <div>

@@ -2,7 +2,16 @@ import React from 'react';
 import { Result, List, Space } from "antd";
 import {CloseCircleOutlined, WarningOutlined} from "@ant-design/icons";
 
-const CheckPanel = (props: any) => {
+interface CheckItem {
+    level: string;
+    message: string;
+}
+
+interface CheckPanelProps {
+    errors: CheckItem[];
+}
+
+const CheckPanel = (props: CheckPanelProps) => {
     let warnings = props.errors.filter(error => error.level === 'Warn');
     let errors = props.errors.filter(error => error.level === 'Error');
 
