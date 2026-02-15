@@ -17,6 +17,7 @@
 git clone https://github.com/bismarckkk/RM-UI-Designer.git
 cd RM-UI-Designer
 yarn
+yarn dev
 yarn build
 ```
 如果需要自行构建Tauri应用，首先需要配置Tauri编译环境，

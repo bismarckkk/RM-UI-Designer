@@ -8,11 +8,11 @@
     "http-deceiver": "npm:http-deceiver-fixes@1.2.8"
   },
   "scripts": {
-    "dev": "umi dev",
+    "dev": "vite",
     "prebuild": "node scripts/downloadWasm.js",
-    "build": "umi build",
-    "postinstall": "node scripts/downloadWasm.js && umi setup",
-    "setup": "umi setup",
+    "build": "vite build",
+    "postinstall": "node scripts/downloadWasm.js",
+    "preview": "vite preview",
     "prestart": "node scripts/downloadWasm.js",
     "start": "npm run dev",
     "tauri": "tauri",
@@ -27,22 +27,22 @@
     "@tauri-apps/api": "^1.5.3",
     "@uiw/codemirror-theme-xcode": "^4.23.6",
     "@uiw/react-codemirror": "^4.23.6",
-    "@umijs/plugins": "^4.3.36",
     "antd": "5.22.4",
     "fabric": "^5.4.2",
     "jszip": "^3.10.1",
     "loadsh": "^0.0.4",
     "node-fetch": "^3.3.2",
     "react-markdown": "^9.0.1",
-    "react-resizable-panels": "^2.1.7",
-    "umi": "^4.3.36",
-    "workbox-webpack-plugin": "^7.3.0"
+    "react-resizable-panels": "^2.1.7"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.4.1",
     "@tauri-apps/cli": "^1.5.9",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@types/wicg-file-system-access": "^2023.10.5",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vite": "^6.2.1",
+    "vite-plugin-pwa": "^0.21.2"
   }
 }

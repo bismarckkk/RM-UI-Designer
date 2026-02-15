@@ -51,15 +51,18 @@ if ('serviceWorker' in navigator && process.env.VERSION.slice(0, 7) !== 'nightly
 
 if (process.env.VERSION !== 'development') {
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag(...args: unknown[]){window.dataLayer!.push(args);}
     gtag('js', new Date());
 
     gtag('config', 'G-4PDL1SSV9H');
 }
 
 var Module = {
-    locateFile: (file, _) => {
-        return require(`@/assets/${file}`);
+    locateFile: (file: string) => {
+        if (file === 'rm_ui_generator.wasm') {
+            return new URL('./assets/rm_ui_generator.wasm', import.meta.url).href;
+        }
+        return file;
     }
 }
 window.Module = Module
