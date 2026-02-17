@@ -11,7 +11,7 @@
 如果在使用过程中遇到故障，请先测试[nightly版本](https://ui.bismarck.xyz/nightly/)中是否存在相同问题，如有请提交issue或联系作者  
 
 ## 自行部署
-本项目为纯前端项目，可直接部署在任何静态服务器上，如Nginx、Apache等，
+本项目前端基于 React + TypeScript + Vite，可直接部署在任何静态服务器上，如Nginx、Apache等，
 在线demo使用Github Pages托管，如需自行构建前端可以参考以下步骤：
 ```shell
 git clone https://github.com/bismarckkk/RM-UI-Designer.git
@@ -33,6 +33,12 @@ yarn tauri build
 
 也可以在Github上Fork我们的项目，利用Github Action进行跨平台构建
 
+## 技术栈与构建
+- 前端：React + TypeScript
+- 构建工具：Vite
+- 桌面端：Tauri
+- 主要配置文件：`package.json`、`tsconfig.json`、`vite.config.ts`
+
 ## 路线图
 - 基本组件
   - [x] 直线
@@ -49,7 +55,7 @@ yarn tauri build
 - 编辑功能
   - [x] 拖拽
   - [x] 缩放
-  - [ ] 通过缩放翻转
+  - [x] 通过缩放翻转
   - [x] 撤销/重做
   - [x] 多选
   - [x] 复制/粘贴
@@ -72,7 +78,7 @@ yarn tauri build
 
 ### 项目结构
 
-详见[代码目录结构](./doc/directory.md)
+当前目录说明已按 TypeScript + Vite 架构维护，详见[代码目录结构](./doc/directory.md)
 
 ### 组件结构
 ![组件结构](./doc/components.png)
