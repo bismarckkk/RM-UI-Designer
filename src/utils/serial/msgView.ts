@@ -71,16 +71,16 @@ export interface objectType {
     _end: number,
 }
 
-interface layerType {
+export interface layerType {
     layer: number,
 }
 
-interface event {
+export interface event {
     type: string,
     obj?: objectType | layerType
 }
 
-interface msg {
+export interface msg {
     sender: number,
     receiver: number,
     sub_id: number,

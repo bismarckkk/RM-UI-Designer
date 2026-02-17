@@ -156,17 +156,17 @@ void ui_delete_layer(const uint8_t delete_type, const uint8_t layer) {
 }
 
 void ui_scan_and_send(const ui_interface_figure_t *ui_now_figures, uint8_t *ui_dirty_figure,
-                      const ui_interface_string_t *ui_now_strings, uint8_t *ui_dirty_string, const int total_figures,
-                      const int total_strings) {
+                      const ui_interface_string_t *ui_now_strings, uint8_t *ui_dirty_string, 
+                      const int total_figures, const int total_strings) {
     if (total_figures > 0) {
         int total_figure = 0;
         for (int i = 0; i < total_figures; i++) {
-            if (ui_dirty_figure[i] == 1) {
+            if (ui_dirty_figure[i] > 0) {
                 total_figure++;
             }
         }
         for (int i = 0, now_cap = 0, pack_size = 0; i < total_figures; i++) {
-            if (ui_dirty_figure[i] == 1) {
+            if (ui_dirty_figure[i] > 0) {
                 const int now_idx = now_cap % 7;
                 if (now_idx == 0) {
                     const int remain_size = total_figure - now_cap;
@@ -216,17 +216,17 @@ void ui_scan_and_send(const ui_interface_figure_t *ui_now_figures, uint8_t *ui_d
                     }
                 }
                 now_cap++;
-                ui_dirty_figure[i] = 0;
+                ui_dirty_figure[i]--;
             }
         }
     }
     if (total_strings > 0) {
         for (int i = 0; i < total_strings; i++) {
-            if (ui_dirty_string[i] == 1) {
+            if (ui_dirty_string[i] > 0) {
                 _ui_string_frame.option = ui_now_strings[i];
                 ui_proc_string_frame(&_ui_string_frame);
                 SEND_MESSAGE((uint8_t *) &_ui_string_frame, sizeof(_ui_string_frame));
-                ui_dirty_string[i] = 0;
+                ui_dirty_string[i]--;
             }
         }
     }

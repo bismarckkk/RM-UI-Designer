@@ -1,0 +1,175 @@
+import {dialog, fs} from '@tauri-apps/api';
+import JSZip from 'jszip';
+
+const a = document.createElement('a')
+const input = document.createElement('input')
+
+input.type = 'file'
+
+export const ColorMap = {
+    'yellow': 'rgb(255, 238, 70)',
+    'green': 'rgb(168, 255, 45)',
+    'orange': 'rgb(255, 163, 8)',
+    'purple': 'rgb(240, 41, 246)',
+    'pink': 'rgb(255, 100, 142)',
+    'cyan': 'rgb(69, 255, 242)',
+    'white': '#fff',
+    'black': '#000',
+    'blue': 'rgb(47, 168, 223)',
+    'red': 'rgb(255, 69, 70)',
+}
+
+type ZipFile = { fileName: string; content: string };
+
+function getFilter(name: string) {
+    const suffix = name.split('.').pop() ?? 'txt'
+    return {
+        name: suffix + ' file',
+        extensions: [suffix]
+    }
+}
+
+export function saveText(text: string, fileName: string) {
+    if (isTauri()) {
+        (async ()=> {
+            const path = await dialog.save({
+                filters: [getFilter(fileName)],
+                defaultPath: fileName
+            });
+            if (path !== null && path.length > 0) {
+                await fs.writeTextFile(path, text)
+            }
+        })()
+    } else {
+        const blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        // 释放创建的URL，以节省内存
+        URL.revokeObjectURL(url);
+    }
+}
+
+export function saveBlob(blob: Blob, fileName: string) {
+    if (isTauri()) {
+        (async ()=> {
+            const path = await dialog.save({
+                filters: [getFilter(fileName)],
+                defaultPath: fileName
+            });
+            if (path !== null && path.length > 0) {
+                const arrayBuffer = await blob.arrayBuffer();
+                await fs.writeBinaryFile(path, arrayBuffer);
+            }
+        })()
+    } else {
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+}
+
+export function saveObj(data: unknown, fileName: string, selected: string) {
+    let _data = {version: 2, data: data, selected}
+    const str = JSON.stringify(_data)
+    saveText(str, fileName)
+}
+
+export function createObjUrl(file: Blob) {
+    let url = null;
+    if (window.createObjectURL !== undefined) {
+        url = window.createObjectURL(file);
+    } else if (window.URL !== undefined) {
+        url = window.URL.createObjectURL(file);
+    } else if (window.webkitURL !== undefined) {
+        url = window.webkitURL.createObjectURL(file);
+    }
+    return url
+}
+
+export function isTauri() {
+    return window !== undefined && window.__TAURI__ !== undefined
+}
+
+export function isNightly() {
+    return process.env.VERSION.slice(0, 7) === 'nightly'
+}
+
+async function createZip(files: ZipFile[]) {
+    let zip = new JSZip();
+
+    files.forEach(file => {
+        zip.file(file.fileName, file.content);
+    });
+
+    return await zip.generateAsync({type: "blob"});
+}
+
+export async function code2zip(code: Record<string, Record<string, string>>) {
+    const files: ZipFile[] = []
+    for (let key in code) {
+        for (let suffix in code[key]) {
+            files.push({fileName: `${key}.${suffix}`, content: code[key][suffix]})
+        }
+    }
+    return await createZip(files)
+}
+
+export function uploadFile(accept: string): Promise<File> {
+    return new Promise<File>((resolve, reject) => {
+        if (isTauri()) {
+            let _accept = [accept.slice(1)]
+            let _acceptType = `${_accept} file`
+            if (accept === 'image/*') {
+                _accept = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'ico', 'svg']
+                _acceptType = 'image'
+            }
+            (async ()=> {
+                const path = await dialog.open({
+                    multiple: false,
+                    directory: false,
+                    filters: [{ name: _acceptType, extensions: _accept }]
+                })
+                if (typeof path === 'string' && path.length > 0) {
+                    const _path = path.replace(/\\/g, '/')
+                    const fileName = _path.split('/').pop() ?? 'file'
+                    const binary = await fs.readBinaryFile(path)
+                    const blob = new Blob([binary.buffer as ArrayBuffer]);
+                    const file = new File([blob], fileName);
+                    resolve(file)
+                } else {
+                    reject();
+                }
+            })()
+        } else {
+            input.accept = accept;
+            input.value = '';
+            input.onchange = () => {
+                if (input.files && input.files.length > 0) {
+                    const file = input.files[0];
+                    resolve(file);
+                } else {
+                    reject(new Error('No file selected'));
+                }
+            };
+            input.click();
+        }
+    })
+}
+
+export function isEditable(element: EventTarget | null) {
+    if (!(element instanceof HTMLElement)) {
+        return false;
+    }
+    if (document.getElementById('content-in')?.contains(element)) {
+        return true;
+    }
+    if (element.getAttribute('contentEditable') === "true") {
+        return true;
+    }
+
+    return element.tagName === "INPUT" || element.tagName === "TEXTAREA";
+}

@@ -17,6 +17,7 @@
 .container {
     height: calc(100vh - 30px);
     width: 100%;
+    overflow: hidden;
 }
 
 .full {
@@ -26,6 +27,8 @@
 
 body {
     user-select: none;
+    overflow: hidden;
+    margin: 0;
 }
 
 /* 下方.rmui为antd样式类，通过调用antd样式变量实现全局暗黑模式，这些变量在运行时生成，在编辑器中可能报错 */

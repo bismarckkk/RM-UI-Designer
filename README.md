@@ -17,7 +17,12 @@
 git clone https://github.com/bismarckkk/RM-UI-Designer.git
 cd RM-UI-Designer
 yarn
+yarn dev
 yarn build
+```
+若临时无法访问镜像源并仅需验证安装流程，可使用：
+```shell
+yarn verify:install:no-mirror
 ```
 如果需要自行构建Tauri应用，首先需要配置Tauri编译环境，
 然后自行生成签名密钥并配置`tauri.conf.json`中的`tauri.updater.pubKey`字段，
