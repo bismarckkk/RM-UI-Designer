@@ -252,8 +252,8 @@ class RenderController {
             const bottom = parentHeight - height;
             const coordinateDisplay = document.getElementById('coordinateDisplay');
             if (coordinateDisplay) {
-                coordinateDisplay.style.right = `${right+12}px`;
-                coordinateDisplay.style.bottom = `${bottom+25}px`;
+                coordinateDisplay.style.right = `${right+20}px`;
+                coordinateDisplay.style.bottom = `${bottom+12}px`;
             }
             for (const key of Object.keys(this.objects[this.state.frame])) {
                 this.objects[this.state.frame][key].setRatio(uiWindow.ratio)
