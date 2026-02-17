@@ -93,6 +93,7 @@ class RenderController {
     his = new History()
     moveTimer: ReturnType<typeof setInterval> | null = null
     moveTimeout: ReturnType<typeof setTimeout> | null = null
+    initialized = false
 
     constructor(props: RenderProps, notify: () => void) {
         this.props = props
@@ -318,6 +319,21 @@ class RenderController {
     }
 
     componentDidMount() {
+        if (this.initialized) {
+            return
+        }
+        this.initialized = true
+
+        const uiCanvas = document.getElementById('ui') as HTMLCanvasElement | null
+        if (uiCanvas?.parentElement?.classList.contains('canvas-container')) {
+            const wrapper = uiCanvas.parentElement
+            const container = wrapper.parentElement
+            if (container) {
+                container.insertBefore(uiCanvas, wrapper)
+                wrapper.remove()
+            }
+        }
+
         const that = this
         this.canvas = new fabric.Canvas('ui')
         this.setBackground(backgroundUrl)
@@ -542,6 +558,13 @@ class RenderController {
         window.dispatch = (type: string, payload: unknown) => {
             this.onObjectEvent(type, payload)
         }
+    }
+
+    componentWillUnmount() {
+        if (this.canvas) {
+            this.canvas.dispose()
+        }
+        this.initialized = false
     }
 
     upload(file: File) {
@@ -888,6 +911,9 @@ const Render = forwardRef<RenderRefApi, RenderProps>((props, ref) => {
 
     useEffect(() => {
         controllerRef.current?.componentDidMount?.()
+        return () => {
+            controllerRef.current?.componentWillUnmount?.()
+        }
     }, [])
 
     return controllerRef.current?.render() ?? null
