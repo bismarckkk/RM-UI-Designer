@@ -26,6 +26,165 @@ type LineOptions = {
     group?: string;
 };
 
+type UiLine = fabric.Line & {
+    ratio: number;
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+    pathOffset?: fabric.Point;
+    controls: { [key: string]: fabric.Control };
+};
+
+type ControlTransform = fabric.Transform & {
+    lineRotateDelta?: number;
+};
+
+const getLinePathOffset = (line: UiLine) => {
+    if (line.pathOffset) {
+        return line.pathOffset
+    }
+    return new fabric.Point((line.x1 + line.x2) / 2, (line.y1 + line.y2) / 2)
+}
+
+const endpointPositionHandler = (which: 'start' | 'end') => {
+    return (
+        _dim: fabric.Point,
+        finalMatrix: number[],
+        fabricObject: fabric.Object
+    ) => {
+        const line = fabricObject as UiLine & { calcLinePoints?: () => { x1: number; y1: number; x2: number; y2: number } }
+        const localLinePoints = line.calcLinePoints ? line.calcLinePoints() : null
+        const pathOffset = getLinePathOffset(line)
+        const localX = which === 'start'
+            ? (localLinePoints ? localLinePoints.x1 : line.x1 - pathOffset.x)
+            : (localLinePoints ? localLinePoints.x2 : line.x2 - pathOffset.x)
+        const localY = which === 'start'
+            ? (localLinePoints ? localLinePoints.y1 : line.y1 - pathOffset.y)
+            : (localLinePoints ? localLinePoints.y2 : line.y2 - pathOffset.y)
+        return fabric.util.transformPoint(new fabric.Point(localX, -localY), finalMatrix)
+    }
+}
+
+const endpointActionHandler = (which: 'start' | 'end') => {
+    return (
+        eventData: MouseEvent,
+        transform: ControlTransform,
+        x: number,
+        y: number
+    ) => {
+        const line = transform.target as UiLine
+        const canvasPointer = line.canvas?.getPointer(eventData)
+        const targetX = Math.round(((canvasPointer?.x ?? x) * line.ratio)) / line.ratio
+        const targetY = Math.round(((canvasPointer?.y ?? y) * line.ratio)) / line.ratio
+
+        if (which === 'start') {
+            line.set('x1', targetX)
+            line.set('y1', targetY)
+        } else {
+            line.set('x2', targetX)
+            line.set('y2', targetY)
+        }
+
+        line.setCoords()
+        if (line.canvas) {
+            line.canvas.requestRenderAll()
+        }
+        return true
+    }
+}
+
+const rotatePositionHandler = (
+    _dim: fabric.Point,
+    finalMatrix: number[],
+    fabricObject: fabric.Object
+) => {
+    const line = fabricObject as UiLine & { calcLinePoints?: () => { x1: number; y1: number; x2: number; y2: number } }
+    const localLinePoints = line.calcLinePoints ? line.calcLinePoints() : null
+    const pathOffset = getLinePathOffset(line)
+    const x1 = localLinePoints ? localLinePoints.x1 : line.x1 - pathOffset.x
+    const y1 = localLinePoints ? localLinePoints.y1 : line.y1 - pathOffset.y
+    const x2 = localLinePoints ? localLinePoints.x2 : line.x2 - pathOffset.x
+    const y2 = localLinePoints ? localLinePoints.y2 : line.y2 - pathOffset.y
+    const centerX = (x1 + x2) / 2
+    const centerY = (y1 + y2) / 2
+    const dx = x2 - x1
+    const dy = y2 - y1
+    const length = Math.hypot(dx, dy)
+    const offset = 28 / line.ratio
+    const nx = length === 0 ? 0 : -dy / length
+    const ny = length === 0 ? 1 : dx / length
+    return fabric.util.transformPoint(new fabric.Point(centerX + nx * offset, -(centerY + ny * offset)), finalMatrix)
+}
+
+const rotateActionHandler = (
+    eventData: MouseEvent,
+    transform: ControlTransform,
+    x: number,
+    y: number
+) => {
+    const line = transform.target as UiLine
+    const canvasPointer = line.canvas?.getPointer(eventData)
+    const pointerX = canvasPointer?.x ?? x
+    const pointerY = canvasPointer?.y ?? y
+    const centerX = (line.x1 + line.x2) / 2
+    const centerY = (line.y1 + line.y2) / 2
+    const halfLength = Math.hypot(line.x2 - line.x1, line.y2 - line.y1) / 2
+    const pointerAngle = Math.atan2(pointerY - centerY, pointerX - centerX)
+    const currentAngle = Math.atan2(line.y2 - line.y1, line.x2 - line.x1)
+    if (typeof transform.lineRotateDelta !== 'number') {
+        transform.lineRotateDelta = currentAngle - pointerAngle
+    }
+    const angle = pointerAngle + transform.lineRotateDelta
+    const cosValue = Math.cos(angle)
+    const sinValue = Math.sin(angle)
+
+    const newX1 = Math.round((centerX - cosValue * halfLength) * line.ratio) / line.ratio
+    const newY1 = Math.round((centerY - sinValue * halfLength) * line.ratio) / line.ratio
+    const newX2 = Math.round((centerX + cosValue * halfLength) * line.ratio) / line.ratio
+    const newY2 = Math.round((centerY + sinValue * halfLength) * line.ratio) / line.ratio
+
+    line.set('x1', newX1)
+    line.set('y1', newY1)
+    line.set('x2', newX2)
+    line.set('y2', newY2)
+    line.setCoords()
+    line.canvas?.requestRenderAll()
+    return true
+}
+
+const createEndpointControls = () => {
+    const controlsUtils = (fabric as typeof fabric & {
+        controlsUtils?: {
+            renderCircleControl?: fabric.Control['render'];
+        }
+    }).controlsUtils
+    const circleRender = controlsUtils?.renderCircleControl
+
+    return {
+        start: new fabric.Control({
+            positionHandler: endpointPositionHandler('start'),
+            actionHandler: endpointActionHandler('start'),
+            actionName: 'modifyLineEndpoint',
+            cursorStyle: 'crosshair',
+            render: circleRender,
+        }),
+        end: new fabric.Control({
+            positionHandler: endpointPositionHandler('end'),
+            actionHandler: endpointActionHandler('end'),
+            actionName: 'modifyLineEndpoint',
+            cursorStyle: 'crosshair',
+            render: circleRender,
+        }),
+        rotate: new fabric.Control({
+            positionHandler: rotatePositionHandler,
+            actionHandler: rotateActionHandler,
+            actionName: 'rotateLineAroundCenter',
+            cursorStyle: 'crosshair',
+        }),
+    }
+}
+
 export const Line = fabric.util.createClass(fabric.Line, {
     type: 'UiLine',
     id: 0,
@@ -61,8 +220,8 @@ export const Line = fabric.util.createClass(fabric.Line, {
         }
         options.fill = null
         this.callSuper('initialize', [options.x1, options.y1, options.x2, options.y2], options)
+        this.controls = createEndpointControls()
         this.moveTo(options.layer)
-        this.setControlVisible('mtr', false)
         this.transparentCorners = false
     },
     resizeScale: function() {
