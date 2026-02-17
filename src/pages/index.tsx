@@ -10,6 +10,7 @@ import type { MenuRefApi } from "@/components/menu/menu";
 import AppHelper from "@/components/appHelper";
 import { modal } from "@/utils/app"
 import enUS from "antd/locale/en_US";
+import StartupReleaseModal from "@/components/modals/startupReleaseModal";
 
 const { darkAlgorithm, compactAlgorithm } = theme;
 
@@ -115,6 +116,7 @@ const Index = () => {
                     </div>
                 </div>
                 <AppHelper/>
+                <StartupReleaseModal/>
                 <UpdateModal/>
                 <EulaModal/>
             </App>
