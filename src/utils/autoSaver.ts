@@ -1,5 +1,4 @@
 import { dialog, fs } from '@tauri-apps/api';
-// @ts-ignore
 import { message } from "@/utils/app";
 import { isTauri } from "@/utils/utils";
 
@@ -13,11 +12,26 @@ interface IWritableStream {
     close(): Promise<void>;
 }
 
+type FilePickerWindow = Window & {
+    showOpenFilePicker?: (options: {
+        types: Array<{
+            description: string;
+            accept: Record<string, string[]>;
+        }>;
+    }) => Promise<IFileHandle[]>;
+    showSaveFilePicker?: (options: {
+        types: Array<{
+            description: string;
+            accept: Record<string, string[]>;
+        }>;
+    }) => Promise<IFileHandle>;
+};
+
 export class FileHandler {
     private readonly getContentFunc: () => string;
     private fileHandle: IFileHandle | string | null;
-    private timerId: NodeJS.Timeout | null;
-    private updateTimerId: NodeJS.Timeout | null;
+    private timerId: ReturnType<typeof setInterval> | null;
+    private updateTimerId: ReturnType<typeof setTimeout> | null;
 
     constructor(getContentFunc: () => string) {
         this.getContentFunc = getContentFunc;
@@ -41,7 +55,11 @@ export class FileHandler {
                     document.title = `${fileName} - RM UI Designer`;
                 }
             } else {
-                [this.fileHandle] = await window.showOpenFilePicker({
+                const picker = window as FilePickerWindow
+                if (!picker.showOpenFilePicker) {
+                    throw new Error('showOpenFilePicker is not available')
+                }
+                [this.fileHandle] = await picker.showOpenFilePicker({
                     types: [
                         {
                             description: "rmui file",
@@ -51,8 +69,10 @@ export class FileHandler {
                         },
                     ]
                 });
-                const fileName = (await this.fileHandle.getFile()).name;
-                document.title = `${fileName} - RM UI Designer`;
+                if (this.fileHandle && typeof this.fileHandle !== 'string') {
+                    const fileName = (await this.fileHandle.getFile()).name;
+                    document.title = `${fileName} - RM UI Designer`;
+                }
             }
             this.enableAutoSave()
         } catch (_) {
@@ -74,7 +94,11 @@ export class FileHandler {
                     document.title = `${fileName} - RM UI Designer`;
                 }
             } else {
-                this.fileHandle = await window.showSaveFilePicker({
+                const picker = window as FilePickerWindow
+                if (!picker.showSaveFilePicker) {
+                    throw new Error('showSaveFilePicker is not available')
+                }
+                this.fileHandle = await picker.showSaveFilePicker({
                     types: [
                         {
                             description: "rmui file",
@@ -84,8 +108,10 @@ export class FileHandler {
                         },
                     ]
                 });
-                const fileName = (await this.fileHandle.getFile()).name;
-                document.title = `${fileName} - RM UI Designer`;
+                if (this.fileHandle && typeof this.fileHandle !== 'string') {
+                    const fileName = (await this.fileHandle.getFile()).name;
+                    document.title = `${fileName} - RM UI Designer`;
+                }
             }
             await this.write(JSON.stringify({version: 2, data: {default: {}}, selected: 'default'}))
             this.enableAutoSave()
@@ -100,7 +126,6 @@ export class FileHandler {
             const content = this.getContentFunc();
             await this.write(content);
         }, 60000);
-        // @ts-ignore
         message.success('Auto save enabled')
     }
 
@@ -114,7 +139,6 @@ export class FileHandler {
             clearTimeout(this.updateTimerId);
             this.updateTimerId = null;
         }
-        // @ts-ignore
         message.warning('Auto save disabled')
     }
 

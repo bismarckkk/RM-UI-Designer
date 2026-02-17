@@ -1,6 +1,31 @@
 import { fabric } from "fabric";
 import { ColorMap } from "../utils";
 
+type ColorKey = keyof typeof ColorMap;
+type EllipseOptions = {
+    id: number;
+    name: string;
+    layer: number;
+    groupName: string;
+    ratio: number;
+    color: ColorKey | 'main';
+    team: ColorKey;
+    rx: number;
+    ry: number;
+    x: number;
+    y: number;
+    lineWidth: number;
+    strokeWidth: number;
+    left: number;
+    top: number;
+    group?: string;
+    stroke?: string;
+    fill?: string | null;
+    lockRotation?: boolean;
+    lockScalingFlip?: boolean;
+    hasRotatingPoint?: boolean;
+};
+
 
 export const Ellipse = fabric.util.createClass(fabric.Ellipse, {
     type: 'UiEllipse',
@@ -11,7 +36,7 @@ export const Ellipse = fabric.util.createClass(fabric.Ellipse, {
     ratio: 1,
     _color: '',
     team: 'red',
-    initialize: function(options) {
+    initialize: function(options: Partial<EllipseOptions>) {
         options || (options = {})
         options.color || (options.color = 'main')
         this.id = options.id
@@ -30,9 +55,9 @@ export const Ellipse = fabric.util.createClass(fabric.Ellipse, {
         options.top || (options.top = 50 / this.ratio)
         options.strokeWidth || (options.strokeWidth = 1 / this.ratio)
         if (this._color && this._color !== 'main') {
-            options.stroke = ColorMap[this._color]
+            options.stroke = ColorMap[this._color as ColorKey]
         } else {
-            options.stroke = ColorMap[options.team]
+            options.stroke = ColorMap[options.team as ColorKey]
             this._color = 'main'
         }
         options.fill = null
@@ -64,7 +89,7 @@ export const Ellipse = fabric.util.createClass(fabric.Ellipse, {
             lineWidth: this.strokeWidth * this.ratio,
         }
     },
-    fromObject: function (options) {
+    fromObject: function (options: EllipseOptions) {
         this._color = options.color
         this.id = options.id
         this.name = options.name
@@ -76,13 +101,13 @@ export const Ellipse = fabric.util.createClass(fabric.Ellipse, {
         this.set('top', (options.y - options.ry) / this.ratio)
         this.set('strokeWidth', options.lineWidth / this.ratio)
         if (this._color === 'main') {
-            this.set('stroke', ColorMap[this.team])
+            this.set('stroke', ColorMap[this.team as ColorKey])
         } else {
-            this.set('stroke', ColorMap[this._color])
+            this.set('stroke', ColorMap[this._color as ColorKey])
         }
         this.moveTo(options.layer)
     },
-    setRatio: function (ratio) {
+    setRatio: function (ratio: number) {
         this.set('rx', this.rx * this.ratio / ratio)
         this.set('ry', this.ry * this.ratio / ratio)
         this.set('left', this.left * this.ratio / ratio)
@@ -90,10 +115,10 @@ export const Ellipse = fabric.util.createClass(fabric.Ellipse, {
         this.set('strokeWidth', this.strokeWidth * this.ratio / ratio)
         this.ratio = ratio
     },
-    setTeam: function (team) {
+    setTeam: function (team: ColorKey) {
         this.team = team
         if (this._color === 'main') {
-            this.set('stroke', ColorMap[this.team])
+            this.set('stroke', ColorMap[this.team as ColorKey])
         }
     }
 })

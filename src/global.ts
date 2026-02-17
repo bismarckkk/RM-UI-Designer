@@ -5,27 +5,32 @@ import generatorWasmUrl from './assets/rm_ui_generator.wasm?url'
 fabric.Object.prototype.isOnScreen = () => true
 fabric.ActiveSelection.prototype.hasControls = false
 
-function findCornerQuadrant(fabricObject, control) {
-    const cornerAngle = fabricObject.angle + fabric.util.radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
+type FabricWithControls = typeof fabric & { controlsUtils: { skewCursorStyleHandler: (eventData: MouseEvent, control: fabric.Control, fabricObject: fabric.Object) => string } };
+const fabricControls = (fabric as FabricWithControls).controlsUtils
+
+function findCornerQuadrant(fabricObject: fabric.Object, control: fabric.Control) {
+    const cornerAngle = (fabricObject.angle ?? 0) + fabric.util.radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
     return Math.round((cornerAngle % 360) / 45);
 }
 
-fabric.controlsUtils.skewCursorStyleHandler = (eventData, control, fabricObject) => {
+fabricControls.skewCursorStyleHandler = (eventData: MouseEvent, control: fabric.Control, fabricObject: fabric.Object) => {
+    void eventData
     const notAllowed = 'not-allowed';
     const skewMap = ['ew', 'nesw', 'ns', 'nwse']
-    if (control.x !== 0 && fabricObject.lockSkewingY) {
+    if (control.x !== 0 && (fabricObject as fabric.Object & { lockSkewingY?: boolean }).lockSkewingY) {
         return notAllowed;
     }
-    if (control.y !== 0 && fabricObject.lockSkewingX) {
+    if (control.y !== 0 && (fabricObject as fabric.Object & { lockSkewingX?: boolean }).lockSkewingX) {
         return notAllowed;
     }
     const n = findCornerQuadrant(fabricObject, control) % 4;
     return skewMap[n] + '-resize';
 }
 
-for(let corner in fabric.Object.prototype.controls) {
-    const control = fabric.Object.prototype.controls[corner]
-    control.cursorStyleHandler = fabric.controlsUtils.skewCursorStyleHandler
+const controls = fabric.Object.prototype.controls
+for(let corner in controls) {
+    const control = controls[corner]
+    control.cursorStyleHandler = fabricControls.skewCursorStyleHandler
 }
 
 

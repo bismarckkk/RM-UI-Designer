@@ -1,6 +1,31 @@
 import { fabric } from "fabric";
 import { ColorMap } from "../utils";
 
+type ColorKey = keyof typeof ColorMap;
+type LineOptions = {
+    id: number;
+    name: string;
+    layer: number;
+    groupName: string;
+    ratio: number;
+    color: ColorKey | 'main';
+    team: ColorKey;
+    x: number;
+    y: number;
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+    lineWidth: number;
+    strokeWidth: number;
+    stroke?: string;
+    fill?: string | null;
+    lockRotation?: boolean;
+    lockScalingFlip?: boolean;
+    hasRotatingPoint?: boolean;
+    group?: string;
+};
+
 export const Line = fabric.util.createClass(fabric.Line, {
     type: 'UiLine',
     id: 0,
@@ -10,7 +35,7 @@ export const Line = fabric.util.createClass(fabric.Line, {
     ratio: 1,
     _color: '',
     team: 'red',
-    initialize: function(options) {
+    initialize: function(options: Partial<LineOptions>) {
         options || (options = {})
         options.color || (options.color = 'main')
         this.id = options.id
@@ -29,9 +54,9 @@ export const Line = fabric.util.createClass(fabric.Line, {
         options.y2 || (options.y2 = 100 / this.ratio)
         options.strokeWidth || (options.strokeWidth = 1 / this.ratio)
         if (this._color && this._color !== 'main') {
-            options.stroke = ColorMap[this._color]
+            options.stroke = ColorMap[this._color as ColorKey]
         } else {
-            options.stroke = ColorMap[options.team]
+            options.stroke = ColorMap[options.team as ColorKey]
             this._color = 'main'
         }
         options.fill = null
@@ -84,7 +109,7 @@ export const Line = fabric.util.createClass(fabric.Line, {
             lineWidth: this.strokeWidth * this.ratio,
         }
     },
-    fromObject: function (options) {
+    fromObject: function (options: LineOptions) {
         this._color = options.color
         this.id = options.id
         this.name = options.name
@@ -96,13 +121,13 @@ export const Line = fabric.util.createClass(fabric.Line, {
         this.set('y1', options.y / this.ratio)
         this.set('strokeWidth', options.lineWidth / this.ratio)
         if (this._color === 'main') {
-            this.set('stroke', ColorMap[this.team])
+            this.set('stroke', ColorMap[this.team as ColorKey])
         } else {
-            this.set('stroke', ColorMap[this._color])
+            this.set('stroke', ColorMap[this._color as ColorKey])
         }
         this.moveTo(options.layer)
     },
-    setRatio: function (ratio) {
+    setRatio: function (ratio: number) {
         this.set('x1', this.x1 * this.ratio / ratio)
         this.set('y1', this.y1 * this.ratio / ratio)
         this.set('x2', this.x2 * this.ratio / ratio)
@@ -110,10 +135,10 @@ export const Line = fabric.util.createClass(fabric.Line, {
         this.set('strokeWidth', this.strokeWidth * this.ratio / ratio)
         this.ratio = ratio
     },
-    setTeam: function (team) {
+    setTeam: function (team: ColorKey) {
         this.team = team
         if (this._color === 'main') {
-            this.set('stroke', ColorMap[this.team])
+            this.set('stroke', ColorMap[this.team as ColorKey])
         }
     }
 })

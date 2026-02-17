@@ -3,6 +3,11 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const gitRef = process.env.ref;
 
 const tauriConf = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, 'src-tauri/tauri.conf.json'), 'utf-8'),
@@ -12,12 +17,12 @@ let version = `v${tauriConf.package.version}`;
 if (process.env.NODE_ENV === 'development') {
   version = 'development';
 }
-if (process.env.ref) {
-  version = `nightly ${process.env.ref.slice(0, 7)}`;
+if (gitRef) {
+  version = `nightly ${gitRef.slice(0, 7)}`;
 }
 
 export default defineConfig({
-  base: process.env.ref ? '/nightly/' : '/',
+  base: gitRef ? '/nightly/' : '/',
   server: {
     port: 8000,
     strictPort: true,
@@ -33,7 +38,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    ...(!process.env.ref
+    ...(!gitRef
       ? [
           VitePWA({
             strategies: 'generateSW',

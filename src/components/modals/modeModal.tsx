@@ -2,9 +2,16 @@ import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react';
 import { Button, Divider, Modal, Space } from "antd";
 import { isAvailable } from "@/utils/autoSaver";
 
-const ModeModal = forwardRef((props, ref: any) => {
+type Deferred<T> = {
+    resolve: (value: T | PromiseLike<T>) => void;
+    reject: (reason?: unknown) => void;
+};
+
+export type ModeModalRef = { open: () => Promise<string> };
+
+const ModeModal = forwardRef<ModeModalRef>((_props, ref) => {
     const [open, setOpen] = useState(false)
-    const promiseRef = useRef<any>(null)
+    const promiseRef = useRef<Deferred<string> | null>(null)
 
     useImperativeHandle(ref, () => ({
         open: () => {
@@ -20,7 +27,7 @@ const ModeModal = forwardRef((props, ref: any) => {
 
     const onClick = (mode: string) => {
         setOpen(false)
-        promiseRef.current.resolve(mode)
+        promiseRef.current?.resolve(mode)
         promiseRef.current = null
     }
 
@@ -33,7 +40,7 @@ const ModeModal = forwardRef((props, ref: any) => {
             zIndex={2050}
             open={open}
         >
-            <Space direction="vertical" size="middle" style={{width: '100%', padding: 15}}>
+            <Space direction="vertical" size="middle" style={{width: 'calc(100% - 30px)', padding: 15}}>
                     <Button
                         type="primary" disabled={!ava} style={{ width: '100%' }} size="large"
                         onClick={() => onClick('new')}

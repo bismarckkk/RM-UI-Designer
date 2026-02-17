@@ -1,11 +1,20 @@
 import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react';
 import { ModalForm, ProFormText } from "@ant-design/pro-components";
 
-const FormModal = forwardRef((props, ref: any) => {
+type Deferred<T> = {
+    resolve: (value: T | PromiseLike<T>) => void;
+    reject: (reason?: unknown) => void;
+};
+
+type FormValues = { frame: string };
+
+export type FormModalRef = { open: (title: string, frames: string[]) => Promise<string> };
+
+const FormModal = forwardRef<FormModalRef>((_props, ref) => {
     const [title, setTitle] = useState('')
     const [open, setOpen] = useState(false)
     const [frames, setFrames] = useState<string[]>([])
-    const promiseRef = useRef<any>(null)
+    const promiseRef = useRef<Deferred<string> | null>(null)
 
     useImperativeHandle(ref, () => ({
         open: (_title: string, _frames: string[]) => {
@@ -33,8 +42,8 @@ const FormModal = forwardRef((props, ref: any) => {
                 }
                 setOpen(e)
             }}
-            onFinish={async (e: any)=>{
-                promiseRef.current.resolve(e.frame)
+            onFinish={async (e: FormValues)=>{
+                promiseRef.current?.resolve(e.frame)
                 promiseRef.current = null
                 return true
             }}

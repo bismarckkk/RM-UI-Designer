@@ -1,10 +1,33 @@
 import React, {useRef, useState} from 'react';
 import {Card, Dropdown, Tree, Space, Flex} from "antd";
+import type { MenuProps } from 'antd';
+import type { MenuInfo } from 'rc-menu/lib/interface';
 import { DownOutlined, EyeOutlined, EyeInvisibleOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import SwitchButton from "./switchButton";
 
-function selectId2Key(ids) {
-    return ids.map(id => id === -2 ? 'window' : `E-${id}`)
+type ElementNode = {
+    id: number;
+    name: string;
+    layer?: string | number;
+    group?: string | number;
+    [key: string]: unknown;
+};
+
+type ElementsProps = {
+    data: Record<string, ElementNode>;
+    selectedId: Array<number | string>;
+    editable: boolean;
+    onSelect: (ids: number[]) => void;
+    onObjectEvent: (type: string, payload: unknown) => void;
+    onReset: () => Promise<void>;
+};
+
+type TreeLeaf = { title: React.ReactNode; key: string };
+type TreeGroup = { title: React.ReactNode; key: string; children: TreeLeaf[]; isLeaf?: boolean };
+type TreeNode = TreeLeaf | TreeGroup;
+
+function selectId2Key(ids: Array<number | string>) {
+    return ids.map((id: number | string) => id === -2 ? 'window' : `E-${id}`)
 }
 
 const items = [
@@ -12,22 +35,24 @@ const items = [
     {key: 'D1-group-group', label: 'group'}
 ]
 
-const Elements = (props: any) => {
+const Elements = (props: ElementsProps) => {
     const [rightClickMenuOpen, setRightClickMenuOpen] = useState(false)
     const [groupKey, setGroupKey] = useState('layer')
-    const treeDataRef = useRef<any[]>([])
+    const treeDataRef = useRef<TreeNode[]>([])
 
-    const selectKey2id = (keys: any[]) => {
-        let res = []
-        for (let key of keys) {
-            if (key === 'window') {
+    const selectKey2id = (keys: React.Key[]) => {
+        const res: number[] = []
+        for (const key of keys) {
+            const keyStr = String(key)
+            if (keyStr === 'window') {
                 res.push(-2)
             } else {
-                if (key.startsWith('E-')) {
-                    res.push(parseInt(key.slice(2)))
+                if (keyStr.startsWith('E-')) {
+                    res.push(parseInt(keyStr.slice(2)))
                 } else {
-                    const ids = treeDataRef.current.find(e => e.key === key).children.map(e => parseInt(e.key.slice(2)))
-                    for (let id of ids) {
+                    const group = treeDataRef.current.find((e) => e.key === keyStr) as TreeGroup | undefined
+                    const ids = group?.children.map((e: TreeLeaf) => parseInt(e.key.slice(2))) ?? []
+                    for (const id of ids) {
                         if (!res.includes(id)) {
                             res.push(id)
                         }
@@ -38,25 +63,26 @@ const Elements = (props: any) => {
         return res
     }
 
-    const onElementMenuContainerClick = (e) => {
-        if (e.target.classList.value.includes('ant-dropdown-menu')) {
+    const onElementMenuContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        const target = e.target as HTMLElement
+        if (target.classList.value.includes('ant-dropdown-menu')) {
             return;
         }
-        console.log(e.target.className)
+        console.log(target.className)
         setRightClickMenuOpen(false)
-        if (e.target.classList.contains('ant-tree') || (!e.ctrlKey && !e.shiftKey)) {
+        if (target.classList.contains('ant-tree') || (!e.ctrlKey && !e.shiftKey)) {
             props.onSelect([])
         }
     }
 
-    const onElementMenuClick = (e) => {
+    const onElementMenuClick = (e: MenuInfo) => {
         setRightClickMenuOpen(false)
         if (e.key === 'D2-copy') {
             let info = null
-            if (e.target.localName !== 'input' && props.selectedId.length !== 0 &&props.selectedId[0] !== -2) {
-                e.preventDefault()
-                info = JSON.stringify(props.selectedId.map(id => props.data[id]))
-                e.clipboardData.setData('text', info)
+            const target = e.domEvent.target as HTMLElement | null
+            if (target?.localName !== 'input' && props.selectedId.length !== 0 &&props.selectedId[0] !== -2) {
+                e.domEvent.preventDefault()
+                info = JSON.stringify(props.selectedId.map((id) => props.data[String(id)]))
             }
         } else if (e.key === 'D2-delete') {
             for (let id of props.selectedId) {
@@ -66,14 +92,14 @@ const Elements = (props: any) => {
         }
     }
 
-    const onElementRightClick = (e) => {
+    const onElementRightClick = (e: { node: { key: React.Key } }) => {
         let id = selectKey2id([e.node.key])
         if (!(id[0] in props.selectedId)) {
             props.onSelect(id)
         }
     }
 
-    const onSelect = (nodes) => {
+    const onSelect = (nodes: React.Key[]) => {
         if (nodes.length === 0) {
             return
         }
@@ -84,7 +110,7 @@ const Elements = (props: any) => {
         props.onSelect(ids)
     }
 
-    const onMenuOpenChange = (e) => {
+    const onMenuOpenChange = (e: boolean) => {
         if (e) {
             setTimeout(()=>{
                 if (props.selectedId.length !== 0 && props.selectedId[0] !== -2) {
@@ -98,13 +124,13 @@ const Elements = (props: any) => {
         }
     }
 
-    const elementsMenuOnClick = (key) => {
+    const elementsMenuOnClick = (key: { key: string }) => {
         setGroupKey(key.key.slice(9))
     }
 
     const updateTree = () => {
         const key = groupKey
-        let treeDataList = []
+        let treeDataList: TreeGroup[] = []
         const keys = Object.keys(props.data)
         for (let i = 0; i < keys.length; i++) {
             const node = props.data[keys[i]]
@@ -146,10 +172,12 @@ const Elements = (props: any) => {
         }
 
         treeDataList = treeDataList.sort((a, b) => a.key.toString().localeCompare(b.key.toString()))
-        treeDataList.unshift({title: "UI Window", key: 'window'})
 
-        treeDataRef.current = treeDataList
-        return treeDataList
+        const result: TreeNode[] = [...treeDataList]
+        result.unshift({title: "UI Window", key: 'window'})
+
+        treeDataRef.current = result
+        return result
     }
 
     return (
@@ -161,14 +189,14 @@ const Elements = (props: any) => {
                     <Dropdown
                         menu={{
                             items,
-                            onClick: (e)=>elementsMenuOnClick(e),
+                            onClick: (e)=>elementsMenuOnClick(e as { key: string }),
                             selectable: true,
                             selectedKeys: [`D1-group-${groupKey}`]
                         }}
                     >
                         <Space style={{fontSize: 11}}>
                             Group by
-                            <DownOutlined size="small" />
+                            <DownOutlined size={12} />
                         </Space>
                     </Dropdown>
                 }
@@ -195,7 +223,7 @@ const Elements = (props: any) => {
                             onSelect={(e)=>onSelect(e)}
                             selectedKeys={selectId2Key(props.selectedId)}
                             onRightClick={(e)=>onElementRightClick(e)}
-                            treeDefaultExpandAll={true}
+                            defaultExpandAll={true}
                             showLine={true}
                             blockNode={true}
                             multiple={true}

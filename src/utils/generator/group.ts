@@ -1,12 +1,19 @@
 import GroupSplit from "./groupSplit";
+import type { objectType } from "@/utils/serial/msgView";
+
+type GroupObj = objectType;
 
 class Group {
-    constructor(frame_name, group_name, _objs) {
+    frame_name: string
+    group_name: string
+    splits: GroupSplit[]
+
+    constructor(frame_name: string, group_name: string, _objs: GroupObj[]) {
         this.frame_name = frame_name
         this.group_name = group_name
         this.splits = []
 
-        for (let obj of _objs) {
+        for (const obj of _objs) {
             if (obj.type === "UiText") {
                 this.splits.push(new GroupSplit(
                     this.frame_name, this.splits.length, [obj]
@@ -14,7 +21,7 @@ class Group {
             }
         }
 
-        const objs = _objs.filter(obj => obj.type !== "UiText");
+        const objs = _objs.filter((obj) => obj.type !== "UiText");
         const splitNum = Math.ceil(objs.length / 7);
         for (let i = 0; i < splitNum; i++) {
             this.splits.push(new GroupSplit(
@@ -24,8 +31,8 @@ class Group {
     }
 
     toSerialMsg() {
-        let res = []
-        for (let split of this.splits) {
+        const res: Uint8Array[] = []
+        for (const split of this.splits) {
             res.push(split.toSerialMsg())
         }
         return res

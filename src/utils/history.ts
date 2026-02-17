@@ -1,6 +1,9 @@
 import lodash from 'lodash'
 
-function getPrevious(hh) {
+type HistoryNow = { version: number; data: Record<string, unknown>; selected: string };
+type HistoryCache = { data: HistoryNow[]; head: number; version: number };
+
+function getPrevious(hh: HistoryCache) {
     if (hh.head > 0) {
         return {...hh.data[hh.head - 1]}
     } else {
@@ -8,7 +11,7 @@ function getPrevious(hh) {
     }
 }
 
-function getNext(hh) {
+function getNext(hh: HistoryCache) {
     if (hh.head < hh.data.length - 1) {
         return {...hh.data[hh.head + 1]}
     } else {
@@ -17,17 +20,17 @@ function getNext(hh) {
 }
 
 class History {
-    cacheTimer = null
-    updateTimer = null
-    now = null
-    _previous = null
-    _next = null
-    his = null
+    cacheTimer: ReturnType<typeof setTimeout> | null = null
+    updateTimer: ReturnType<typeof setTimeout> | null = null
+    now: HistoryNow | null = null
+    _previous: HistoryNow | null = null
+    _next: HistoryNow | null = null
+    his: HistoryCache | null = null
     catchUpdate = true
 
     constructor() {
         let his = localStorage.getItem('history')
-        let hh = {data: [{}], head: 0, version: 1}
+        let hh: HistoryCache = {data: [{version: 2, data: {default: {}}, selected: 'default'}], head: 0, version: 1}
         if (his) {
             hh = JSON.parse(his)
         } else {
@@ -49,6 +52,9 @@ class History {
             clearTimeout(this.cacheTimer)
         }
         this.cacheTimer = setTimeout(()=>{
+            if (!this.his) {
+                return
+            }
             if (this.his.head > 50) {
                 this.his.data = this.his.data.slice(this.his.head - 50)
                 this.his.head = 50
@@ -63,7 +69,10 @@ class History {
 
     read() {
         if(!this.his) {
-            this.his = JSON.parse(localStorage.getItem('history'))
+            const historyText = localStorage.getItem('history')
+            if (historyText) {
+                this.his = JSON.parse(historyText) as HistoryCache
+            }
         }
     }
 
@@ -75,7 +84,7 @@ class History {
         }
     }
 
-    reset(data) {
+    reset(data: HistoryNow) {
         this._previous = null
         this._next = null
         this.his = {data: [data], head: 0, version: 1}
@@ -84,7 +93,7 @@ class History {
     }
 
     next() {
-        if (this._next) {
+        if (this._next && this.his) {
             this._previous = this.now
             this.now = this._next
             this.read()
@@ -96,7 +105,7 @@ class History {
     }
 
     previous() {
-        if (this._previous) {
+        if (this._previous && this.his) {
             this._next = this.now
             this.now = this._previous
             this.read()
@@ -113,7 +122,7 @@ class History {
         }
     }
 
-    update(data) {
+    update(data: HistoryNow) {
         if (!this.catchUpdate) {
             return
         }
@@ -121,7 +130,7 @@ class History {
             clearTimeout(this.updateTimer)
         }
         this.updateTimer = setTimeout(()=>{
-            if (!lodash.isEqual(data, this.now)) {
+            if (!lodash.isEqual(data, this.now) && this.his) {
                 this._previous = this.now
                 this.now = data
                 this.read()

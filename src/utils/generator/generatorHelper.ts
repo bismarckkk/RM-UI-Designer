@@ -5,8 +5,13 @@ import typesHUrlS from '@/assets/code_template/static/ui_types.h?url'
 import interfaceHUrlD from '@/assets/code_template/dynamic/ui_interface.h?url'
 import interfaceCUrlD from '@/assets/code_template/dynamic/ui_interface.c?url'
 import typesHUrlD from '@/assets/code_template/dynamic/ui_types.h?url'
+import type { objectType } from "@/utils/serial/msgView";
 
-async function getUiBase(static_mode) {
+type GeneratorObj = objectType
+export type GeneratorData = Record<string, Record<string, GeneratorObj>>
+type GeneratorResult = { code: Record<string, { h?: string; c?: string }>; info: Array<{ level: string; message: string }> }
+
+async function getUiBase(static_mode: boolean) {
     if (static_mode) {
         return {
             ui_interface: {
@@ -31,13 +36,17 @@ async function getUiBase(static_mode) {
 }
 
 class GeneratorHelper {
-    constructor(data, static_mode) {
-        this.res = JSON.parse(window.Module.generate(JSON.stringify(data), static_mode))
+    res: GeneratorResult
+    frames: Frame[]
+
+    constructor(data: GeneratorData, static_mode: boolean) {
+        const moduleApi = window.Module as { generate: (input: string, staticMode: boolean) => string }
+        this.res = JSON.parse(moduleApi.generate(JSON.stringify(data), static_mode))
         this.frames = []
         if (Object.keys(data).length === 1) {
             this.frames.push(new Frame('g', data[Object.keys(data)[0]]))
         } else {
-            for (let frame_name in data) {
+            for (const frame_name in data) {
                 this.frames.push(new Frame(frame_name, data[frame_name]))
             }
         }
@@ -47,7 +56,7 @@ class GeneratorHelper {
         return this.res.code
     }
 
-    getUiBase(static_mode) {
+    getUiBase(static_mode: boolean) {
         return () => getUiBase(static_mode);
     }
 
@@ -56,8 +65,8 @@ class GeneratorHelper {
     }
 
     toSerialMsg() {
-        let res = {}
-        for (let frame of this.frames) {
+        const res: Record<string, Uint8Array[]> = {}
+        for (const frame of this.frames) {
             res[frame.name] = frame.toSerialMsg()
         }
         return res

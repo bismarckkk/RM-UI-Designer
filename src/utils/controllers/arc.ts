@@ -1,11 +1,17 @@
 import { fabric } from "fabric";
 import { Ellipse } from "./ellipse";
 
+type ArcOptions = {
+    startAngle: number;
+    endAngle: number;
+    [key: string]: unknown;
+};
+
 export const Arc = fabric.util.createClass(Ellipse, {
     type: 'UiArc',
     startAngle: 0,
     endAngle: 90,
-    initialize: function(options) {
+    initialize: function(options: Partial<ArcOptions>) {
         options || (options = {});
         options.startAngle || (options.startAngle = 0);
         options.endAngle || (options.endAngle = 90);
@@ -20,7 +26,7 @@ export const Arc = fabric.util.createClass(Ellipse, {
             endAngle: this.endAngle
         });
     },
-    _render: function(ctx) {
+    _render: function(ctx: CanvasRenderingContext2D) {
         var startAngle = -(this.endAngle - 90) * (Math.PI / 180);
         var endAngle = -(this.startAngle - 90) * (Math.PI / 180);
 
@@ -30,7 +36,7 @@ export const Arc = fabric.util.createClass(Ellipse, {
         ctx.lineWidth = this.strokeWidth
         ctx.stroke()
     },
-    fromObject: function (options) {
+    fromObject: function (options: ArcOptions) {
         this.set('startAngle', options.startAngle);
         this.set('endAngle', options.endAngle);
         // without this line, this will not update

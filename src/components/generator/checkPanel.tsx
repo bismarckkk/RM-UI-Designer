@@ -25,7 +25,7 @@ const CheckPanel = (props: CheckPanelProps) => {
     if (errors.length + warnings.length > 0) {
         res = <div style={{color: 'var(--ant-color-text)', height: '100%'}}>
             <p>Found {errors.length} errors, {warnings.length} warnings.</p>
-            <div style={{paddingBottom: 10}} className="card-body">
+            <div style={{paddingBottom: 10, height: 'calc(100% - 20px)'}} className="card-body">
                 <List
                     bordered
                     dataSource={props.errors}
@@ -50,7 +50,7 @@ const CheckPanel = (props: CheckPanelProps) => {
             width: '100%',
             height: 'calc(100% - 50px)',
         }}>
-            <h3 style={{color: 'var(--ant-color-text)'}}>Check Data</h3>
+            <h3 style={{color: 'var(--ant-color-text)', margin: 0}}>Check Data</h3>
             {res}
         </div>
     );

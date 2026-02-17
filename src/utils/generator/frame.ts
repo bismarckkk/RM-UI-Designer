@@ -1,12 +1,16 @@
 import Group from "./group";
+import type { objectType } from "@/utils/serial/msgView";
 
 class Frame {
-    constructor(name, objs) {
+    name: string
+    groups: Group[]
+
+    constructor(name: string, objs: Record<string, objectType>) {
         this.name = name
         this.groups = []
 
-        let _groups = {}
-        for (let obj_name in objs) {
+        const _groups: Record<string, objectType[]> = {}
+        for (const obj_name in objs) {
             const obj = objs[obj_name]
             if (obj.group in _groups) {
                 _groups[obj.group].push(obj)
@@ -15,14 +19,14 @@ class Frame {
             }
         }
 
-        for (let group_name in _groups) {
+        for (const group_name in _groups) {
             this.groups.push(new Group(this.name, group_name, _groups[group_name]))
         }
     }
 
     toSerialMsg() {
-        let res = []
-        for (let group of this.groups) {
+        let res: Uint8Array[] = []
+        for (const group of this.groups) {
             res = res.concat(group.toSerialMsg())
         }
         return res

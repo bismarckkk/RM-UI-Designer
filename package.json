@@ -15,7 +15,7 @@
     "preview": "vite preview",
     "prestart": "node scripts/downloadWasm.js",
     "start": "npm run dev",
-    "verify:install:no-mirror": "yarn install --no-lockfile --registry https://registry.npmjs.org --network-timeout 1000000",
+    "install:no-mirror": "yarn install --no-lockfile --registry https://registry.npmjs.org --network-timeout 1000000",
     "tauri": "tauri",
     "release": "node scripts/release.mjs",
     "updateJson": "node scripts/updater.mjs"
@@ -38,11 +38,14 @@
     "react-resizable-panels": "^2.1.7"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.4.1",
     "@tauri-apps/cli": "^1.5.9",
+    "@types/fabric": "^5.3.11",
+    "@types/lodash": "^4.17.23",
+    "@types/node": "^25.2.3",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@types/wicg-file-system-access": "^2023.10.5",
+    "@vitejs/plugin-react": "^4.4.1",
     "typescript": "^5.7.2",
     "vite": "^6.2.1",
     "vite-plugin-pwa": "^0.21.2"

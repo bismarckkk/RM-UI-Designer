@@ -1,6 +1,31 @@
 import { fabric } from "fabric";
 import { ColorMap } from "../utils";
 
+type ColorKey = keyof typeof ColorMap;
+type RectOptions = {
+    id: number;
+    name: string;
+    layer: number;
+    groupName: string;
+    ratio: number;
+    color: ColorKey | 'main';
+    team: ColorKey;
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+    lineWidth: number;
+    strokeWidth: number;
+    left: number;
+    top: number;
+    group?: string;
+    stroke?: string;
+    fill?: string | null;
+    lockRotation?: boolean;
+    lockScalingFlip?: boolean;
+    hasRotatingPoint?: boolean;
+};
+
 export const Rect = fabric.util.createClass(fabric.Rect, {
     type: 'UiRect',
     id: 0,
@@ -10,7 +35,7 @@ export const Rect = fabric.util.createClass(fabric.Rect, {
     ratio: 1,
     _color: '',
     team: 'red',
-    initialize: function(options) {
+    initialize: function(options: Partial<RectOptions>) {
         options || (options = {})
         options.color || (options.color = 'main')
         this.id = options.id
@@ -29,9 +54,9 @@ export const Rect = fabric.util.createClass(fabric.Rect, {
         options.top || (options.top = 50 / this.ratio)
         options.strokeWidth || (options.strokeWidth = 1 / this.ratio)
         if (this._color && this._color !== 'main') {
-            options.stroke = ColorMap[this._color]
+            options.stroke = ColorMap[this._color as ColorKey]
         } else {
-            options.stroke = ColorMap[options.team]
+            options.stroke = ColorMap[options.team as ColorKey]
             this._color = 'main'
         }
         options.fill = null
@@ -63,7 +88,7 @@ export const Rect = fabric.util.createClass(fabric.Rect, {
             lineWidth: this.strokeWidth * this.ratio,
         }
     },
-    fromObject: function (options) {
+    fromObject: function (options: RectOptions) {
         this._color = options.color
         this.id = options.id
         this.name = options.name
@@ -75,13 +100,13 @@ export const Rect = fabric.util.createClass(fabric.Rect, {
         this.set('top', options.y / this.ratio)
         this.set('strokeWidth', options.lineWidth / this.ratio)
         if (this._color === 'main') {
-            this.set('stroke', ColorMap[this.team])
+            this.set('stroke', ColorMap[this.team as ColorKey])
         } else {
-            this.set('stroke', ColorMap[this._color])
+            this.set('stroke', ColorMap[this._color as ColorKey])
         }
         this.moveTo(options.layer)
     },
-    setRatio: function (ratio) {
+    setRatio: function (ratio: number) {
         this.set('width', this.width * this.ratio / ratio)
         this.set('height', this.height * this.ratio / ratio)
         this.set('left', this.left * this.ratio / ratio)
@@ -89,10 +114,10 @@ export const Rect = fabric.util.createClass(fabric.Rect, {
         this.set('strokeWidth', this.strokeWidth * this.ratio / ratio)
         this.ratio = ratio
     },
-    setTeam: function (team) {
+    setTeam: function (team: ColorKey) {
         this.team = team
         if (this._color === 'main') {
-            this.set('stroke', ColorMap[this.team])
+            this.set('stroke', ColorMap[this.team as ColorKey])
         }
     }
 })

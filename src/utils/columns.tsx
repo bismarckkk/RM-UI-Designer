@@ -1,4 +1,7 @@
 import Color from "../components/render/color";
+import type { ProDescriptionsItemProps } from "@ant-design/pro-components";
+
+type ColumnItem = ProDescriptionsItemProps<Record<string, unknown>, string>;
 
 const renderRobotId = (idx: number) => {
     const rawIdx = idx
@@ -14,7 +17,7 @@ const renderRobotId = (idx: number) => {
         color = "Red"
     }
     idx %= 100
-    const map = {
+    const map: Record<number, string> = {
         1: "Hero",
         2: "Engineer",
         3: "No3. Infantry",
@@ -25,7 +28,7 @@ const renderRobotId = (idx: number) => {
     return `${color} ${map[idx]} ${type} (${rawIdx})`
 }
 
-export const columns = {
+export const columns: Record<string, ColumnItem> = {
     id: {
         title: 'Id',
         key: 'id',
@@ -217,14 +220,14 @@ export const columns = {
         key: 'cmd_id',
         dataIndex: 'cmd_id',
         valueType: 'text',
-        renderText: (idx) => `0x${idx.toString(16).padStart(4, '0')}`
+        renderText: (idx: number) => `0x${idx.toString(16).padStart(4, '0')}`
     },
     sub_id: {
         title: 'Sub Id',
         key: 'sub_id',
         dataIndex: 'sub_id',
         valueType: 'text',
-        renderText: (idx) => `0x${idx.toString(16).padStart(4, '0')}`
+        renderText: (idx: number) => `0x${idx.toString(16).padStart(4, '0')}`
     },
     sender: {
         title: 'Sender',
@@ -256,10 +259,11 @@ export const columns = {
 
 export function getColumnsFromData(data: Record<string, unknown>) {
     const keys = Object.keys(data)
-    let _columns = []
+    const _columns: ColumnItem[] = []
     for(let i = 0; i < keys.length; i++) {
-        if (columns[keys[i]]) {
-            _columns.push(columns[keys[i]])
+        const column = columns[keys[i]]
+        if (column) {
+            _columns.push(column)
         }
     }
     return _columns

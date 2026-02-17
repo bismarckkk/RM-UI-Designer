@@ -19,8 +19,10 @@ const UpdateModal = () => {
         try {
             setStep(2)
             await installUpdate()
-            if (!isTauri() || !await relaunch()) {
+            if (!isTauri()) {
                 setStep(3)
+            } else {
+                await relaunch()
             }
         } catch (_) {
             setStep(-1)
@@ -66,11 +68,11 @@ const UpdateModal = () => {
             (async () => {
                 try {
                     const { shouldUpdate, manifest } = await checkUpdate()
-                    if (shouldUpdate) {
+                    if (shouldUpdate && manifest) {
                         setStep(1)
-                        setContent(manifest.body.replace(regex_pr, (match, p1, p2) => {
+                        setContent(manifest.body.replace(regex_pr, (_match: string, p1: string, p2: string) => {
                             return `[#${p2}](${p1}${p2})`;
-                        }).replace(regex_cl, (match, p1, p2) => {
+                        }).replace(regex_cl, (_match: string, p1: string, p2: string) => {
                             return `[#${p2}](${p1}${p2})`;
                         }))
                         setVersion(manifest.version)

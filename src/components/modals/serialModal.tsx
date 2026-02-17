@@ -5,13 +5,34 @@ const baudRate = [
     1152000, 1000000, 921600, 576000, 500000, 460800, 230400, 115200, 74800, 57600, 38400, 19200, 9600, 4800
 ]
 
-const SerialModal = forwardRef((props, ref: any) => {
+type Deferred<T> = {
+    resolve: (value: T | PromiseLike<T>) => void;
+    reject: (reason?: unknown) => void;
+};
+
+export type SerialOptions = {
+    baudRate: number;
+    dataBits: number;
+    stopBits: number;
+    parity: string;
+    flowControl: string;
+};
+
+export type SerialModalRef = { getOptions: (defaultOptions: SerialOptions) => Promise<SerialOptions> };
+
+const SerialModal = forwardRef<SerialModalRef>((_props, ref) => {
     const [open, setOpen] = useState(false)
-    const [defaultOptions, setDefaultOptions] = useState<any>({})
-    const promiseRef = useRef<any>(null)
+    const [defaultOptions, setDefaultOptions] = useState<SerialOptions>({
+        baudRate: 115200,
+        dataBits: 8,
+        stopBits: 1,
+        parity: 'none',
+        flowControl: 'none'
+    })
+    const promiseRef = useRef<Deferred<SerialOptions> | null>(null)
 
     useImperativeHandle(ref, () => ({
-        getOptions: (_defaultOptions: any) => {
+        getOptions: (_defaultOptions: SerialOptions) => {
             return new Promise((resolve, reject) => {
                 setOpen(true)
                 setDefaultOptions(_defaultOptions)
@@ -29,8 +50,8 @@ const SerialModal = forwardRef((props, ref: any) => {
             width={400}
             open={open}
             onOpenChange={setOpen}
-            onFinish={async e => {
-                promiseRef.current.resolve(e)
+            onFinish={async (e: SerialOptions) => {
+                promiseRef.current?.resolve(e)
                 promiseRef.current = null
                 return true
             }}

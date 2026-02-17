@@ -3,9 +3,39 @@ import { ColorMap } from "../utils";
 
 const scale = 1.25;
 
-function getTextWidth(text, font) {
+type ColorKey = keyof typeof ColorMap;
+
+type TextOptions = {
+    id: number;
+    name: string;
+    layer: number;
+    groupName: string;
+    ratio: number;
+    color: ColorKey | 'main';
+    team: ColorKey;
+    text: string;
+    fontSize: number;
+    fontFamily: string;
+    left: number;
+    top: number;
+    width: number;
+    fill?: string;
+    flipY?: boolean;
+    group?: string;
+    x?: number;
+    y?: number;
+};
+
+type GetTextWidthFn = ((text: string, font: string) => number) & {
+    canvas?: HTMLCanvasElement;
+};
+
+const getTextWidth: GetTextWidthFn = (text, font) => {
     const canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
     const context = canvas.getContext("2d");
+    if (!context) {
+        return 0;
+    }
     context.font = font;
     const metrics = context.measureText(text);
     return metrics.width * scale;
@@ -21,7 +51,7 @@ export const Text = fabric.util.createClass(fabric.Text, {
     _color: '',
     team: 'red',
     rawFontSize: 0,
-    initialize: function(options) {
+    initialize: function(options: Partial<TextOptions>) {
         options || (options = {});
         options.color || (options.color = 'main');
         this.id = options.id;
@@ -42,9 +72,9 @@ export const Text = fabric.util.createClass(fabric.Text, {
         options.width || (options.width = getTextWidth(options.text, options.fontSize + 'px ' + options.fontFamily) * this.ratio);
         this.rawFontSize = options.fontSize;
         if (this._color && this._color !== 'main') {
-            options.fill = ColorMap[this._color];
+            options.fill = ColorMap[this._color as ColorKey];
         } else {
-            options.fill = ColorMap[options.team];
+            options.fill = ColorMap[options.team as ColorKey];
             this._color = 'main';
         }
         this.callSuper('initialize', options.text, options);
@@ -61,7 +91,7 @@ export const Text = fabric.util.createClass(fabric.Text, {
             mtr: false, // rotate point
         });
         setTimeout(()=>{
-            this.set('width', getTextWidth(options.text, options.fontSize + 'px ' + options.fontFamily) / this.ratio)
+            this.set('width', getTextWidth(options.text ?? 'Text', `${options.fontSize ?? this.fontSize}px ${options.fontFamily ?? this.fontFamily}`) / this.ratio)
         }, 100)
     },
     toObject: function() {
@@ -78,15 +108,15 @@ export const Text = fabric.util.createClass(fabric.Text, {
             color: this._color,
         };
     },
-    fromObject: function(options) {
+    fromObject: function(options: TextOptions) {
         this._color = options.color
         this.id = options.id
         this.name = options.name
         this.layer = options.layer
         this.groupName = options.group
         this.set('fontSize', options.fontSize / this.ratio * scale)
-        this.set('left', options.x / this.ratio)
-        this.set('top', options.y / this.ratio - this.fontSize)
+        this.set('left', (options.x ?? 0) / this.ratio)
+        this.set('top', (options.y ?? 0) / this.ratio - this.fontSize)
         this.text = options.text
         this.set('width', getTextWidth(options.text, options.fontSize + 'px ' + this.fontFamily) / this.ratio)
         this.rawFontSize = options.fontSize
@@ -94,14 +124,14 @@ export const Text = fabric.util.createClass(fabric.Text, {
             this.set('width', getTextWidth(options.text, options.fontSize + 'px ' + this.fontFamily) / this.ratio)
         }, 100)
         if (this._color === 'main') {
-            this.set('fill', ColorMap[this.team])
+            this.set('fill', ColorMap[this.team as ColorKey])
         } else {
-            this.set('fill', ColorMap[this._color])
+            this.set('fill', ColorMap[this._color as ColorKey])
         }
         this.moveTo(options.layer)
         this.set('fontFamily', 'ds-digitalnormal')
     },
-    setRatio: function (ratio) {
+    setRatio: function (ratio: number) {
         this.set('width', this.width * this.ratio / ratio)
         this.set('left', this.left * this.ratio / ratio)
         this.set('fontSize', this.fontSize * this.ratio / ratio)
@@ -111,10 +141,10 @@ export const Text = fabric.util.createClass(fabric.Text, {
     },
     resizeScale: function() {
     },
-    setTeam: function (team) {
+    setTeam: function (team: ColorKey) {
         this.team = team
         if (this._color === 'main') {
-            this.set('fill', ColorMap[this.team])
+            this.set('fill', ColorMap[this.team as ColorKey])
         }
     }
 })

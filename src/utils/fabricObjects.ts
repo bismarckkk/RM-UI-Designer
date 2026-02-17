@@ -20,9 +20,21 @@ const Controller = {
     Float,
 }
 
+type UiElementOptions = {
+    id: number;
+    name: string;
+    layer: number;
+    group: string;
+    ratio: number;
+    team: string;
+    type: string;
+};
 
-export function createUiElement(options) {
-    let obj = {
+type ControllerKey = keyof typeof Controller;
+
+
+export function createUiElement(options: UiElementOptions) {
+    const obj = {
         id: options.id,
         name: options.name,
         layer: options.layer,
@@ -30,13 +42,13 @@ export function createUiElement(options) {
         ratio: options.ratio,
         team: options.team
     }
-    const type = options.type.slice(2)
+    const type = options.type.slice(2) as ControllerKey
     return new Controller[type](obj)
 }
 
 export function getMenuProps() {
-    let info = []
-    for (let key of Object.keys(Controller)) {
+    const info: Array<{ key: string; label: string }> = []
+    for (const key of Object.keys(Controller)) {
         info.push({key: `Insert-${key}`, label: key})
     }
     return info

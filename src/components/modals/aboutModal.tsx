@@ -4,7 +4,9 @@ import Loading from "../../loading";
 import Markdown from "react-markdown";
 import aboutMdUrl from '../../assets/about.md?url'
 
-const AboutModal = forwardRef((props, ref: any) => {
+export type AboutModalRef = { show: () => void };
+
+const AboutModal = forwardRef<AboutModalRef>((_props, ref) => {
     const [open, setOpen] = useState(false)
     const [content, setContent] = useState<string | null>(null)
 

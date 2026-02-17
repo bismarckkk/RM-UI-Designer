@@ -1,10 +1,16 @@
 import { fabric } from "fabric";
 import { Text } from "./text";
 
+type FloatOptions = {
+    float: number;
+    text?: string;
+    [key: string]: unknown;
+};
+
 export const Float = fabric.util.createClass(Text, {
     type: 'UiFloat',
     float: 12.345,
-    initialize: function(options) {
+    initialize: function(options: Partial<FloatOptions>) {
         options || (options = {});
         this.float = options.float || 12.345;
         options.text = this.float.toString();
@@ -16,8 +22,8 @@ export const Float = fabric.util.createClass(Text, {
         delete obj.text
         return obj;
     },
-    fromObject: function(options) {
-        this.float = parseFloat(options.float);
+    fromObject: function(options: FloatOptions) {
+        this.float = Number(options.float);
         options.text = this.float.toString();
         this.callSuper('fromObject', options);
     }

@@ -2,12 +2,16 @@ import React, {forwardRef, useImperativeHandle, useState} from 'react';
 import {Result, List, Space, Drawer} from "antd";
 import {CloseCircleOutlined, WarningOutlined} from "@ant-design/icons";
 
-const LogDrawer = forwardRef((props, ref: any) => {
+type LogEntry = { level: string; message: string; time: Date };
+
+export type LogDrawerRef = { show: (data: LogEntry[]) => void };
+
+const LogDrawer = forwardRef<LogDrawerRef>((_props, ref) => {
     const [show, setShow] = useState(false)
-    const [errorsData, setErrorsData] = useState<any[]>([])
+    const [errorsData, setErrorsData] = useState<LogEntry[]>([])
 
     useImperativeHandle(ref, () => ({
-        show: (data: any[]) => {
+        show: (data: LogEntry[]) => {
             setShow(true)
             setErrorsData(data)
         }
@@ -19,7 +23,7 @@ const LogDrawer = forwardRef((props, ref: any) => {
         let res = <Result
             status="success"
             title="0 error, 0 warning!"
-            style={{marginTop: '50px'}}
+            style={{marginTop: '30px'}}
         />
 
         if (errors.length + warnings.length > 0) {
@@ -52,13 +56,13 @@ const LogDrawer = forwardRef((props, ref: any) => {
                 onClose={() => setShow(false)}
                 open={show}
                 size="large"
-                getContainer={document.getElementById('content-in')}
+                getContainer={() => document.getElementById('content-in') ?? document.body}
                 rootStyle={{inset: '25px 0 0 0'}}
                 style={{borderTop: '3px var(--ant-line-type) var(--ant-color-split)'}}
             >
                 <div style={{
                     width: '100%',
-                    height: 'calc(100% - 25px)',
+                    height: 'calc(100% - 30px)',
                 }}>
                     {res}
                 </div>

@@ -3,6 +3,26 @@ import { getEvent } from './msgView';
 import logger from "./logger";
 import { message } from "../app";
 import { rid } from "../app";
+import type { msg as SerialMsg } from "./msgView";
+
+type SerialPortLike = {
+    open: (options: {
+        baudRate: number;
+        dataBits: number;
+        stopBits: number;
+        flowControl: string;
+        parity: string;
+    }) => Promise<void>;
+    close: () => Promise<void>;
+    readable: ReadableStream<Uint8Array>;
+    writable: WritableStream<Uint8Array>;
+};
+
+type SerialNavigator = Navigator & {
+    serial?: {
+        requestPort: () => Promise<SerialPortLike>;
+    };
+};
 
 class Serial {
     options = {
@@ -13,20 +33,30 @@ class Serial {
         parity: 'none'
     }
 
-    constructor(onEvent, onError) {
+    private onEvent: (event: SerialMsg) => string[] | void
+    private onError: (error: unknown) => void
+    private reader: ReadableStreamDefaultReader<Uint8Array> | null
+    private transformer: TransformStream<Uint8Array, Uint8Array>
+    private port: SerialPortLike | null
+    private readableStreamClosed: Promise<void> | null
+
+    constructor(onEvent: (event: SerialMsg) => string[] | void, onError: (error: unknown) => void) {
         this.onEvent = onEvent;
         this.onError = onError;
         this.reader = null;
         this.transformer = new TransformStream(new SerialTransformer());
+        this.port = null;
+        this.readableStreamClosed = null;
     }
 
     async connect() {
-        if (!('serial' in navigator)) {
+        const serialNavigator = navigator as SerialNavigator;
+        if (!serialNavigator.serial) {
             message.error('Web Serial API not supported.');
             return;
         }
 
-        this.port = await navigator.serial.requestPort();
+        this.port = await serialNavigator.serial.requestPort();
         await this.port.open(this.options);
 
         this.readableStreamClosed = this.port.readable.pipeTo(this.transformer.writable);
@@ -39,6 +69,10 @@ class Serial {
     }
 
     async stop() {
+        if (!this.port || !this.reader || !this.readableStreamClosed) {
+            return;
+        }
+
         const textEncoder = new TextEncoderStream();
         const writer = textEncoder.writable.getWriter();
         const writableStreamClosed = textEncoder.readable.pipeTo(this.port.writable);
@@ -53,11 +87,16 @@ class Serial {
 
         this.reader = null;
         this.transformer = new TransformStream(new SerialTransformer());
+        this.port = null;
+        this.readableStreamClosed = null;
         logger.enabled = false;
     }
 
     async readLoop() {
         try {
+            if (!this.reader) {
+                return;
+            }
             while (true) {
                 const { value, done } = await this.reader.read();
                 if (done) {
@@ -91,6 +130,8 @@ class Serial {
             } catch (_) { }
             this.reader = null;
             this.transformer = new TransformStream(new SerialTransformer());
+            this.port = null;
+            this.readableStreamClosed = null;
             logger.enabled = false;
             logger.clear()
             this.onError(error);

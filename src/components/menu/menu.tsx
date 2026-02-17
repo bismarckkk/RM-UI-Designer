@@ -1,15 +1,21 @@
 import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Flex, Button, Dropdown, Badge } from "antd";
+import type { MenuProps } from 'antd';
 import { FullscreenExitOutlined, FullscreenOutlined, ThunderboltOutlined,
     GithubOutlined, CloseOutlined, MinusOutlined } from "@ant-design/icons";
 import FormModal from "@/components/modals/formModal";
+import type { FormModalRef } from "@/components/modals/formModal";
 import { getMenuProps } from "@/utils/fabricObjects";
 import AboutModal from "@/components/modals/aboutModal";
+import type { AboutModalRef } from "@/components/modals/aboutModal";
 import ModeModal from "@/components/modals/modeModal";
+import type { ModeModalRef } from "@/components/modals/modeModal";
 import MoonSvg from "@/assets/moon.svg"
 import SunSvg from "@/assets/sun.svg"
 import SerialModal from "@/components/modals/serialModal";
+import type { SerialModalRef } from "@/components/modals/serialModal";
 import LogDrawer from "@/components/modals/logDrawer";
+import type { LogDrawerRef } from "@/components/modals/logDrawer";
 import RxDrawer from "@/components/modals/rxDrawer";
 import CheckedItem from "@/components/menu/checkedItem";
 import { message } from "@/utils/app";
@@ -20,9 +26,43 @@ import Generator from "@/components/generator";
 import SerialFrom from "@/utils/serial/webSerialFromDriver";
 import SerialTo from "@/utils/serial/webSerialToDriver";
 import { FileHandler } from "@/utils/autoSaver";
+import type { msg as SerialMsg } from "@/utils/serial/msgView";
+
+type MenuItem = {
+    key?: string;
+    label?: React.ReactNode;
+    icon?: React.ReactNode;
+    type?: 'divider';
+    disabled?: boolean;
+    selectable?: boolean | string;
+    children?: MenuItem[];
+};
+type MenuClickInfo = { key: string; keyPath: string[] };
+
+type GeneratorRef = { gen: (data: unknown, mode: string) => void };
+type RxDrawerRef = { show: (data: { log: Uint8Array[]; rx: number }) => void };
+
+type MenuControllerProps = {
+    save: () => void;
+    onObjectEvent: (type: string, payload: unknown) => string;
+    setEditable: (editable: boolean) => void;
+    getData: () => unknown;
+    upload: (file: File) => void;
+    reset: () => void;
+    onHistoryEvent: (type: string) => void;
+    setFrame: (type: string, frame: string) => void;
+    setDarkMode: (dark: boolean) => void;
+    darkMode: boolean;
+};
+
+export type MenuRefApi = {
+    setFrames: (info: { frames: string[]; selected: string }) => void;
+    setCouldDo: (e: { couldPrevious: boolean; couldNext: boolean }) => void;
+    setRobotId: (id: number) => void;
+};
 
 
-const fileItems = [
+const fileItems: MenuItem[] = [
     {
         key: 'File-new',
         label: "New"
@@ -56,7 +96,7 @@ const fileItems = [
     }
 ]
 
-let editItems = [
+let editItems: MenuItem[] = [
     {
         key: 'Edit-undo',
         label: "Undo"
@@ -71,7 +111,7 @@ let editItems = [
     },
 ]
 
-const simulateItems = [
+const simulateItems: MenuItem[] = [
     {
         key: 'Simulate-from',
         label: 'From Robot',
@@ -119,6 +159,8 @@ const simulateItems = [
 ]
 
 class MenuController {
+    props: MenuControllerProps
+    notify: () => void
     state = {
         fullscreen: false,
         frames: ['default'],
@@ -130,24 +172,24 @@ class MenuController {
         serialToStart: false,
         autoSave: true,
     }
-    formRef = createRef()
-    aboutRef = createRef()
-    generatorRef = createRef()
-    logDrawerRef = createRef()
-    rxDrawerRef = createRef()
-    serialModalRef = createRef()
-    modeModalRef = createRef()
+    formRef = createRef<FormModalRef>()
+    aboutRef = createRef<AboutModalRef>()
+    generatorRef = createRef<GeneratorRef>()
+    logDrawerRef = createRef<LogDrawerRef>()
+    rxDrawerRef = createRef<RxDrawerRef>()
+    serialModalRef = createRef<SerialModalRef>()
+    modeModalRef = createRef<ModeModalRef>()
     tauri = isTauri()
-    serial = new SerialFrom(e => this.onSerialEvent(e), e => this.onSerialError(e))
+    serial = new SerialFrom((e: SerialMsg) => this.onSerialEvent(e), (e: unknown) => this.onSerialError(e))
     serialTo = new SerialTo()
-    fileHandler = null
+    fileHandler: FileHandler | null = null
 
-    constructor(props, notify) {
+    constructor(props: MenuControllerProps, notify: () => void) {
         this.props = props
         this.notify = notify
     }
 
-    setState(update, cb) {
+    setState(update: Partial<typeof this.state> | ((prev: typeof this.state) => Partial<typeof this.state>), cb?: () => void) {
         const next = typeof update === 'function' ? update(this.state) : update
         this.state = {...this.state, ...next}
         this.notify()
@@ -155,9 +197,9 @@ class MenuController {
     }
 
 
-    onSerialEvent(e) {
-        const res = []
-        for (let event of e.events) {
+    onSerialEvent(e: SerialMsg) {
+        const res: string[] = []
+        for (const event of e.events) {
             const rr = this.props.onObjectEvent(event.type, event.obj)
             if (rr[0] === 'W' || rr[0] === 'E') {
                 res.push(rr)
@@ -166,10 +208,10 @@ class MenuController {
         return res
     }
 
-    onSerialError(e) {
+    onSerialError(e: unknown) {
         this.props.setEditable(true)
         this.setState({serialStart: false})
-        message.error(e.text)
+        message.error(e instanceof Error ? e.message : String(e))
     }
 
     async componentDidMount() {
@@ -221,7 +263,7 @@ class MenuController {
         });
     }
 
-    setCouldDo(e) {
+    setCouldDo(e: { couldPrevious: boolean; couldNext: boolean }) {
         this.setState({couldUndo: e.couldPrevious, couldRedo: e.couldNext})
         if (this.fileHandler && this.state.autoSave) {
             this.fileHandler.update()
@@ -267,11 +309,14 @@ class MenuController {
         });
     }
 
-    setFrames(info) {
+    setFrames(info: { frames: string[]; selected: string }) {
         this.setState({frames: info.frames, selectedFrame: info.selected})
     }
 
-    async onMenuClick(key) {
+    setRobotId(_id: number) {
+    }
+
+    async onMenuClick(key: MenuClickInfo) {
         const first = key.keyPath[key.keyPath.length - 1]
         if (first.slice(0, 6) === 'Insert') {
             const type = key.key.slice(7)
@@ -338,7 +383,7 @@ class MenuController {
                 }
             } else {
                 uploadFile('.rmui').then(file => {
-                    this.props.upload(file)
+                    this.props.upload(file as File)
                 }).catch(() => {})
             }
         } else if (first === "File-generate1") {
@@ -346,15 +391,18 @@ class MenuController {
         } else if (first === "File-generate2") {
             this.generatorRef.current?.gen(this.props.getData(), 'dynamic')
         } else if (first === 'FrameOp-add') {
-            const name = await this.formRef.current.open('New Frame', this.state.frames)
+            const name = await this.formRef.current?.open('New Frame', this.state.frames)
+            if (!name) return
             this.props.setFrame('add', name)
         } else if (first === 'FrameOp-remove') {
             this.props.setFrame('remove', this.state.selectedFrame)
         } else if (first === 'FrameOp-copy') {
-            const name = await this.formRef.current.open('Copy Frame To', this.state.frames)
+            const name = await this.formRef.current?.open('Copy Frame To', this.state.frames)
+            if (!name) return
             this.props.setFrame('copy', name)
         } else if (first === 'FrameOp-rename') {
-            const name = await this.formRef.current.open('Rename Frame To', this.state.frames)
+            const name = await this.formRef.current?.open('Rename Frame To', this.state.frames)
+            if (!name) return
             this.props.setFrame('rename', name)
         } else if (first === 'FrameOp-change') {
             const name = key.key.slice(7)
@@ -365,7 +413,7 @@ class MenuController {
                 this.props.setEditable(false)
                 this.setState({serialStart: true})
             } catch (e) {
-                message.error(e.text)
+                message.error(e instanceof Error ? e.message : String(e))
             }
         } else if (key.key === 'Simulate-from-stop') {
             try {
@@ -373,7 +421,7 @@ class MenuController {
                 this.props.setEditable(true)
                 this.setState({serialStart: false})
             } catch (e) {
-                message.error(e.text)
+                message.error(e instanceof Error ? e.message : String(e))
             }
         } else if (key.key === 'Simulate-from-log') {
             this.logDrawerRef.current?.show(this.serial.getLog())
@@ -385,20 +433,20 @@ class MenuController {
                 message.warning('This Module is beta now, maybe not work!')
                 this.setState({serialToStart: true})
             } catch (e) {
-                message.error(e.text)
+                message.error(e instanceof Error ? e.message : String(e))
             }
         } else if (key.key === 'Simulate-to-stop') {
             try {
                 await this.serialTo.stop()
                 this.setState({serialToStart: false})
             } catch (e) {
-                message.error(e.text)
+                message.error(e instanceof Error ? e.message : String(e))
             }
         } else if (key.key === 'Simulate-to-update') {
             try {
                 await this.serialTo.write({data: this.props.getData(), selected: this.state.selectedFrame})
             } catch (e) {
-                message.error(e.text)
+                message.error(e instanceof Error ? e.message : String(e))
             }
         }  else if (first === 'Simulate-settings') {
             const options = await this.serialModalRef.current?.getOptions(this.serial.options)
@@ -408,8 +456,8 @@ class MenuController {
         }
     }
 
-    getFramesMenu() {
-        const menu = [
+    getFramesMenu(): MenuItem[] {
+        const menu: MenuItem[] = [
             {
                 key: 'FrameOp-add',
                 label: "New Frame"
@@ -434,7 +482,7 @@ class MenuController {
             },
         ]
         for (const frame of this.state.frames) {
-            menu[4].children.push({
+            menu[4].children?.push({
                 key: `Frames-${frame}`,
                 label: frame
             })
@@ -468,11 +516,11 @@ class MenuController {
         simulateItems[0]['disabled'] = this.state.serialToStart
         simulateItems[1]['disabled'] = this.state.serialStart
         simulateItems[2]['disabled'] = this.state.serialStart || this.state.serialToStart
-        simulateItems[0].children[0]['disabled'] = this.state.serialStart
-        simulateItems[0].children[1]['disabled'] = !this.state.serialStart
-        simulateItems[1].children[0]['disabled'] = this.state.serialToStart
-        simulateItems[1].children[1]['disabled'] = !this.state.serialToStart
-        simulateItems[1].children[2]['disabled'] = !this.state.serialToStart
+        if (simulateItems[0].children?.[0]) simulateItems[0].children[0].disabled = this.state.serialStart
+        if (simulateItems[0].children?.[1]) simulateItems[0].children[1].disabled = !this.state.serialStart
+        if (simulateItems[1].children?.[0]) simulateItems[1].children[0].disabled = this.state.serialToStart
+        if (simulateItems[1].children?.[1]) simulateItems[1].children[1].disabled = !this.state.serialToStart
+        if (simulateItems[1].children?.[2]) simulateItems[1].children[2].disabled = !this.state.serialToStart
         fileItems[3]['disabled'] = !this.fileHandler
         fileItems[4]['disabled'] = !this.fileHandler
         fileItems[4]['label'] = <CheckedItem checked={this.state.autoSave}>
@@ -497,23 +545,23 @@ class MenuController {
                     >
                         RoboMaster UI Designer
                     </div>
-                    <Dropdown menu={{ items: [...fileItems], onClick: e=>this.onMenuClick(e) }}>
+                    <Dropdown menu={{ items: [...fileItems] as MenuProps['items'], onClick: e=>this.onMenuClick(e as MenuClickInfo) }}>
                         <Button type="text" size="small">File</Button>
                     </Dropdown>
-                    <Dropdown menu={{ items: [...editItems], onClick: e=>this.onMenuClick(e) }}>
+                    <Dropdown menu={{ items: [...editItems] as MenuProps['items'], onClick: e=>this.onMenuClick(e as MenuClickInfo) }}>
                         <Button type="text" size="small">Edit</Button>
                     </Dropdown>
-                    <Dropdown menu={{ items: getMenuProps(), onClick: e=>this.onMenuClick(e) }}>
+                    <Dropdown menu={{ items: getMenuProps() as MenuProps['items'], onClick: e=>this.onMenuClick(e as MenuClickInfo) }}>
                         <Button type="text" size="small">Insert</Button>
                     </Dropdown>
                     <Dropdown menu={{
-                        items: this.getFramesMenu(),
-                        onClick: e=>this.onMenuClick(e),
+                        items: this.getFramesMenu() as MenuProps['items'],
+                        onClick: e=>this.onMenuClick(e as MenuClickInfo),
                         selectedKeys: [`Frames-${this.state.selectedFrame}`]
                     }}>
                         <Button type="text" size="small">Frames</Button>
                     </Dropdown>
-                    <Dropdown menu={{ items: [...simulateItems], onClick: e=>this.onMenuClick(e) }}>
+                    <Dropdown menu={{ items: [...simulateItems] as MenuProps['items'], onClick: e=>this.onMenuClick(e as MenuClickInfo) }}>
                         <Button type="text" size="small">
                             Simulate&nbsp;
                             <Badge color={this.state.serialStart || this.state.serialToStart?"green":"red"} />
@@ -600,21 +648,21 @@ class MenuController {
     }
 }
 
-const Menu = forwardRef((props: any, ref: any) => {
+const Menu = forwardRef<MenuRefApi, MenuControllerProps>((props, ref) => {
     const [, setTick] = useState(0)
-    const controllerRef = useRef<any>(null)
+    const controllerRef = useRef<MenuController | null>(null)
     if (!controllerRef.current) {
         controllerRef.current = new MenuController(props, () => setTick((x) => x + 1))
     }
     controllerRef.current.props = props
 
-    useImperativeHandle(ref, () => controllerRef.current)
+    useImperativeHandle(ref, () => controllerRef.current as MenuRefApi)
 
     useEffect(() => {
-        controllerRef.current.componentDidMount?.()
+        controllerRef.current?.componentDidMount?.()
     }, [])
 
-    return controllerRef.current.render()
+    return controllerRef.current?.render() ?? null
 })
 
 export default Menu;

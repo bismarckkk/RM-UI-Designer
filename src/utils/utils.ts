@@ -19,15 +19,17 @@ export const ColorMap = {
     'red': 'rgb(255, 69, 70)',
 }
 
-function getFilter(name) {
-    let suffix = name.split('.').pop()
+type ZipFile = { fileName: string; content: string };
+
+function getFilter(name: string) {
+    const suffix = name.split('.').pop() ?? 'txt'
     return {
         name: suffix + ' file',
         extensions: [suffix]
     }
 }
 
-export function saveText(text, fileName) {
+export function saveText(text: string, fileName: string) {
     if (isTauri()) {
         (async ()=> {
             const path = await dialog.save({
@@ -49,7 +51,7 @@ export function saveText(text, fileName) {
     }
 }
 
-export function saveBlob(blob, fileName) {
+export function saveBlob(blob: Blob, fileName: string) {
     if (isTauri()) {
         (async ()=> {
             const path = await dialog.save({
@@ -70,13 +72,13 @@ export function saveBlob(blob, fileName) {
     }
 }
 
-export function saveObj(data, fileName, selected) {
+export function saveObj(data: unknown, fileName: string, selected: string) {
     let _data = {version: 2, data: data, selected}
     const str = JSON.stringify(_data)
     saveText(str, fileName)
 }
 
-export function createObjUrl(file) {
+export function createObjUrl(file: Blob) {
     let url = null;
     if (window.createObjectURL !== undefined) {
         url = window.createObjectURL(file);
@@ -96,7 +98,7 @@ export function isNightly() {
     return process.env.VERSION.slice(0, 7) === 'nightly'
 }
 
-async function createZip(files) {
+async function createZip(files: ZipFile[]) {
     let zip = new JSZip();
 
     files.forEach(file => {
@@ -106,8 +108,8 @@ async function createZip(files) {
     return await zip.generateAsync({type: "blob"});
 }
 
-export async function code2zip(code) {
-    let files = []
+export async function code2zip(code: Record<string, Record<string, string>>) {
+    const files: ZipFile[] = []
     for (let key in code) {
         for (let suffix in code[key]) {
             files.push({fileName: `${key}.${suffix}`, content: code[key][suffix]})
@@ -116,8 +118,8 @@ export async function code2zip(code) {
     return await createZip(files)
 }
 
-export function uploadFile(accept) {
-    return new Promise((resolve, reject) => {
+export function uploadFile(accept: string): Promise<File> {
+    return new Promise<File>((resolve, reject) => {
         if (isTauri()) {
             let _accept = [accept.slice(1)]
             let _acceptType = `${_accept} file`
@@ -131,10 +133,11 @@ export function uploadFile(accept) {
                     directory: false,
                     filters: [{ name: _acceptType, extensions: _accept }]
                 })
-                if (path !== null && path.length > 0) {
+                if (typeof path === 'string' && path.length > 0) {
                     const _path = path.replace(/\\/g, '/')
-                    const fileName = _path.split('/').pop()
-                    const blob = new Blob([await fs.readBinaryFile(path)]);
+                    const fileName = _path.split('/').pop() ?? 'file'
+                    const binary = await fs.readBinaryFile(path)
+                    const blob = new Blob([binary.buffer as ArrayBuffer]);
                     const file = new File([blob], fileName);
                     resolve(file)
                 } else {
@@ -145,7 +148,7 @@ export function uploadFile(accept) {
             input.accept = accept;
             input.value = '';
             input.onchange = () => {
-                if (input.files.length > 0) {
+                if (input.files && input.files.length > 0) {
                     const file = input.files[0];
                     resolve(file);
                 } else {
@@ -157,8 +160,11 @@ export function uploadFile(accept) {
     })
 }
 
-export function isEditable(element) {
-    if (document.getElementById('content-in').contains(element)) {
+export function isEditable(element: EventTarget | null) {
+    if (!(element instanceof HTMLElement)) {
+        return false;
+    }
+    if (document.getElementById('content-in')?.contains(element)) {
         return true;
     }
     if (element.getAttribute('contentEditable') === "true") {

@@ -1,10 +1,17 @@
 import { fabric } from "fabric";
 import { Ellipse } from "./ellipse";
 
+type RoundOptions = {
+    r: number;
+    rx?: number;
+    ry?: number;
+    [key: string]: unknown;
+};
+
 export const Round = fabric.util.createClass(Ellipse, {
     type: 'UiRound',
     r: 50,
-    initialize: function(options) {
+    initialize: function(options: Partial<RoundOptions>) {
         options || (options = {})
         options.r || (options.r = 50 / this.ratio)
         options.rx = options.r
@@ -29,7 +36,7 @@ export const Round = fabric.util.createClass(Ellipse, {
             lineWidth: this.strokeWidth * this.ratio,
         }
     },
-    fromObject: function (options) {
+    fromObject: function (options: RoundOptions) {
         options.rx = options.r
         options.ry = options.r
         this.callSuper('fromObject', options)

@@ -1,4 +1,7 @@
-function normalizeTempFrameName(data) {
+type UiFrames = Record<string, Record<string, unknown>>;
+export type UiFile = { version?: number; selected?: string; data: UiFrames } & Record<string, unknown>;
+
+function normalizeTempFrameName(data: UiFile) {
     if (!data || !data.data || typeof data.data !== 'object') {
         return data
     }
@@ -9,7 +12,7 @@ function normalizeTempFrameName(data) {
         return data
     }
 
-    const isEmptyFrame = (frame) => !frame || Object.keys(frame).length === 0
+    const isEmptyFrame = (frame: Record<string, unknown> | undefined) => !frame || Object.keys(frame).length === 0
     const normalized = {
         ...data,
         data: {...frameData}
@@ -34,7 +37,12 @@ function normalizeTempFrameName(data) {
     return normalized
 }
 
-export async function readUiFile(data, onEvent, setFrame, render) {
+export async function readUiFile(
+    data: UiFile,
+    onEvent: (type: string, payload: unknown) => void,
+    setFrame: (frame: string) => Promise<void> | void,
+    render: () => void,
+) {
     if (!data) {
         return
     }
@@ -55,7 +63,7 @@ export async function readUiFile(data, onEvent, setFrame, render) {
                 onEvent('_update', data.data[frame][key])
             }
         }
-        await setFrame(data.selected)
+        await setFrame(data.selected ?? 'default')
     }
     render()
 }

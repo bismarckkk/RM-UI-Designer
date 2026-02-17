@@ -1,7 +1,7 @@
 import React from 'react';
 import AppInit from '@/utils/app'
 
-function AppHelper(_) {
+function AppHelper() {
     AppInit()
     return (
         <div />
