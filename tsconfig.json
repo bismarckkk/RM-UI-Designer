@@ -1,9 +1,21 @@
 {
-  "extends": "./src/.umi/tsconfig.json",
-  "path": {
-    "@tauri-apps/api": ["./node_modules/@tauri-apps/api"],
-    "@uiw/react-codemirror": ["./node_modules/@uiw/react-codemirror"],
-    "@uiw/codemirror-theme-xcode": ["./node_modules/@uiw/codemirror-theme-xcode"],
-    "react-resizable-panels": ["./node_modules/react-resizable-panels"]
-  }
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "types": ["vite/client", "node"]
+  },
+  "include": ["src", "typings.d.ts", "vite.config.ts"]
 }
