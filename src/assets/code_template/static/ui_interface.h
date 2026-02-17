@@ -12,7 +12,9 @@ extern int ui_self_id;
 
 void print_message(const uint8_t* message, int length);
 
+// User Code Begin
 #define SEND_MESSAGE(message, length) print_message(message, length)
+// User Code End
 
 void ui_proc_1_frame(ui_1_frame_t *msg);
 void ui_proc_2_frame(ui_2_frame_t *msg);

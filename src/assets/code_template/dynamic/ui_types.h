@@ -6,6 +6,8 @@
 #ifndef UI_TYPES_H
 #define UI_TYPES_H
 
+// User Code Begin
+
 // #define MANUAL_DIRTY
 
 #if defined(__GNUC__) || defined(__CC_ARM)
@@ -15,13 +17,15 @@
 #error "MESSAGE_PACKED not defined for this compiler"
 #endif
 
+// User Code End
+
 #define PRIMITIVE_CAT(x, y) x ## y
 #define CAT(x, y) PRIMITIVE_CAT(x, y)
 
 #define DEFINE_MESSAGE(name, p_a, p_b, p_c, p_d, p_e)   \
 typedef struct {                                        \
 uint8_t figure_name[3];                                 \
-uint32_t operate_type:3;                               \
+uint32_t operate_type:3;                                \
 uint32_t figure_type:3;                                 \
 uint32_t layer:4;                                       \
 uint32_t color:4;                                       \
