@@ -100,6 +100,13 @@ const StartupReleaseModal = () => {
             closable={countdown <= 0}
             maskClosable={countdown <= 0}
             zIndex={2100}
+            style={{ maxHeight: 600 }}
+            styles={{
+                body: {
+                    maxHeight: 480,
+                    overflowY: 'auto'
+                }
+            }}
             footer={
                 <Space>
                     <Button type="primary" onClick={handleClose} disabled={countdown > 0}>
