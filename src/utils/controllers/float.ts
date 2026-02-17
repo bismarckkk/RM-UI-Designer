@@ -12,7 +12,8 @@ export const Float = fabric.util.createClass(Text, {
     float: 12.345,
     initialize: function(options: Partial<FloatOptions>) {
         options || (options = {});
-        this.float = options.float || 12.345;
+        const parsed = globalThis.Number(options.float);
+        this.float = globalThis.Number.isFinite(parsed) ? parsed : 12.345;
         options.text = this.float.toString();
         this.callSuper('initialize', options);
     },
@@ -23,7 +24,8 @@ export const Float = fabric.util.createClass(Text, {
         return obj;
     },
     fromObject: function(options: FloatOptions) {
-        this.float = Number(options.float);
+        const parsed = globalThis.Number(options.float);
+        this.float = globalThis.Number.isFinite(parsed) ? parsed : 12.345;
         options.text = this.float.toString();
         this.callSuper('fromObject', options);
     }
